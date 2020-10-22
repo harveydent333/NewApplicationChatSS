@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewAppChatSS", "NewAppChatSS\NewAppChatSS.csproj", "{D74DE752-ABDB-4F87-A8DE-16B7BCFE36A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewAppChatSS", "NewAppChatSS\NewAppChatSS.csproj", "{D74DE752-ABDB-4F87-A8DE-16B7BCFE36A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastucture", "Infrastucture\Infrastucture.csproj", "{1D5D1DF9-8484-4B8A-9AA6-AD0C9DCB825B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Data", "Data\Data.csproj", "{DF11A8A1-F666-4C4C-B961-A72C8955939A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{D74DE752-ABDB-4F87-A8DE-16B7BCFE36A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D74DE752-ABDB-4F87-A8DE-16B7BCFE36A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D74DE752-ABDB-4F87-A8DE-16B7BCFE36A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D5D1DF9-8484-4B8A-9AA6-AD0C9DCB825B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D5D1DF9-8484-4B8A-9AA6-AD0C9DCB825B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D5D1DF9-8484-4B8A-9AA6-AD0C9DCB825B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D5D1DF9-8484-4B8A-9AA6-AD0C9DCB825B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF11A8A1-F666-4C4C-B961-A72C8955939A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF11A8A1-F666-4C4C-B961-A72C8955939A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF11A8A1-F666-4C4C-B961-A72C8955939A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF11A8A1-F666-4C4C-B961-A72C8955939A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
