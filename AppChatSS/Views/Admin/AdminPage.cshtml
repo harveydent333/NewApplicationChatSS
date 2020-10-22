@@ -1,0 +1,56 @@
+﻿@model IQueryable<User>
+@{
+    Layout = "_Layout";
+}
+
+<br><br><br>
+<a class="btn btn-info" asp-action="RoomStatistics" asp-controller="Admin">Посмотреть статистику комнат</a>
+<a class="btn btn-info" asp-action="DictionaryBadWords" asp-controller="Word">Cловарь плохих слов</a>
+<a class="btn btn-info" asp-action="SwearingUsers" asp-controller="Admin">Ругающиеся пользователи</a>
+
+<table class="table table-sm" style="position: relative; top:+70px; width: 90%">
+    <thead>
+        <tr>
+            <th scope="col">Логин</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col">Роль</th>
+            <th scope="col"></th>
+            <th scope="col">Статус блокировки</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (User user in Model)
+            {
+                <tr>
+                    <td>@user.Login</td>
+                    <td>@user.Email</td>
+                    <td>@user.Role.RoleName</td>
+                    @if (user.Role.RoleName == "RegularUser")
+                    {
+                        <td>@Html.ActionLink("Назначить модератором", "SetModerationRole", "Admin", new { id = user.Id }, new { @class = "btn btn-primary" })</td>
+                    }
+                    else if (user.Role.RoleName == "Moderator")
+                    {
+                        <td>@Html.ActionLink("Лишить полномочий модератора", "SetRegularUserRole", "Admin", new { id = user.Id }, new { @class = "btn btn-primary" })</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    @if ((user.Loked == false) && (user.Role.RoleName != "Administrator"))
+                    {
+                        <td>Не заблокирован</td>
+                        <td>@Html.ActionLink("Заблокировать", "BlockUser", "Admin", new { id = user.Id }, new { @class = "btn btn-danger" })</td>
+                    }
+                    else if (user.Role.RoleName != "Administrator")
+                    {
+                        <td>Заблокирован</td>
+                        <td>@Html.ActionLink("Разблокировать", "UnblockUser", "Admin", new { id = user.Id }, new { @class = "btn btn-success" })</td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>

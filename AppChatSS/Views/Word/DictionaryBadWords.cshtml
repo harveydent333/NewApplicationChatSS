@@ -1,0 +1,50 @@
+﻿@model AppChatSS.Models.Dictionary_Bad_Words.DictionaryBadWords
+@{
+    Layout = "_Layout";
+}
+
+<br>
+<br>
+<div style="color: white" asp-validation-summary="All"></div>
+@using (Html.BeginForm("AddBadWord", "Word", FormMethod.Post, htmlAttributes: new { @class = "form", @id = "login-form" }))
+{
+    <h3>Добавить слово в словарь</h3>
+    <div class="form-group">
+        <label asp-for="Word" class="text-info">Слово:</label><br>
+        <input type="text" asp-for="Word" class="form-control">
+    </div>
+    <div class="form-group">
+        <input type="submit" name="submit" class="btn btn-info btn-md" value="Добавить слово">
+    </div>
+}
+
+<h3>Словарь плохих слов</h3>
+<table class="table table-sm" style="position: relative; top:+70px; width: 90%">
+    <thead>
+        <tr>
+            <th scope="col">Слово</th>
+            <th scope="col">Редактировать</th>
+            <th scope="col">Удалить</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (DictionaryBadWords badWord in ViewBag.badWords)
+            {
+                <tr>
+                    @using (Html.BeginForm("EditBadWord", "Word", FormMethod.Post))
+                    {
+                        <input type="hidden" asp-for="Id" value="@badWord.Id">
+                        <td><input type="text" asp-for="Word" class="form-control" value="@badWord.Word"></td>
+                        <td><button type="submit" class="btn btn-warning">Редактировать</button></td>
+                    }
+                    @using (Html.BeginForm("DeleteBadWord", "Word", FormMethod.Post))
+                    {
+                        <input type="hidden" asp-for="Id" value="@badWord.Id">
+                        <td><button type="submit" class="btn btn-danger">Удалить</button></td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>
