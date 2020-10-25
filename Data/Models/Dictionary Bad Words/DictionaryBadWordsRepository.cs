@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace AppChatSS.Models.Dictionary_Bad_Words
+namespace Data.Models.Dictionary_Bad_Words
 {
     public class DictionaryBadWordsRepository : IDictionaryBadWordsRepository
     {

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace AppChatSS.Models.Roles
+namespace Data.Models.Roles
 {
     public interface IRoleRepository
     {

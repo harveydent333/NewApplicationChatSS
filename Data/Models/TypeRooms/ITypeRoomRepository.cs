@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
-namespace AppChatSS.Models.TypeRooms
+namespace Data.Models.TypeRooms
 {
     public interface ITypeRoomRepository
     {

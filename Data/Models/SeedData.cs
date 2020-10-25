@@ -1,19 +1,21 @@
-﻿//using AppChatSS.Infrastucture;
+﻿//using Infrastucture;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.DependencyInjection;
-using AppChatSS.Models.Roles;
-using AppChatSS.Models.Users;
+using Data.Models.Roles;
+using Data.Models.Users;
 using System.Linq;
-using AppChatSS.Models.Rooms;
-using AppChatSS.Models.TypeRooms;
-using AppChatSS.Models.Members;
+using Data.Models.Rooms;
+using Data.Models.TypeRooms;
+using Data.Models.Members;
+using Data.Models;
 
-namespace AppChatSS.Models
+namespace Data.Models
 {
-    public static class SeedData
+    public static class SeedData 
     {
+        
         /// <summary>
         /// Метод загружает первые данные в базу данных
         /// </summary>
@@ -51,8 +53,8 @@ namespace AppChatSS.Models
                     {
                         Login = "admin",
                         Email = "admin@mail.ru",
-      //                  Password = HashPassword.GetHashPassword("admin123456"),
-      //                  PasswordConfirm = HashPassword.GetHashPassword("admin123456"),
+                  //      Password = HashPassword.GetHashPassword("admin123456"),
+                  //      PasswordConfirm = HashPassword.GetHashPassword("admin123456"),
                         RoleId = 3
                     }
                 );

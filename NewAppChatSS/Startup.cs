@@ -8,10 +8,22 @@ using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
-using NewAppChatSS.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+//using Data.Models;
+//using Data.Models.Roles;
+//using Data.Models.Users;
+//using Data.Models.Messages;
+//using Data.Models.Rooms;
+//using Data.Models.Members;
+//using Data.Models.MutedUsers;
+//using Data.Models.KickedOuts;
+//using Data.Models.Dictionary_Bad_Words;
+using Microsoft.AspNetCore.SignalR;
+using NewAppChatSS.DAL.Entities;
+//using Data.Models.SwearingUsers;
+//using Infrastructure.Hubs;
 
 namespace NewAppChatSS
 {
@@ -28,12 +40,36 @@ namespace NewAppChatSS
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //   services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+            //   services.AddTransient<IUserRepository, UserRepository>();
+            //services.AddTransient<IRoleRepository, RoleRepository>();
+            //services.AddTransient<IRoomRepository, RoomRepository>();
+            //services.AddTransient<IMessageRepository, MessageRepository>();
+            //services.AddTransient<IMemberRepository, MemberRepository>();
+            //services.AddTransient<IMutedUserRepository, MutedUserRepository>();
+            //services.AddTransient<IKickedOutsRepository, KickedOutsRepository>();
+            //services.AddTransient<IDictionaryBadWordsRepository, DictionaryBadWordsRepository>();
+            //services.AddTransient<ISwearingUserRepository, SwearingUserRepository>();
+            //   services.AddTransient<ChatHub>();
+            //   services.AddTransient<UserValidator>();
+            //   services.AddTransient<UserCommandHandlerHub>();
+            //   services.AddTransient<RoomCommandHandlerHub>();
+
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //    options.UseSqlServer(
+            //        Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
             services.AddControllersWithViews();
             services.AddRazorPages();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +100,7 @@ namespace NewAppChatSS
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+         //       endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }

@@ -1,15 +1,15 @@
-﻿//using AppChatSS.Infrastucture;
-//using AppChatSS.ViewModels;
-using AppChatSS.ViewModels;
+﻿//using Infrastucture;
+using Data.ViewModels;
+using Data.Models;
 using System;
 using System.Linq;
 
-namespace AppChatSS.Models.Users
+namespace Data.Models.Users
 {
     public class UserRepository : IUserRepository
     {
         private ApplicationDbContext userContext;
-
+        
         public IQueryable<User> Users => userContext.Users;
 
         public UserRepository(ApplicationDbContext context)

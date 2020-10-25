@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AppChatSS.Models.Messages
+namespace Data.Models.Messages
 {
     public class MessageRepository : IMessageRepository
     {

@@ -1,10 +1,10 @@
-﻿using AppChatSS.Models.Users;
+﻿using Data.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AppChatSS.Models.SwearingUsers
+namespace Data.Models.SwearingUsers
 {
     /// <summary>
     /// Ругающийся пользователь

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AppChatSS.Models.KickedOuts
+namespace Data.Models.KickedOuts
 {
     public class KickedOutsRepository : IKickedOutsRepository
     {

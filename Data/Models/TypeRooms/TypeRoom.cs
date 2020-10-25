@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AppChatSS.Models.Rooms;
+using Data.Models.Rooms;
 
-namespace AppChatSS.Models.TypeRooms
+namespace Data.Models.TypeRooms
 {
     /// <summary>
     /// Тип комнаты

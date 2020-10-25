@@ -1,11 +1,11 @@
-﻿using AppChatSS.Models.Rooms;
-using AppChatSS.Models.Users;
+﻿using Data.Models.Rooms;
+using Data.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AppChatSS.Models.KickedOuts
+namespace Data.Models.KickedOuts
 {
     /// <summary>
     /// Модель изгнанных пользователей из комнат

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace AppChatSS.Models.Roles
+namespace Data.Models.Roles
 {
     public class RoleRepository : IRoleRepository
     {

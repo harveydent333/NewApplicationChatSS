@@ -1,14 +1,11 @@
-﻿using AppChatSS.Models.Messages;
-using AppChatSS.Models.TypeRooms;
-using AppChatSS.Models.Users;
+﻿using Data.Models.Messages;
+using Data.Models.TypeRooms;
+using Data.Models.Users;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace AppChatSS.Models.Rooms
+namespace Data.Models.Rooms
 {
     /// <summary>
     /// Комната чата

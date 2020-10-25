@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using AppChatSS.Models.Roles;
+using Data.Models.Roles;
 using System.ComponentModel.DataAnnotations;
 
-namespace AppChatSS.Models.Users
+namespace Data.Models.Users
 {
     /// <summary>
     /// Пользователь

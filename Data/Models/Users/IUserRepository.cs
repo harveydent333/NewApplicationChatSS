@@ -1,10 +1,8 @@
-﻿//using AppChatSS.ViewModels;
+﻿using Data.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace AppChatSS.Models.Users
+namespace Data.Models.Users
 {
     public interface IUserRepository
     {
@@ -14,7 +12,7 @@ namespace AppChatSS.Models.Users
 
         User FindUserByLogin(String userLogin);
 
-  //      void AddUser(RegisterModel registerUser);
+        void AddUser(RegisterModel registerUser);
 
         void EditUser(User user);
 

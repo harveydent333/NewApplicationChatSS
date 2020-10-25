@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace AppChatSS.Models.MutedUsers
+namespace Data.Models.MutedUsers
 {
     public interface IMutedUserRepository
     {

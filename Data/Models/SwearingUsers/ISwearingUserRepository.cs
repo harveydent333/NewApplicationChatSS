@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace AppChatSS.Models.SwearingUsers
+namespace Data.Models.SwearingUsers
 {
     public interface ISwearingUserRepository
     {

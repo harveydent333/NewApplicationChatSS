@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace AppChatSS.ViewModels
+namespace Data.ViewModels
 {
     /// <summary>
     /// Данны авторизации пользователя

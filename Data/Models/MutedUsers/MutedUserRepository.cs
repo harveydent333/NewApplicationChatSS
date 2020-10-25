@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AppChatSS.Models.MutedUsers
+namespace Data.Models.MutedUsers
 {
     public class MutedUserRepository : IMutedUserRepository
     {

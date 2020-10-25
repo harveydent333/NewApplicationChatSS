@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace AppChatSS.Models.SwearingUsers
+namespace Data.Models.SwearingUsers
 {
     public class SwearingUserRepository : ISwearingUserRepository
     {
