@@ -8,12 +8,12 @@ namespace NewApplicationChatSS.ViewModels
     /// </summary>
     public class LoginViewModel
     {
-        /// <summary>
-        /// Логин пользователя
-        /// </summary>
-        [Required(ErrorMessage = "Не указан Логин")]
-        [Display(Name = "Логин")]
-        public String Login { get; set; }
+        [Required]
+        [Display(Name = "Email")]
+        public String Email { get; set; }
+
+        [Display(Name = "Запомнить?")]
+        public Boolean RememberMe { get; set; }
 
         /// <summary>
         /// Пароль пользователя

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
@@ -48,31 +49,18 @@ namespace NewApplicationChatSS.Controllers
             {
                 try
                 {
-                    //ClaimsIdentity id2 = _userService.AuthenticateUser(new UserDTO
-                    //{
-                    //    Login = loginUserModel.Login,
-                    //    PasswordHash = HashPassword.GetHashPassword(loginUserModel.PasswordHash),
-                    //});
-                    //var claims = new List<Claim>
-                    //{
-                    //    new Claim(ClaimsIdentity.DefaultNameClaimType, "fba6ee9c-e5e1-42a1-be25-5754d92717cd"),
-                    //    new Claim(ClaimsIdentity.DefaultRoleClaimType, "RegularUser")
-                    //};
-                    //ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-                    //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-
-                    var x = User.Identity;
-                    await Authenticate();
+                    //if (result.Succeeded)
+                    var result = await _signInManager.PasswordSignInAsync(loginUserModel.Email, loginUserModel.PasswordHash, loginUserModel.RememberMe, false);
                     return RedirectToAction("Index", "Home");
+
                 }
                 catch (ValidationException ex)
                 {
                     ModelState.AddModelError(ex.Property, ex.Message);
-
                     return View(loginUserModel);
-                }
+                } 
             }
-            return View(loginUserModel);
+             return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -81,14 +69,11 @@ namespace NewApplicationChatSS.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {                    
-                    await _userService.RegisterUser(new UserDTO
-                    {
-                        Login = registerUserModel.Login,
-                        Email = registerUserModel.Email,
-                        PasswordHash = HashPassword.GetHashPassword(registerUserModel.PasswordHash),
-                        Loked = registerUserModel.Loked
-                    });
+                {
+                    var mapper = new MapperConfiguration(cfg => cfg.CreateMap<RegisterViewModel, UserDTO>()).CreateMapper();
+                    UserDTO userDTO = mapper.Map<RegisterViewModel, UserDTO>(registerUserModel);
+
+                    await _userService.RegisterUser(userDTO);
 
                     return RedirectToAction("Index","Home");
                 }
@@ -102,26 +87,12 @@ namespace NewApplicationChatSS.Controllers
             return View(registerUserModel);
         }
 
-        //TEST
-        private async Task Authenticate()
-        {
-            var claims = new List<Claim>
-                    {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, "fba6ee9c-e5e1-42a1-be25-5754d92717cd"),
-                        new Claim(ClaimsIdentity.DefaultRoleClaimType, "RegularUser")
-                    };
-
-            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login", "Account");
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

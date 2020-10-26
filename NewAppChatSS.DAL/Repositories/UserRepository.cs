@@ -43,7 +43,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task Create(User item)
         {
-            await _userManager.CreateAsync(item);
+            await _userManager.CreateAsync(item, item.PasswordHash);
         }
 
         public async Task Update(User item)

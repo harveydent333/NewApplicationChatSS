@@ -35,7 +35,6 @@ namespace NewApplicationChatSS.Controllers
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, RegisterViewModel>()).CreateMapper();
             var users = mapper.Map<IEnumerable<UserDTO>, List<RegisterViewModel>>(usersDtos);
 
-            ViewBag.hello = User.Identity.Name;
             return View(users);
             //return View("Chat");
         }
