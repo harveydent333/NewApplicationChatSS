@@ -10,30 +10,35 @@ using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : IUserRepository
     {
-        private ApplicationDbContext dbUserContext;
-        private UserManager<User> _userManager;
+        private readonly ApplicationDbContext _dbUserContext;
+        private readonly UserManager<User> _userManager;
 
         public UserRepository(ApplicationDbContext context, UserManager<User> manager)
         {
-            dbUserContext = context;
+            _dbUserContext = context;
             _userManager = manager;
         }
 
         public IEnumerable<User> GetAll()
         {
-            return _userManager.Users.ToList();
+            return _dbUserContext.Users.ToList();
         }
 
-        public User Get(String id)
+        public User FindById(String id)
         {
-            throw new NotImplementedException();
+            return _dbUserContext.Users.FirstOrDefault(u => u.Id == id);
         }
 
-        public IEnumerable<User> Find(Func<User, bool> predicate)
+        public User FindByLogin(String login)
         {
-            throw new NotImplementedException();
+            return _dbUserContext.Users.FirstOrDefault(u => u.Login == login);
+        }
+
+        public User FindByEmail(String email)
+        {
+            return _dbUserContext.Users.FirstOrDefault(u => u.Email == email);
         }
 
         public async Task Create(User item)
@@ -41,14 +46,15 @@ namespace NewAppChatSS.DAL.Repositories
             await _userManager.CreateAsync(item);
         }
 
-        public void Update(User item)
+        public async Task Update(User item)
         {
-            throw new NotImplementedException();
+            await _userManager.UpdateAsync(item);
         }
 
-        public void Delete(String id)
+        public async Task Delete(User item)
         {
-            throw new NotImplementedException();
+            await _userManager.DeleteAsync(item);
         }
+
     }
 }

@@ -7,7 +7,8 @@ namespace NewAppChatSS.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IRepository<User> Users { get; }
+        IUserRepository Users { get; }
+        IRoleRepository Roles { get; }
         IRepository<TypeRoom> TypesRooms { get; }
         void Save();
     }

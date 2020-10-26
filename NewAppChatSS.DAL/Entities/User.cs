@@ -27,15 +27,9 @@ namespace NewAppChatSS.DAL.Entities
         public DateTime? DateUnblock { get; set; }
 
         /// <summary>
-        /// Роль пользователя
+        /// ID роль пользователя
         /// </summary>
         [Required]
-        public Role Role { get; set; }
-
-        /// <summary>
-        /// Id роли пользователя
-        /// </summary>
-        [Required]
-        public Int32? RoleId { get; set; }
+        public String RoleId { get; set; }
     }
 }

@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NewAppChatSS.BLL.DTO
 {
     public class UserDTO
     {
-        public String id { get; set; }
+        public String Id { get; set; }
 
         /// <summary>
         /// Логин пользователя
         /// </summary>
         public String Login { get; set; }
-        
-        public String UserName { get; set; }
 
         /// <summary>
         /// E-mail адрес пользователя
@@ -23,18 +19,21 @@ namespace NewAppChatSS.BLL.DTO
         /// <summary>
         /// Пароль пользователя
         /// </summary>
-        public String Password { get; set; }
+        public String PasswordHash { get; set; }
 
         /// <summary>
         /// Id роли пользователя
         /// </summary>
-        public Int32 RoleId { get; set; }
+        public String RoleId { get; set; }
 
         /// <summary>
         /// Флаг заблокирован ли пользователь
         /// </summary>
         public Boolean Loked { get; set; } = false;
         
+        /// <summary>
+        /// Дата разблокировки
+        /// </summary>
         public DateTime? DateUnblock { get; set; }
     }
 }

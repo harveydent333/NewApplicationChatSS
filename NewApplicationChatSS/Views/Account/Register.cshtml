@@ -48,14 +48,13 @@
                                     <input type="text" asp-for="Email" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label asp-for="Password" class="text-info">Пароль:</label><br>
-                                    <input type="password" asp-for="Password" class="form-control">
+                                    <label asp-for="PasswordHash" class="text-info">Пароль:</label><br>
+                                    <input type="password" asp-for="PasswordHash" class="form-control">
                                     <label asp-for="PasswordConfirm" class="text-info">Пароль:</label><br>
                                     <input type="password" asp-for="PasswordConfirm" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <input type="submit" name="submit" class="btn btn-info btn-md" value="Отправить">
-                                    <input asp-for="RoleId" type="hidden" value="1" />
                                     <input asp-for="Loked" type="hidden" value="false" />
                                 </div>
                             }

@@ -14,6 +14,7 @@ using NewAppChatSS.DAL.Repositories;
 using NewAppChatSS.DAL;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace NewApplicationChatSS
 {
@@ -32,18 +33,23 @@ namespace NewApplicationChatSS
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddControllersWithViews();
+            
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddSignalR();
             services.AddRazorPages();
-            services.AddControllersWithViews();
 
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
             services.AddTransient<IUserService, UserService>();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+               .AddCookie(options => {
+                   options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+               });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -81,7 +87,6 @@ namespace NewApplicationChatSS
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
                 endpoints.MapHub<ChatHub>("/chathub");
-
             });
         }
     }

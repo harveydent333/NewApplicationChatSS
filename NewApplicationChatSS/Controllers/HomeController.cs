@@ -11,9 +11,11 @@ using AutoMapper;
 using NewApplicationChatSS.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NewApplicationChatSS.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -32,6 +34,8 @@ namespace NewApplicationChatSS.Controllers
             IEnumerable<UserDTO> usersDtos = _userService.GetUsersDTO();
             var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, RegisterViewModel>()).CreateMapper();
             var users = mapper.Map<IEnumerable<UserDTO>, List<RegisterViewModel>>(usersDtos);
+
+            ViewBag.hello = User.Identity.Name;
             return View(users);
             //return View("Chat");
         }

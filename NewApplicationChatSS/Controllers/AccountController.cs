@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NewAppChatSS.BLL.DTO;
@@ -31,28 +34,45 @@ namespace NewApplicationChatSS.Controllers
             return View("Register");
         }
 
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View("Login");
+        }
+
         [HttpPost]
-        public async Task<IActionResult> Register2(RegisterViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel loginUserModel)
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Email = model.Email, UserName = model.Email, Loked = model.Loked, RoleId = model.RoleId, Login = model.Login };
-                var result = await _userManager.CreateAsync(user);
-
-                if (result.Succeeded)
+                try
                 {
-                    await _signInManager.SignInAsync(user, false);
+                    //ClaimsIdentity id2 = _userService.AuthenticateUser(new UserDTO
+                    //{
+                    //    Login = loginUserModel.Login,
+                    //    PasswordHash = HashPassword.GetHashPassword(loginUserModel.PasswordHash),
+                    //});
+                    //var claims = new List<Claim>
+                    //{
+                    //    new Claim(ClaimsIdentity.DefaultNameClaimType, "fba6ee9c-e5e1-42a1-be25-5754d92717cd"),
+                    //    new Claim(ClaimsIdentity.DefaultRoleClaimType, "RegularUser")
+                    //};
+                    //ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                    //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+
+                    var x = User.Identity;
+                    await Authenticate();
                     return RedirectToAction("Index", "Home");
                 }
-                else
+                catch (ValidationException ex)
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
+                    ModelState.AddModelError(ex.Property, ex.Message);
+
+                    return View(loginUserModel);
                 }
             }
-            return View("Register",model);
+            return View(loginUserModel);
         }
 
         [HttpPost]
@@ -61,35 +81,47 @@ namespace NewApplicationChatSS.Controllers
             if (ModelState.IsValid)
             {
                 try
-                {
-                    UserDTO userDto = new UserDTO
+                {                    
+                    await _userService.RegisterUser(new UserDTO
                     {
-                        UserName = registerUserModel.Email,
                         Login = registerUserModel.Login,
                         Email = registerUserModel.Email,
-                        Password = HashPassword.GetHashPassword(registerUserModel.Password),
-                        RoleId = registerUserModel.RoleId,
+                        PasswordHash = HashPassword.GetHashPassword(registerUserModel.PasswordHash),
                         Loked = registerUserModel.Loked
-                    };
+                    });
 
-                    await _userService.RegisterUser(userDto);
                     return RedirectToAction("Index","Home");
                 }
-                catch (Exception ex)
+                catch (ValidationException ex)
                 {
-                    //  ModelState.AddModelError(ex.Property, ex.Message);
+                    ModelState.AddModelError(ex.Property, ex.Message);
+
                     return View(registerUserModel);
                 }
             }
             return View(registerUserModel);
         }
 
+        //TEST
+        private async Task Authenticate()
+        {
+            var claims = new List<Claim>
+                    {
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, "fba6ee9c-e5e1-42a1-be25-5754d92717cd"),
+                        new Claim(ClaimsIdentity.DefaultRoleClaimType, "RegularUser")
+                    };
+
+            ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
         }
     }
 }

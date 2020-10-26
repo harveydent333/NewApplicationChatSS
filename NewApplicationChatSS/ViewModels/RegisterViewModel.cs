@@ -37,22 +37,16 @@ namespace NewApplicationChatSS.ViewModels
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
         [StringLength(40, MinimumLength = 6, ErrorMessage = "Не соотсвествует требованию размера пароля, длина должна быть от 6 до  символов")]
-        public String Password { get; set; }
+        public String PasswordHash { get; set; }
 
         /// <summary>
         /// Подтвержденный пароль пользователя
         /// </summary>
         [Required(ErrorMessage = "Поле \"Подтвердить пароль\" обязательно к заполнению.")]
         [Display(Name = "Подтвердить пароль")]
-        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+        [Compare("PasswordHash", ErrorMessage = "Пароли не совпадают")]
         [DataType(DataType.Password)]
         public String PasswordConfirm { get; set; }
-
-        /// <summary>
-        /// Id роли пользователя
-        /// </summary>
-        [Required]
-        public Int32 RoleId { get; set; }
 
         /// <summary>
         /// Флаг заблокирован ли пользователь

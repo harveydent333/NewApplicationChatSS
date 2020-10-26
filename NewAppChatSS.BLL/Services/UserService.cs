@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.DTO;
+using NewAppChatSS.BLL.Infrastructure;
 using NewAppChatSS.BLL.Interfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,24 +15,16 @@ namespace NewAppChatSS.BLL.Services
 {
     public class UserService : IUserService
     {
-        IUnitOfWork Database { get; set; }
-        private readonly UserManager<User> _userManager;
+        public IUnitOfWork Database { get; set; }
 
-        public UserService(IUnitOfWork uow, UserManager<User> userManager)
+        public UserService(IUnitOfWork uow)
         {
             Database = uow;
-            _userManager = userManager;
         }
 
         public IEnumerable<UserDTO> GetUsersDTO()
         {
-            // применяем автомаппер для проекции одной коллекции на другую
-            //var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
-            //return mapper.Map<IEnumerable<User>, List<UserDTO>>(Database.Users.GetAll());
-
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()
-                .ForMember("Login", opt => opt.MapFrom(src => src.UserName)));
-            var mapper = new Mapper(config);
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
             return mapper.Map<IEnumerable<User>, List<UserDTO>>(Database.Users.GetAll());
         }
 
@@ -41,23 +35,55 @@ namespace NewAppChatSS.BLL.Services
 
         public async Task RegisterUser(UserDTO userDTO)
         {
-            User user = new User
+            UserValidator userValidator = new UserValidator(Database);
+
+            if (!userValidator.UniquenessCheckUserLogin(userDTO.Login))
+            {
+                throw new ValidationException("Пользователь с данным логином уже зарегистрирован.", "");
+            }
+
+            if (!userValidator.UniquenessCheckUserEMail(userDTO.Email))
+            {
+                throw new ValidationException("Данный E-mail адрес уже зарегистрирован.", "");
+            }
+
+            await Database.Users.Create(new User
             {
                 UserName = userDTO.Email,
                 Email = userDTO.Email,
                 Login = userDTO.Login,
                 Loked = userDTO.Loked,
-                RoleId = userDTO.RoleId,
-                PasswordHash = userDTO.Password,
-            };
-
-            //var config = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, User>()
-            //    .ForMember("UserName", opt => opt.MapFrom(src => src.Login)));
-            //var mapper = new Mapper(config);
-            //Database.Users.Create(mapper.Map<UserDTO, User>(userDTO));
-
-            await Database.Users.Create(user);
+                RoleId = Database.Roles.FindRoleIdByName("RegularUser"),
+                PasswordHash = userDTO.PasswordHash,
+            });
         }
 
+        public ClaimsIdentity AuthenticateUser(UserDTO userDTO)
+        {
+            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
+            UserDTO user = mapper.Map<User, UserDTO>(Database.Users.FindByLogin(userDTO.Login));
+
+            if (user != null)
+            {
+                if (user.PasswordHash == userDTO.PasswordHash)
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id),
+                        new Claim(ClaimsIdentity.DefaultRoleClaimType, Database.Roles.FindRoleNameById(user.RoleId))
+                    };          
+
+                    return new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                }
+                else
+                {
+                    throw new ValidationException("Неправильный логин и (или) пароль", "");
+                }
+            }
+            else
+            {
+                throw new ValidationException("Неправильный логин и (или) пароль", "");
+            }
+        }
     }
 }

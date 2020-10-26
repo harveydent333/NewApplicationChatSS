@@ -21,6 +21,6 @@ namespace NewApplicationChatSS.ViewModels
         [Required(ErrorMessage = "Не указан Пароль")]
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
-        public String Password { get; set; }
+        public String PasswordHash { get; set; }
     }
 }

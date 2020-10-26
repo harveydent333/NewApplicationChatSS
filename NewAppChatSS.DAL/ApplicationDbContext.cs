@@ -18,10 +18,8 @@ namespace NewAppChatSS.DAL
         public DbSet<MutedUser> MutedUsers { get; set; }
         public DbSet<DictionaryBadWords> DicrtionaryBadWords { get; set; }
         public DbSet<SwearingUser> SwearingUsers { get; set; }
-        
-        //public DbSet<Role> Roles { get; set; }
-        //public DbSet<User> Users { get; set; }
     }
+
     /*
     public class RoleInitializer
     {
