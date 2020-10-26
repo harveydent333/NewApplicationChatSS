@@ -1,0 +1,62 @@
+﻿@model NewApplicationChatSS.ViewModels.LoginViewModel
+<head>
+    <!------ Include the above in your HEAD tag ---------->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #17a2b8;
+            height: 100vh;
+        }
+
+        #login .container #login-row #login-column #login-box {
+            margin-top: 120px;
+            max-width: 600px;
+            height: 350px;
+            border: 1px solid #9C9C9C;
+            background-color: #EAEAEA;
+        }
+
+            #login .container #login-row #login-column #login-box #login-form {
+                padding: 20px;
+            }
+
+                #login .container #login-row #login-column #login-box #login-form #register-link {
+                    margin-top: -85px;
+                }
+    </style>
+</head>
+<body>
+    <div id="login">
+        <h3 class="text-center text-white pt-5"></h3>
+        <div class="container">
+            <div style="color: white" asp-validation-summary="All"></div>
+            <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+                        @using (Html.BeginForm("Login", "Account", FormMethod.Post, htmlAttributes: new { @class = "form", @id = "login-form" }))
+                        {
+                            <h3 class="text-center text-info">Авторизация на сайте</h3>
+                            <div class="form-group">
+                                <label asp-for="Login" class="text-info">Логин:</label><br>
+                                <input type="text" asp-for="Login" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Password" class="text-info">Пароль:</label><br>
+                                <input type="password" asp-for="Password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="remember-me" class="text-info"><span>Запомнить меня</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br>
+                                <input type="submit" name="submit" class="btn btn-info btn-md" value="Войти">
+                            </div>
+                            <div id="register-link" class="text-right">
+                                <a asp-action="Register" asp-controller="Account" class="text-info">Регистрация</a><br><br>
+                                <!--<a href="#" class="text-info">Забыли пароль?</a>-->
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
