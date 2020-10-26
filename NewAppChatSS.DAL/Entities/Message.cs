@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Web.Mvc;
 
 namespace NewAppChatSS.DAL.Entities
 {
@@ -36,7 +36,7 @@ namespace NewAppChatSS.DAL.Entities
         /// ID пользователя отправляющего сообщение
         /// </summary>
         [Required]
-        public Int32 UserId { get; set; }
+        public String UserId { get; set; }
 
         /// <summary>
         /// Объект комнаты в которой было отправлено сообщение

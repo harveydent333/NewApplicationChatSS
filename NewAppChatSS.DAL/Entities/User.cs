@@ -9,7 +9,15 @@ namespace NewAppChatSS.DAL.Entities
     /// </summary>
     public class User : IdentityUser
     {
-     //   [Required]
+        /// <summary>
+        /// Логин пользователя
+        /// </summary>
+        [Required]
+        [RegularExpression(@"[a-zA-Z0-9]+")]
+        [StringLength(35, MinimumLength = 4)]
+        public String Login { get; set; }
+
+        [Required]
         public Boolean Loked { get; set; } = false;
 
         /// <summary>
@@ -28,6 +36,6 @@ namespace NewAppChatSS.DAL.Entities
         /// Id роли пользователя
         /// </summary>
         [Required]
-        public Int32 RoleId { get; set; }
+        public Int32? RoleId { get; set; }
     }
 }

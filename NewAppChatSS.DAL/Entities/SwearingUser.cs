@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Web.Mvc;
 
 namespace NewAppChatSS.DAL.Entities
 {
@@ -18,7 +18,7 @@ namespace NewAppChatSS.DAL.Entities
         public User User { get; set; }
 
         [Required]
-        public Int32? UserId { get; set; }
+        public String UserId { get; set; }
 
         /// <summary>
         /// Количество ругающихся слов, написанных пользователем

@@ -22,7 +22,7 @@ namespace NewAppChatSS.DAL.Entities
         /// ID владельца пользователя
         /// </summary>
         [Required]
-        public Int32 OwnerId { get; set; }
+        public String OwnerId { get; set; }
 
         /// <summary>
         /// Владелец пользователя

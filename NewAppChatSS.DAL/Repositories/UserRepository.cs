@@ -4,21 +4,26 @@ using NewAppChatSS.DAL;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
 {
     public class UserRepository : IRepository<User>
     {
         private ApplicationDbContext dbUserContext;
+        private UserManager<User> _userManager;
 
-        UserRepository(ApplicationDbContext context)
+        public UserRepository(ApplicationDbContext context, UserManager<User> manager)
         {
             dbUserContext = context;
+            _userManager = manager;
         }
 
         public IEnumerable<User> GetAll()
         {
-            return dbUserContext.Users;
+            return _userManager.Users.ToList();
         }
 
         public User Get(String id)
@@ -31,9 +36,9 @@ namespace NewAppChatSS.DAL.Repositories
             throw new NotImplementedException();
         }
 
-        public void Create(User item)
+        public async Task Create(User item)
         {
-            throw new NotImplementedException();
+            await _userManager.CreateAsync(item);
         }
 
         public void Update(User item)

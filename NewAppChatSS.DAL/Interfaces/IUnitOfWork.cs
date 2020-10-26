@@ -5,9 +5,10 @@ using System.Text;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable
     {
-     //   IRepository<User> Users { get; }
+        IRepository<User> Users { get; }
+        IRepository<TypeRoom> TypesRooms { get; }
         void Save();
     }
 }
