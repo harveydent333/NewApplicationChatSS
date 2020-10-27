@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 using NewAppChatSS.BLL.Interfaces;
-using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,12 +10,28 @@ namespace NewAppChatSS.BLL.Infrastructure
     public class UserValidator
     {
         public IUnitOfWork Database { get; set; }
-        private readonly UserManager<User> _userManager;
 
-        public UserValidator(IUnitOfWork uow, UserManager<User> userManager)
+        public UserValidator(IUnitOfWork uow)
         {
             Database = uow;
-            _userManager = userManager;
+        }
+
+        /// <summary>
+        /// Метод проверяет на уникальность значение логина
+        /// </summary>
+        /// <returns>Возвращает True если логин уникальный</returns>
+        public bool UniquenessCheckUserLogin (string userLogin)
+        {
+            return Database.Users.FindByLogin(userLogin) == null;
+        }
+
+        /// <summary>
+        /// Метод проверяет на уникальность значение логина
+        /// </summary>
+        /// <returns>Возвращает True если логин уникальный</returns>
+        public bool UniquenessCheckUserEMail(string userEmail)
+        {
+            return Database.Users.FindByEmail(userEmail) == null;
         }
     }
 }

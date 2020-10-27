@@ -31,7 +31,7 @@ namespace NewAppChatSS.DAL
 
             if (await userManager.FindByNameAsync(adminEmail) == null)
             {
-                User admin = new User { Email = adminEmail, UserName = "admin", IsLocked = false};
+                User admin = new User { Email = adminEmail, UserName = adminEmail, IsLocked = false, Login = "admin" };
                 IdentityResult result = await userManager.CreateAsync(admin, password);
 
                 if (result.Succeeded)
