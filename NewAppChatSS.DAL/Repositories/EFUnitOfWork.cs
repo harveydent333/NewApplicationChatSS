@@ -14,7 +14,6 @@ namespace NewAppChatSS.DAL.Repositories
         private ApplicationDbContext db;
         private UserRepository userRepository;
         private RoleRepository roleRepository;
-        private TypeRoomRepository typeRoomRepository;
         private readonly UserManager<User> _userManager;
 
         public EFUnitOfWork(ApplicationDbContext dbContext, UserManager<User> manager)
@@ -44,18 +43,6 @@ namespace NewAppChatSS.DAL.Repositories
                     userRepository = new UserRepository(db, _userManager);
                 }
                 return userRepository;
-            }
-        }
-
-        public IRepository<TypeRoom> TypesRooms
-        {
-            get
-            {
-                if (typeRoomRepository == null)
-                {
-                    typeRoomRepository = new TypeRoomRepository(db);
-                }
-                return typeRoomRepository;
             }
         }
 

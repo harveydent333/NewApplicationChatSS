@@ -16,14 +16,14 @@ namespace NewAppChatSS.DAL.Entities
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Наименование роли пользователя
         /// </summary>
         [Required]
         [Display(Name = "Роль")]
-        public String RoleName { get; set; }
+        public string RoleName { get; set; }
 
         /// <summary>
         /// Список пользователей

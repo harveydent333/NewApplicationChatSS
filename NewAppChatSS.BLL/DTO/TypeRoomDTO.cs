@@ -12,12 +12,12 @@ namespace NewAppChatSS.BLL.DTO
             Rooms = new List<Room>();
         }
 
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Название типа комнаты
         /// </summary>
-        public String TypeName { get; set; }
+        public string TypeName { get; set; }
 
         /// <summary>
         /// Список комнат

@@ -12,7 +12,7 @@ namespace NewAppChatSS.DAL.Entities
     {
         [HiddenInput(DisplayValue = false)]
         [Key]
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Объект пользователя исключенного из комнаты
@@ -24,7 +24,7 @@ namespace NewAppChatSS.DAL.Entities
         /// ID пользователя исключенного из комнаты
         /// </summary>
         [Required]
-        public String UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <summary>
         /// Объект комнаты из которого исключают пользователя
@@ -36,7 +36,7 @@ namespace NewAppChatSS.DAL.Entities
         /// ID комнаты из которого исключают пользователя
         /// </summary>
         [Required]
-        public String RoomId { get; set; }
+        public string RoomId { get; set; }
 
         /// <summary>
         /// Дата окончания изгнания из комнаты

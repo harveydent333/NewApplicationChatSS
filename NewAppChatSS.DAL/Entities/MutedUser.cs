@@ -12,19 +12,19 @@ namespace NewAppChatSS.DAL.Entities
     {
         [HiddenInput(DisplayValue = false)]
         [Key]
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         [ForeignKey("UserId")]
         public User User { get; set; }
 
         [Required]
-        public String UserId { get; set; }
+        public string UserId { get; set; }
 
         [ForeignKey("RoomId")]
         public Room Room { get; set; }
 
         [Required]
-        public String RoomId { get; set; }
+        public string RoomId { get; set; }
 
         /// <summary>
         /// Дата окончания ограничения писать сообщения в чат

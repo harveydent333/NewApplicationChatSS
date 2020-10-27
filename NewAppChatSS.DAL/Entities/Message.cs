@@ -12,13 +12,13 @@ namespace NewAppChatSS.DAL.Entities
     {
         [HiddenInput(DisplayValue = false)]
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public String Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Содержимое сообщения
         /// </summary>
         [Required]
-        public String ContentMessage { get; set; }
+        public string ContentMessage { get; set; }
 
         /// <summary>
         /// Дата публикации
@@ -36,7 +36,7 @@ namespace NewAppChatSS.DAL.Entities
         /// ID пользователя отправляющего сообщение
         /// </summary>
         [Required]
-        public String UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <summary>
         /// Объект комнаты в которой было отправлено сообщение
@@ -48,6 +48,6 @@ namespace NewAppChatSS.DAL.Entities
         /// Id комнаты в которой было отправлено сообщение
         /// </summary>
         [Required]
-        public String RoomId { get; set; }
+        public string RoomId { get; set; }
     }
 }

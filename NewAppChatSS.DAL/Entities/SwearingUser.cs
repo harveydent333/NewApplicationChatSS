@@ -12,18 +12,18 @@ namespace NewAppChatSS.DAL.Entities
     {
         [HiddenInput(DisplayValue = false)]
         [Key]
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         [ForeignKey("UserId")]
         public User User { get; set; }
 
         [Required]
-        public String UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <summary>
         /// Количество ругающихся слов, написанных пользователем
         /// </summary>
         [Required]
-        public Int32 CountSwear { get; set; }
+        public int CountSwear { get; set; }
     }
 }

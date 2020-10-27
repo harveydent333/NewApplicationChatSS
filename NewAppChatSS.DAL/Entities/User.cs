@@ -15,21 +15,15 @@ namespace NewAppChatSS.DAL.Entities
         [Required]
         [RegularExpression(@"[a-zA-Z0-9]+")]
         [StringLength(35, MinimumLength = 4)]
-        public String Login { get; set; }
+        public string Login { get; set; }
 
         [Required]
-        public Boolean Loked { get; set; } = false;
+        public bool IsLocked { get; set; } = false;
 
         /// <summary>
         /// Дата окончания блокировки
         /// </summary>
         [DataType(DataType.DateTime)]
         public DateTime? DateUnblock { get; set; }
-
-        /// <summary>
-        /// ID роль пользователя
-        /// </summary>
-        [Required]
-        public String RoleId { get; set; }
     }
 }

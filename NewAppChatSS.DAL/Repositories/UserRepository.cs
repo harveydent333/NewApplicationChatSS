@@ -26,23 +26,24 @@ namespace NewAppChatSS.DAL.Repositories
             return _dbUserContext.Users.ToList();
         }
 
-        public User FindById(String id)
+        public User FindById(string id)
         {
             return _dbUserContext.Users.FirstOrDefault(u => u.Id == id);
         }
 
-        public User FindByLogin(String login)
+        public User FindByLogin(string login)
         {
             return _dbUserContext.Users.FirstOrDefault(u => u.Login == login);
         }
 
-        public User FindByEmail(String email)
+        public User FindByEmail(string email)
         {
             return _dbUserContext.Users.FirstOrDefault(u => u.Email == email);
         }
 
         public async Task Create(User item)
         {
+            item.Id = Guid.NewGuid().ToString();
             await _userManager.CreateAsync(item, item.PasswordHash);
         }
 

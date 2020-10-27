@@ -16,14 +16,14 @@ namespace NewAppChatSS.DAL.Entities
         }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Название типа комнаты
         /// </summary>
         [Required]
         [Display(Name = "Тип комнанты")]
-        public String TypeName { get; set; }
+        public string TypeName { get; set; }
 
         /// <summary>
         /// Список комнат

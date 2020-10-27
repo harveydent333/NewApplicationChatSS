@@ -15,11 +15,6 @@ namespace NewApplicationChatSS
 {
     public class Program
     {
-        //public static void Main(string[] args)
-        //{
-        //    CreateHostBuilder(args).Build().Run();
-        //}
-
         public static async Task Main(string[] args)
         {
 
@@ -32,6 +27,7 @@ namespace NewApplicationChatSS
                 {
                     var userManager = services.GetRequiredService<UserManager<User>>();
                     var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
                     await DataInitializer.InitializeAsync(userManager, rolesManager);
                 }
                 catch (Exception ex)

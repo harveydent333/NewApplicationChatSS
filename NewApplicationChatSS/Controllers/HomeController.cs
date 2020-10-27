@@ -19,26 +19,32 @@ namespace NewApplicationChatSS.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private IUserService _userService;
-        private UserManager<User> _userManager;
+        private readonly IUserService _userService;
+        private readonly UserManager<User> _userManager;
+        private readonly IMapper _mapper;
 
-        public HomeController(ILogger<HomeController> logger, IUserService serv, UserManager<User> manager)
+        public HomeController(ILogger<HomeController> logger, IUserService serv, UserManager<User> manager, IMapper mapper)
         {
             _logger = logger;
             _userService = serv;
             _userManager = manager;
+            _mapper = mapper;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             IEnumerable<UserDTO> usersDtos = _userService.GetUsersDTO();
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserDTO, RegisterViewModel>()).CreateMapper();
-            var users = mapper.Map<IEnumerable<UserDTO>, List<RegisterViewModel>>(usersDtos);
-
-            return View(users);
-            //return View("Chat");
+            return View(_mapper.Map<List<RegisterViewModel>>(usersDtos));
         }
 
+        [HttpGet]
+        public IActionResult Chat()
+        {
+            return View("Chat");
+        }
+
+        [HttpGet]
         public IActionResult Privacy()
         {
             return View();

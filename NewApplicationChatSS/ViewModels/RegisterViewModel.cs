@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NewApplicationChatSS.ViewModels
 {
@@ -18,7 +14,7 @@ namespace NewApplicationChatSS.ViewModels
         [Display(Name = "Логин")]
         [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessage = "Поле \"Логин\" может содержать только символы a-z, A-Z, 0-9")]
         [StringLength(35, MinimumLength = 4, ErrorMessage = "Не соотсвествует требованию размера логина, длина должна быть от 4 до 35 символов")]
-        public String Login { get; set; }
+        public string Login { get; set; }
 
         /// <summary>
         /// E-mail адрес пользователя
@@ -28,7 +24,7 @@ namespace NewApplicationChatSS.ViewModels
         [EmailAddress(ErrorMessage = "Некорректный адрес электронной почты")]
         [StringLength(60, ErrorMessage = "Не соотсвествует требованию размера E-mail, длина должна быть не больше 60 символов")]
         [DataType(DataType.EmailAddress)]
-        public String Email { get; set; }
+        public string Email { get; set; }
 
         /// <summary>
         /// Пароль пользователя
@@ -37,21 +33,21 @@ namespace NewApplicationChatSS.ViewModels
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
         [StringLength(40, MinimumLength = 6, ErrorMessage = "Не соотсвествует требованию размера пароля, длина должна быть от 6 до  символов")]
-        public String PasswordHash { get; set; }
+        public string Password { get; set; }
 
         /// <summary>
         /// Подтвержденный пароль пользователя
         /// </summary>
         [Required(ErrorMessage = "Поле \"Подтвердить пароль\" обязательно к заполнению.")]
         [Display(Name = "Подтвердить пароль")]
-        [Compare("PasswordHash", ErrorMessage = "Пароли не совпадают")]
+        [Compare("Password", ErrorMessage = "Пароли не совпадают")]
         [DataType(DataType.Password)]
-        public String PasswordConfirm { get; set; }
+        public string PasswordConfirm { get; set; }
 
         /// <summary>
         /// Флаг заблокирован ли пользователь
         /// </summary>
         [Required]
-        public Boolean Loked { get; set; } = false;
+        public bool IsLocked { get; set; } = false;
     }
 }

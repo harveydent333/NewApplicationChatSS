@@ -10,19 +10,19 @@ namespace NewAppChatSS.DAL.Entities
     public class Room
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public String Id { get; set; }
+        public string Id { get; set; }
         
         /// <summary>
         /// Название комнаты
         /// </summary>
         [Required]
-        public String RoomName { get; set; }
+        public string RoomName { get; set; }
 
         /// <summary>
         /// ID владельца пользователя
         /// </summary>
         [Required]
-        public String OwnerId { get; set; }
+        public string OwnerId { get; set; }
 
         /// <summary>
         /// Владелец пользователя
@@ -33,7 +33,7 @@ namespace NewAppChatSS.DAL.Entities
         /// <summary>
         /// Id типа комнаты
         /// </summary>
-        public Int32 TypeId { get; set; }
+        public int TypeId { get; set; }
 
         /// <summary>
         /// Тип комнаты
@@ -44,7 +44,7 @@ namespace NewAppChatSS.DAL.Entities
         /// <summary>
         /// Id последнего сообщения в комнате
         /// </summary>
-        public String LastMessageId { get; set; }
+        public string LastMessageId { get; set; }
 
         /// <summary>
         /// Последнее сообщение в комнате

@@ -7,7 +7,6 @@ using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,19 +15,22 @@ namespace NewAppChatSS.BLL.Services
     public class UserService : IUserService
     {
         public IUnitOfWork Database { get; set; }
+        private readonly UserManager<User> _userManager;
+        private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork uow)
+        public UserService(IUnitOfWork uow, UserManager<User> userManager, IMapper mapper)
         {
             Database = uow;
+            _userManager = userManager;
+            _mapper = mapper;
         }
 
         public IEnumerable<UserDTO> GetUsersDTO()
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
-            return mapper.Map<IEnumerable<User>, List<UserDTO>>(Database.Users.GetAll());
+            return _mapper.Map<IEnumerable<UserDTO>>(Database.Users.GetAll());
         }
 
-        public UserDTO GetUserDTO(String id)
+        public UserDTO GetUserDTO(string id)
         {
             throw new NotImplementedException();
         }
@@ -47,43 +49,14 @@ namespace NewAppChatSS.BLL.Services
                 throw new ValidationException("Данный E-mail адрес уже зарегистрирован.", "");
             }
 
-            await Database.Users.Create(new User
-            {
-                UserName = userDTO.Email,
-                Email = userDTO.Email,
-                Login = userDTO.Login,
-                Loked = userDTO.Loked,
-                RoleId = Database.Roles.FindRoleIdByName("RegularUser"),
-                PasswordHash = userDTO.PasswordHash,
-            });
+            await Database.Users.Create(_mapper.Map<User>(userDTO));
+
+            await AssignRoleForNewUser(userDTO.Email);
         }
 
-        public ClaimsIdentity AuthenticateUser(UserDTO userDTO)
+        public async Task AssignRoleForNewUser(string userEmail)
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDTO>()).CreateMapper();
-            UserDTO user = mapper.Map<User, UserDTO>(Database.Users.FindByLogin(userDTO.Login));
-
-            if (user != null)
-            {
-                if (user.PasswordHash == userDTO.PasswordHash)
-                {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimsIdentity.DefaultNameClaimType, user.Id),
-                        new Claim(ClaimsIdentity.DefaultRoleClaimType, Database.Roles.FindRoleNameById(user.RoleId))
-                    };          
-
-                    return new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-                }
-                else
-                {
-                    throw new ValidationException("Неправильный логин и (или) пароль", "");
-                }
-            }
-            else
-            {
-                throw new ValidationException("Неправильный логин и (или) пароль", "");
-            }
+            await _userManager.AddToRolesAsync(Database.Users.FindByEmail(userEmail), new string[] { "RegularUser" });
         }
     }
 }

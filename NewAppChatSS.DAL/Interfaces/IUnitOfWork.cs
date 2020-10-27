@@ -9,7 +9,6 @@ namespace NewAppChatSS.DAL.Interfaces
     {
         IUserRepository Users { get; }
         IRoleRepository Roles { get; }
-        IRepository<TypeRoom> TypesRooms { get; }
         void Save();
     }
 }

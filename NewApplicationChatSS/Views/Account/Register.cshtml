@@ -2,30 +2,7 @@
 
 <head>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #17a2b8;
-            height: 100vh;
-        }
-
-        #login .container #login-row #login-column #login-box {
-            margin-top: 100px;
-            max-width: 600px;
-            height: 520px;
-            border: 1px solid #9C9C9C;
-            background-color: #EAEAEA;
-        }
-
-            #login .container #login-row #login-column #login-box #login-form {
-                padding: 20px;
-            }
-
-                #login .container #login-row #login-column #login-box #login-form #register-link {
-                    margin-top: -85px;
-                }
-    </style>
+    <link rel="stylesheet" type="text/css" href="~/css/RegisterPage.css">
 </head>
 <body>
     <br>
@@ -48,14 +25,14 @@
                                     <input type="text" asp-for="Email" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <label asp-for="PasswordHash" class="text-info">Пароль:</label><br>
-                                    <input type="password" asp-for="PasswordHash" class="form-control">
+                                    <label asp-for="Password" class="text-info">Пароль:</label><br>
+                                    <input type="password" asp-for="Password" class="form-control">
                                     <label asp-for="PasswordConfirm" class="text-info">Пароль:</label><br>
                                     <input type="password" asp-for="PasswordConfirm" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <input type="submit" name="submit" class="btn btn-info btn-md" value="Отправить">
-                                    <input asp-for="Loked" type="hidden" value="false" />
+                                    <input asp-for="IsLocked" type="hidden" value="false" />
                                 </div>
                             }
                     </div>

@@ -12,7 +12,7 @@ namespace NewAppChatSS.DAL.Entities
     {
         [HiddenInput(DisplayValue = false)]
         [Key]
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Объект пользователя состоящего в комнате
@@ -24,7 +24,7 @@ namespace NewAppChatSS.DAL.Entities
         /// ID пользователя состоящего в комнате
         /// </summary>
         [Required]
-        public String UserId { get; set; }
+        public string UserId { get; set; }
 
         /// <summary>
         /// Объект комнаты в которой состоит пользователь
@@ -36,6 +36,6 @@ namespace NewAppChatSS.DAL.Entities
         /// ID комнаты в которой состоит пользователь
         /// </summary>
         [Required]
-        public String RoomId { get; set; }
+        public string RoomId { get; set; }
     }
 }

@@ -21,12 +21,14 @@ namespace NewApplicationChatSS.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService, IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -40,7 +42,7 @@ namespace NewApplicationChatSS.Controllers
         {
             return View("Login");
         }
-
+            
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel loginUserModel)
@@ -49,8 +51,7 @@ namespace NewApplicationChatSS.Controllers
             {
                 try
                 {
-                    //if (result.Succeeded)
-                    var result = await _signInManager.PasswordSignInAsync(loginUserModel.Email, loginUserModel.PasswordHash, loginUserModel.RememberMe, false);
+                    var result = await _signInManager.PasswordSignInAsync(loginUserModel.Email, loginUserModel.Password, loginUserModel.RememberMe, false);
                     return RedirectToAction("Index", "Home");
 
                 }
@@ -70,10 +71,8 @@ namespace NewApplicationChatSS.Controllers
             {
                 try
                 {
-                    var mapper = new MapperConfiguration(cfg => cfg.CreateMap<RegisterViewModel, UserDTO>()).CreateMapper();
-                    UserDTO userDTO = mapper.Map<RegisterViewModel, UserDTO>(registerUserModel);
-
-                    await _userService.RegisterUser(userDTO);
+                    await _userService.RegisterUser(_mapper.Map<UserDTO>(registerUserModel));
+                    await _signInManager.PasswordSignInAsync(registerUserModel.Email, registerUserModel.Password, true, false);
 
                     return RedirectToAction("Index","Home");
                 }
@@ -87,11 +86,11 @@ namespace NewApplicationChatSS.Controllers
             return View(registerUserModel);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
+
             return RedirectToAction("Index", "Home");
         }
     }

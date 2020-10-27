@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace NewAppChatSS.DAL.Entities
+﻿namespace NewAppChatSS.DAL.Entities
 {
     public class DictionaryBadWords
     {
-        public Int32 Id { get; set; }
+        public int Id { get; set; }
 
-        public String Word { get; set; }
+        public string Word { get; set; }
     }
 }

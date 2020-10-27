@@ -7,10 +7,10 @@ namespace NewAppChatSS.DAL.Interfaces
     public interface IRepository<T> where T : class
     {
         IEnumerable<T> GetAll();
-        T Get(String id);
-        IEnumerable<T> Find(Func<T, Boolean> predicate);
+        T Get(string id);
+        IEnumerable<T> Find(Func<T, bool> predicate);
         Task Create(T item);
         void Update(T item);
-        void Delete(String id);
+        void Delete(string id);
     }
 }

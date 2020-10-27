@@ -15,6 +15,8 @@ using NewAppChatSS.DAL;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using AutoMapper;
+using NewApplicationChatSS.Mappings;
 
 namespace NewApplicationChatSS
 {
@@ -30,6 +32,8 @@ namespace NewApplicationChatSS
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 

@@ -10,10 +10,10 @@ namespace NewApplicationChatSS.ViewModels
     {
         [Required]
         [Display(Name = "Email")]
-        public String Email { get; set; }
+        public string Email { get; set; }
 
         [Display(Name = "Запомнить?")]
-        public Boolean RememberMe { get; set; }
+        public bool RememberMe { get; set; }
 
         /// <summary>
         /// Пароль пользователя
@@ -21,6 +21,6 @@ namespace NewApplicationChatSS.ViewModels
         [Required(ErrorMessage = "Не указан Пароль")]
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
-        public String PasswordHash { get; set; }
+        public string Password { get; set; }
     }
 }
