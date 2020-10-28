@@ -8,13 +8,13 @@ namespace NewApplicationChatSS.ViewModels
     public class RegisterViewModel
     {
         /// <summary>
-        /// Имя пользователя
+        /// Логин пользователя
         /// </summary>
-        [Required(ErrorMessage = "Поле \"Имя пользователя\" обязательно к заполнению.")]
-        [Display(Name = "Имя пользователя")]
-        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessage = "Поле \"Имя пользователя\" может содержать только символы a-z, A-Z, 0-9")]
-        [StringLength(35, MinimumLength = 4, ErrorMessage = "Не соотсвествует требованию размера имени, длина должна быть от 4 до 35 символов")]
-        public string UserName { get; set; }
+        [Required(ErrorMessage = "Поле \"Логин\" обязательно к заполнению.")]
+        [Display(Name = "Логин")]
+        [RegularExpression(@"[a-zA-Z0-9]+", ErrorMessage = "Поле \"Логин\" может содержать только символы a-z, A-Z, 0-9")]
+        [StringLength(35, MinimumLength = 4, ErrorMessage = "Не соотсвествует требованию размера логина, длина должна быть от 4 до 35 символов")]
+        public string Login { get; set; }
 
         /// <summary>
         /// E-mail адрес пользователя
