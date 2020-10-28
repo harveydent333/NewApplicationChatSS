@@ -37,9 +37,8 @@ namespace NewAppChatSS.BLL.Hubs
         public async Task ReceivingUserInteractionCommand(string userEmail, string comamand)
         {
             User user = await _userManager.FindByEmailAsync(userEmail);
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-
-            await _userCommandHandler.SearchCommand(userDTO, comamand, Clients);
+            
+            await _userCommandHandler.SearchCommandAsync(user, comamand, Clients);
         }
     }
 }

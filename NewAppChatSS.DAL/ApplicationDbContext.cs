@@ -10,7 +10,7 @@ namespace NewAppChatSS.DAL
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
            : base(options) 
         {
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+         //   ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public DbSet<Room> Rooms { get; set; }

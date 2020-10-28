@@ -44,6 +44,11 @@ namespace NewAppChatSS.BLL.Services
                 throw new ValidationException("Данный E-mail адрес уже зарегистрирован.", "");
             }
 
+            if (await _userManager.FindByNameAsync(userDTO.UserName) != null)
+            {
+                throw new ValidationException("Пользователь с таким именем уже зарегистрирован.", "");
+            }
+
             User user = _mapper.Map<User>(userDTO);
             user.Id = Guid.NewGuid().ToString();
 

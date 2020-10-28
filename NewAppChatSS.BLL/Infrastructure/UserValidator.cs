@@ -25,7 +25,7 @@ namespace NewAppChatSS.BLL.Infrastructure
             _mapper = mapper;
         }
 
-        public bool IsUserBlocked(UserDTO userDto)
+        public bool IsUserBlocked(User user)
         {
             throw new NotImplementedException();
         }
@@ -45,11 +45,11 @@ namespace NewAppChatSS.BLL.Infrastructure
             throw new NotImplementedException();
         }
 
-        public async Task<bool> CommandAccessCheckAsync(UserDTO userDto, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
+        public async Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
         {
             foreach(string role in allowedRoles)
             {
-                if (await _userManager.IsInRoleAsync(_mapper.Map<User>(userDto), role))
+                if (await _userManager.IsInRoleAsync(user, role))
                 {
                     return true;
                 }
@@ -57,7 +57,7 @@ namespace NewAppChatSS.BLL.Infrastructure
             
             if (checkOnOwner)
             {
-                return userDto.UserName == processingUserName;
+                return user.UserName == processingUserName;
             }
 
             return false;  
