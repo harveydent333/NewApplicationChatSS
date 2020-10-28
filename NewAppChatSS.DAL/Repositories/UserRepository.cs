@@ -31,6 +31,11 @@ namespace NewAppChatSS.DAL.Repositories
             return _dbUserContext.Users.FirstOrDefault(u => u.Id == id);
         }
 
+        public User FindByLogin(string login)
+        {
+            return _dbUserContext.Users.FirstOrDefault(u => u.Login == login);
+        }
+
         public User FindByEmail(string email)
         {
             return _dbUserContext.Users.FirstOrDefault(u => u.Email == email);
