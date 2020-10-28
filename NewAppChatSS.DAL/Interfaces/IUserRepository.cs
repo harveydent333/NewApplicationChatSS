@@ -10,7 +10,6 @@ namespace NewAppChatSS.DAL.Interfaces
     {
         IEnumerable<User> GetAll();
         User FindById(string id);
-        User FindByLogin(string login);
         User FindByEmail(string email);
         Task Create(User item);
         Task Update(User item);

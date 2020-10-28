@@ -51,7 +51,7 @@ namespace NewApplicationChatSS.Controllers
             {
                 try
                 {
-                    var result = await _signInManager.PasswordSignInAsync(loginUserModel.Email, loginUserModel.Password, loginUserModel.RememberMe, false);
+                    await _userService.AuthenticateUserAsync(_mapper.Map<UserDTO>(loginUserModel));
                     return RedirectToAction("Index", "Home");
 
                 }
@@ -71,7 +71,7 @@ namespace NewApplicationChatSS.Controllers
             {
                 try
                 {
-                    await _userService.RegisterUser(_mapper.Map<UserDTO>(registerUserModel));
+                    await _userService.RegisterUserAsync(_mapper.Map<UserDTO>(registerUserModel));
                     await _signInManager.PasswordSignInAsync(registerUserModel.Email, registerUserModel.Password, true, false);
 
                     return RedirectToAction("Index","Home");

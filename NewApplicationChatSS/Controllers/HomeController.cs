@@ -38,10 +38,10 @@ namespace NewApplicationChatSS.Controllers
             return View(_mapper.Map<List<RegisterViewModel>>(usersDtos));
         }
 
-        [HttpGet]
+        [HttpGet("/Chat")]
         public IActionResult Chat()
         {
-            return View("Chat");
+            return View();
         }
 
         [HttpGet]

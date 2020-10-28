@@ -7,14 +7,14 @@ namespace NewAppChatSS.BLL.DTO
         public string Id { get; set; }
 
         /// <summary>
-        /// Логин пользователя
-        /// </summary>
-        public string Login { get; set; }
-
-        /// <summary>
         /// E-mail адрес пользователя
         /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// Имя пользователя
+        /// </summary>
+        public string UserName { get; set; }
 
         /// <summary>
         /// Пароль пользователя
@@ -25,7 +25,9 @@ namespace NewAppChatSS.BLL.DTO
         /// Флаг заблокирован ли пользователь
         /// </summary>
         public bool IsLocked { get; set; } = false;
-        
+
+        public bool? RememberMe { get; set; } = false;
+
         /// <summary>
         /// Дата разблокировки
         /// </summary>
