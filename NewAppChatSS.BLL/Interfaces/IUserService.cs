@@ -9,10 +9,10 @@ namespace NewAppChatSS.BLL.Interfaces
 {
     public interface IUserService
     {
-        Task RegisterUser(UserDTO userDTO);
-        Task AssignRoleForNewUser(string userEmail);
+        Task RegisterUserAsync(UserDTO userDTO);
+        Task AssignRoleForNewUserAsync(string userEmail);
         IEnumerable<UserDTO> GetUsersDTO();
         UserDTO GetUserDTO(string id);
-        //void AuthenticateUser(UserDTO userDTO);
+        Task AuthenticateUserAsync(UserDTO userDTO);
     }
 }

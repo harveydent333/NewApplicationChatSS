@@ -15,10 +15,8 @@ namespace NewApplicationChatSS.Mappings
         {
             CreateMap<User, UserDTO>();
             CreateMap<UserDTO, User>()
-                .ForMember(x => x.UserName, opt => opt.MapFrom(src => src.Email))
                 .ForMember(x => x.PasswordHash, opt => opt.MapFrom(src => src.Password));
 
-            CreateMap<IEnumerable<UserDTO>, IEnumerable<User>>();
             CreateMap<RegisterViewModel, UserDTO>().ReverseMap();
             CreateMap<LoginViewModel, UserDTO>().ReverseMap();
         }

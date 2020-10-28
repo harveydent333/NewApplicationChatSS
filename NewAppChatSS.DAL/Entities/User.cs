@@ -9,14 +9,6 @@ namespace NewAppChatSS.DAL.Entities
     /// </summary>
     public class User : IdentityUser
     {
-        /// <summary>
-        /// Логин пользователя
-        /// </summary>
-        [Required]
-        [RegularExpression(@"[a-zA-Z0-9]+")]
-        [StringLength(35, MinimumLength = 4)]
-        public string Login { get; set; }
-
         [Required]
         public bool IsLocked { get; set; } = false;
 
