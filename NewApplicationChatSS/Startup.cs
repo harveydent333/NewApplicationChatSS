@@ -17,6 +17,9 @@ using System.IO;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AutoMapper;
 using NewApplicationChatSS.Mappings;
+using NewAppChatSS.BLL.Interfaces.HubInterfaces;
+using NewAppChatSS.BLL.Hubs.CommandHandlersHubs;
+using NewAppChatSS.BLL.Infrastructure;
 
 namespace NewApplicationChatSS
 {
@@ -29,7 +32,6 @@ namespace NewApplicationChatSS
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
@@ -47,6 +49,8 @@ namespace NewApplicationChatSS
 
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IUserCommandHandler, UserCommandHandlerHub>();
+            services.AddTransient<IUserValidator, UserValidator>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                .AddCookie(options => {

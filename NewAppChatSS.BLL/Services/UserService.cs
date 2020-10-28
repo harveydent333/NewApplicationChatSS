@@ -14,7 +14,7 @@ namespace NewAppChatSS.BLL.Services
 {
     public class UserService : IUserService
     {
-        public IUnitOfWork Database { get; set; }
+        private IUnitOfWork Database { get; set; }
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly SignInManager<User> _signInManager;
