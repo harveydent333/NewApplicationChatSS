@@ -96,6 +96,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             userDto.UserName = userNames["newUserName"];
             //user = _mapper.Map<User>(userDto);
             await _userManager.UpdateAsync(_mapper.Map<User>(userDto));
+            Database.Save();
 
             if (ownerLogin == userNames["oldUserName"])
             {

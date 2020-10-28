@@ -44,6 +44,8 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task Update(User item)
         {
+            //_dbUserContext.Users.Update();
+            //И потом Save()
             await _userManager.UpdateAsync(item);
         }
 
