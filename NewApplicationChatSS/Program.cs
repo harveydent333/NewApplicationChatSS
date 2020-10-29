@@ -25,10 +25,12 @@ namespace NewApplicationChatSS
                 var services = scope.ServiceProvider;
                 try
                 {
+                    var dbContext = services.GetRequiredService<ApplicationDbContext>();
                     var userManager = services.GetRequiredService<UserManager<User>>();
                     var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                    
 
-                    await DataInitializer.InitializeAsync(userManager, rolesManager);
+                    await DataInitializer.InitializeAsync(userManager, rolesManager, dbContext);
                 }
                 catch (Exception ex)
                 {

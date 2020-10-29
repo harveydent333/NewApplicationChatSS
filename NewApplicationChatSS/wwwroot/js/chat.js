@@ -33,12 +33,12 @@ document.getElementById("sendButton").addEventListener("click", function (event)
 
     if (message.match(/^\/\//) != null) {
         if (message.match(/^\/\/user/)) {
-            connection.invoke("ReceivingUserInteractionCommand", userEmail, message).catch(function (err) {
+            connection.invoke("ReceivingUserInteractionCommand", userEmail, message).catch(function (err) { // ТУТ userEmail менять
                 return console.error(err.toString());
             });
         }
         else if (message.match(/^\/\/room/)) {
-            connection.invoke("ReceivingRoomInteractionCommand", userLogin, roomId, message).catch(function (err) {
+            connection.invoke("ReceivingRoomInteractionCommand", userEmail, roomId, message).catch(function (err) { // ТУТ userEmail менять
                 return console.error(err.toString());
             });
         }

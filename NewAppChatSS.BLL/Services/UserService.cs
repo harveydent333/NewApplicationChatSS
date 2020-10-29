@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.DTO;
 using NewAppChatSS.BLL.Infrastructure;
-using NewAppChatSS.BLL.Interfaces;
+using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
@@ -59,7 +59,7 @@ namespace NewAppChatSS.BLL.Services
 
         public async Task AssignRoleForNewUserAsync(string userEmail)
         {
-            await _userManager.AddToRolesAsync(Database.Users.FindByEmail(userEmail), new string[] { "RegularUser" });
+            await _userManager.AddToRolesAsync(await _userManager.FindByEmailAsync(userEmail), new string[] { "RegularUser" });
         }
 
         public async Task AuthenticateUserAsync(UserDTO userDTO)

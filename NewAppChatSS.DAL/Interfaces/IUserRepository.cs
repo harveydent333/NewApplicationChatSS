@@ -9,10 +9,17 @@ namespace NewAppChatSS.DAL.Interfaces
     public interface IUserRepository
     {
         IEnumerable<User> GetAll();
-        User FindById(string id);
-        User FindByEmail(string email);
+
+        Task<User> FindById(string id);
+
+        Task<User> FindByEmailAsync(string email);
+
         Task Create(User item);
+
         Task Update(User item);
+
         Task Delete(User item);
+
+        void Save();
     }
 }

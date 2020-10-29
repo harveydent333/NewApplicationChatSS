@@ -1,14 +1,19 @@
 ﻿using System;
-using NewAppChatSS.DAL.Entities;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
         IUserRepository Users { get; }
-        IRoleRepository Roles { get; }
-        void Save();
+
+        IRoomRepository Rooms { get; }
+
+        IMessageRepository Messages { get; }
+
+        IMemberRepository Members { get; }
+
+        IMutedUserRepository MutedUsers { get; }
+
+        IKickedOutsRepository KickedOuts { get; }
     }
 }

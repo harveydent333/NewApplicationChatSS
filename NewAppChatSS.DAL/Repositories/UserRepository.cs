@@ -1,39 +1,38 @@
-﻿using NewAppChatSS.DAL.Interfaces;
+﻿using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL;
+using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _dbUserContext;
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
 
         public UserRepository(ApplicationDbContext context, UserManager<User> manager)
         {
-            _dbUserContext = context;
+            _context = context;
             _userManager = manager;
         }
 
         public IEnumerable<User> GetAll()
         {
-            return _dbUserContext.Users.ToList();
+            return _context.Users.ToList();
         }
 
-        public User FindById(string id)
+        public async Task<User> FindById(string id)
         {
-            return _dbUserContext.Users.FirstOrDefault(u => u.Id == id);
+            return await _userManager.FindByIdAsync(id);
         }
 
-        public User FindByEmail(string email)
+        public async Task<User> FindByEmailAsync(string email)
         {
-            return _dbUserContext.Users.FirstOrDefault(u => u.Email == email);
+            return await _userManager.FindByEmailAsync(email); 
         }
 
         public async Task Create(User item)
@@ -44,10 +43,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task Update(User item)
         {
-            _dbUserContext.Users.Update(item);
-            _dbUserContext.SaveChanges();
-            //И потом Save()
-            //await _userManager.UpdateAsync(item);
+            await _userManager.UpdateAsync(item);
         }
 
         public async Task Delete(User item)
@@ -55,5 +51,9 @@ namespace NewAppChatSS.DAL.Repositories
             await _userManager.DeleteAsync(item);
         }
 
+        public void Save()
+        {
+            _context.SaveChanges();
+        }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace NewAppChatSS.BLL.Infrastructure
+namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
     public class CommandHandler
     {

@@ -5,14 +5,18 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NewAppChatSS.BLL.Interfaces
+namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {
     public interface IUserService
     {
         Task RegisterUserAsync(UserDTO userDTO);
+
         Task AssignRoleForNewUserAsync(string userEmail);
+
         IEnumerable<UserDTO> GetUsersDTO();
+
         UserDTO GetUserDTO(string id);
+
         Task AuthenticateUserAsync(UserDTO userDTO);
     }
 }

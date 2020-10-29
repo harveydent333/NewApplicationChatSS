@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Text;
 using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.BLL.Interfaces.HubInterfaces;
-using NewAppChatSS.BLL.DTO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.DAL.Entities;
 using AutoMapper;
 using System.Linq;
-using NewAppChatSS.BLL.Interfaces;
 using NewAppChatSS.DAL.Interfaces;
 using NewAppChatSS.BLL.Infrastructure;
+using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 
 namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
@@ -56,7 +54,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// Метод проверяет какое регулярное выражение соответствует полученной команде
         /// по результатам перенаправляет на нужный метод обработки команды
         /// </summary>
-        public Task SearchCommand(User user, string command, IHubCallerClients calledClients)
+        public Task SearchCommandAsync(User user, string command, IHubCallerClients calledClients)
         {
             foreach (Regex keyCommand in userCommands.Keys)
             {
@@ -76,10 +74,10 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string ownerUserName = user.UserName;
 
-            Dictionary<String, String> userNames = ParsingUserNames(command);
+            Dictionary<string, string> userNames = ParsingUserNames(command);
 
-            if (!await _userValidator.CommandAccessCheckAsync(user, 
-                new String[] { "Administrator", "Moderator" }, true, userNames["oldUserName"]))
+            if (!await _userValidator.CommandAccessCheckAsync(user,
+                new string[] { "Administrator", "Moderator" }, true, userNames["oldUserName"]))
             {
 
                 //return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
@@ -99,7 +97,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
                 user.UserName = userNames["newUserName"];
                 await _userManager.UpdateAsync(user);
-                
+
 
                 if (ownerUserName == userNames["oldUserName"])
                 {
@@ -113,7 +111,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     //        $"на {userLogins["newLogin"]}"));
                     return clients.Caller.SendAsync("ReceiveCommand",
                         $"Имя пользователя {userNames["oldUserName"]} было успешно изменено на {userNames["newUserName"]}");
-                }
+            }
 
             //return clients.Caller.SendAsync("ReceiveCommand",
             //  CommandHandler.CreateCommandInfo($"Имя пользователя {userLogins["oldLogin"]} уже занято"));
@@ -126,7 +124,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public async Task<Task> UserBanAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new String[] { "Administrator", "Moderator" }))
+            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
             {
                 //return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
                 return clients.Caller.SendAsync("ReceiveCommand", "Отказано в доступе.");
@@ -153,7 +151,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public async Task<Task> UserPardonAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new String[] { "Administrator", "Moderator" }))
+            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
             {
                 //return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
                 return clients.Caller.SendAsync("ReceiveCommand", "Отказано в доступе.");
@@ -180,7 +178,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public async Task<Task> TemporaryUserBlockAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new String[] { "Administrator", "Moderator" }))
+            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
             {
                 //return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
                 return clients.Caller.SendAsync("ReceiveCommand", "Отказано в доступе.");
@@ -207,7 +205,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public async Task<Task> SetModerationRoleAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new String[] { "Administrator", "Moderator" }))
+            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
             {
                 //return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
                 return clients.Caller.SendAsync("ReceiveCommand", "Отказано в доступе.");
@@ -223,7 +221,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             }
 
             user = await _userManager.FindByNameAsync(userName);
-            await _userManager.AddToRoleAsync(user,"Moderator");
+            await _userManager.AddToRoleAsync(user, "Moderator");
 
             //        return clients.Caller.SendAsync("ReceiveCommand",
             //            CommandHandler.CreateCommandInfo($"Пользователь {user.Login} был назначен модератором."));
@@ -235,7 +233,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public async Task<Task> RemoveModerationRoleAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new String[] { "Administrator", "Moderator" }))
+            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
             {
                 //return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
                 return clients.Caller.SendAsync("ReceiveCommand", "Отказано в доступе.");

@@ -3,27 +3,26 @@ using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    class RoleRepository : IRoleRepository
+    public class RoleRepository : IRoleRepository
     {
-        private readonly ApplicationDbContext _dbRoleContext;
+        private readonly ApplicationDbContext _context;
 
         public RoleRepository(ApplicationDbContext context)
         {
-            _dbRoleContext = context;
+            _context = context;
         }
 
         public string FindRoleIdByName(string roleName)
         {
-            return _dbRoleContext.Roles.FirstOrDefault(r => r.Name == roleName)?.Id;
+            return _context.Roles.FirstOrDefault(r => r.Name == roleName)?.Id;
         }
 
         public string FindRoleNameById(string roleId)
         {
-            return _dbRoleContext.Roles.FirstOrDefault(r => r.Id == roleId)?.Name;
+            return _context.Roles.FirstOrDefault(r => r.Id == roleId)?.Name;
         }
     }
 }

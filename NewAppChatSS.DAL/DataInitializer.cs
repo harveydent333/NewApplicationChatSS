@@ -4,16 +4,14 @@ using System.Text;
 using NewAppChatSS.DAL.Entities;  
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace NewAppChatSS.DAL
 {
     public class DataInitializer
     {
-        public static async Task InitializeAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task InitializeAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext dbContext)
         {
-            string adminEmail = "admin@gmail.com";
-            string password = "_Qq123456";
-
             if (await roleManager.FindByNameAsync("RegularUser") == null)
             {
                 await roleManager.CreateAsync(new IdentityRole("RegularUser"));
@@ -29,15 +27,54 @@ namespace NewAppChatSS.DAL
                 await roleManager.CreateAsync(new IdentityRole("Administrator"));
             }
 
-            if (await userManager.FindByNameAsync(adminEmail) == null)
+            if (await userManager.FindByNameAsync("admin@gmail.com") == null)
             {
-                User admin = new User { Email = adminEmail, UserName = "admin", IsLocked = false};
-                IdentityResult result = await userManager.CreateAsync(admin, password);
+                User admin = new User 
+                { 
+                    Email = "admin@gmail.com",
+                    UserName = "admin",
+                    IsLocked = false
+                };
+
+                IdentityResult result = await userManager.CreateAsync(admin, "_Qq123456");
 
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(admin, "Administrator");
                 }
+            }
+            if (!dbContext.TypesRooms.Any())
+            {
+                dbContext.TypesRooms.AddRange(
+                    new TypeRoom
+                    {
+                        Id = 1,
+                        TypeName = "RegularRoom",
+                    },
+                    new TypeRoom
+                    {
+                        Id = 2,
+                        TypeName = "PrivateRoom",
+                    },
+                    new TypeRoom
+                    {
+                        Id = 3,
+                        TypeName = "BotRoom",
+                    });
+                dbContext.SaveChanges();
+            };
+
+            if (!dbContext.Rooms.Any())
+            {
+                dbContext.Rooms.Add(
+                    new Room
+                    {
+                        Id = "1",
+                        RoomName = "MainRoom",
+                        OwnerId = (await userManager.FindByEmailAsync("admin@gmail.com")).Id,
+                        TypeId = 1,
+                    });
+                dbContext.SaveChanges();
             }
         }
     }

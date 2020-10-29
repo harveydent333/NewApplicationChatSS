@@ -51,6 +51,5 @@ namespace NewAppChatSS.DAL.Entities
         /// </summary>
         [ForeignKey("LastMessageId")]
         public Message LastMessage { get; set; }
-
     }
 }
