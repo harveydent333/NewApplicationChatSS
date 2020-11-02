@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
@@ -9,14 +10,14 @@ namespace NewAppChatSS.DAL.Interfaces
     {
         IEnumerable<Message> GetAll();
 
-        void AddMessage(Message item);
+        Task AddMessage(Message item);
 
-        void DeleteMessage(string id);
+        Task DeleteMessageAsync(string id);
 
         IEnumerable<Message> FindMessagesByRoomId(string roomId);
 
         IEnumerable<Message> GetRoomMessages(string roomId);
 
-        void Save();
+        Task SaveAsync();
     }
 }

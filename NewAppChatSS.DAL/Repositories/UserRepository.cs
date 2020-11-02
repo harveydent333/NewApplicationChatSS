@@ -35,25 +35,25 @@ namespace NewAppChatSS.DAL.Repositories
             return await _userManager.FindByEmailAsync(email); 
         }
 
-        public async Task Create(User item)
+        public async Task CreateAsync(User item)
         {
             item.Id = Guid.NewGuid().ToString();
             await _userManager.CreateAsync(item, item.PasswordHash);
         }
 
-        public async Task Update(User item)
+        public async Task UpdateAsync(User item)
         {
             await _userManager.UpdateAsync(item);
         }
 
-        public async Task Delete(User item)
+        public async Task DeleteAsync(User item)
         {
             await _userManager.DeleteAsync(item);
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

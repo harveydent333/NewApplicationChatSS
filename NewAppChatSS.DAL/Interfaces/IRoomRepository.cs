@@ -13,19 +13,19 @@ namespace NewAppChatSS.DAL.Interfaces
 
         Room FindByName(string roomName);
 
-        void Create(Room item);
+        Task CreateAsync(Room item);
 
-        void Update(Room item);
+        Task UpdateAsync(Room item);
 
-        void UpdateById(string roomId);
+        Task UpdateByIdAsync(string roomId);
 
-        void Delete(Room item);
+        Task DeleteAsync(Room item);
 
-        void DeleteById(string roomId);
+        Task DeleteByIdAsync(string roomId);
 
-        void DeleteByName(string roomName);
+        Task DeleteByNameAsync(string roomName);
 
-        void Save();
+        Task SaveAsync();
     }
 }
 

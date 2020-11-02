@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
 {
@@ -27,7 +28,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// <summary>
         /// Добавляет запись в таблицу базы данных
         /// </summary>
-        public void AddMutedUser(string userId, string roomId, DateTime dateUnmute)
+        public async Task AddMutedUserAsync(string userId, string roomId, DateTime dateUnmute)
         {
             _context.MutedUsers.Add(
                 new MutedUser
@@ -36,13 +37,13 @@ namespace NewAppChatSS.DAL.Repositories
                     RoomId = roomId,
                     DateUnmute = dateUnmute
                 });
-            Save();
+            await SaveAsync();
         }
 
         /// <summary>
         /// Метод удаляет запись из таблицы базы данных
         /// </summary>
-        public void DeleteMutedUser(string userId, string roomId)
+        public async Task DeleteMutedUserAsync(string userId, string roomId)
         {
             MutedUser mutedUser = _context.MutedUsers
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
@@ -51,7 +52,7 @@ namespace NewAppChatSS.DAL.Repositories
             {
                 _context.Remove(mutedUser);
             }
-            Save();
+            await SaveAsync();
         }
 
         /// <summary>
@@ -74,9 +75,9 @@ namespace NewAppChatSS.DAL.Repositories
              .ToList();
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -14,12 +14,12 @@ namespace NewAppChatSS.DAL.Interfaces
 
         Task<User> FindByEmailAsync(string email);
 
-        Task Create(User item);
+        Task CreateAsync(User item);
 
-        Task Update(User item);
+        Task UpdateAsync(User item);
 
-        Task Delete(User item);
+        Task DeleteAsync(User item);
 
-        void Save();
+        Task SaveAsync();
     }
 }

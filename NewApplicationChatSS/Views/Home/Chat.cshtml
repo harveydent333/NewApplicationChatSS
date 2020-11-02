@@ -1,10 +1,6 @@
 ﻿@using NewApplicationChatSS.ViewModels
 
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
-
 <html>
 <head>
     <link href="~/css/chat.css" rel="stylesheet" />
@@ -58,7 +54,7 @@
                     <div class="msg_history">
                         @foreach (MessageViewModel message in ViewBag.Messages) 
                         {
-                            if (User.Identity.Name != message.User.Id.ToString())
+                            if (User.Identity.Name != message.User.UserName)
                             {
                                 <div class="incoming_msg">
                                     <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png"> </div>
@@ -116,11 +112,13 @@
                     button.setAttribute("aria-label","Close");
                     button.className = "close";
                     button.id = "button-close" + messageId;
+
                     button.onclick = function () {
-                        document.location.href = "/Message/Delete/@ViewBag.CurrentRoomId/" + messageId;
+                        deleteMessage(event);
                     };
+
                 var span = document.createElement("span");
-                    span.setAttribute("aria-hidden","true");
+                    span.setAttribute("aria-hidden", "true");
                     span.innerHTML = "&#215;";
 
             event.prepend(button);

@@ -9,13 +9,13 @@ namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces
 {
     public interface IUserValidator
     {
-        bool IsUserBlocked(User user);
+        Task<bool> IsUserBlocked(User user);
 
-        bool IsUserMutedById(string userId, string roomId);
+        Task<bool> IsUserMutedById(string userId, string roomId);
 
         Task<bool> IsUserMutedByNameAsync(string userName, string roomId);
 
-        bool IsUserKickedById(string userId, string roomId);
+        Task<bool> IsUserKickedById(string userId, string roomId);
 
         Task<bool> IsUserKickedByNameAsync(string userName, string roomId);
 

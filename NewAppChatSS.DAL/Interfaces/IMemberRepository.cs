@@ -10,9 +10,9 @@ namespace NewAppChatSS.DAL.Interfaces
     {
         IEnumerable<Member> GetAll();
 
-        Task AddMember(string userId, string roomId);
+        Task AddMemberAsync(string userId, string roomId);
 
-        Task DeleteMember(string userId, string roomId);
+        Task DeleteMemberAsync(string userId, string roomId);
 
         IEnumerable<User> GetMembers(string roomId);
 
@@ -22,6 +22,6 @@ namespace NewAppChatSS.DAL.Interfaces
 
         IEnumerable<string> GetRoomsIds(string userId);
 
-        Task Save();
+        Task SaveAsync();
     }
 }

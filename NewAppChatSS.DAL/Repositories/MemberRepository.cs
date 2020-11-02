@@ -26,7 +26,7 @@ namespace NewAppChatSS.DAL.Repositories
             return _context.Members.ToList();
         }
 
-        public async Task AddMember(string userId, string roomId)
+        public async Task AddMemberAsync(string userId, string roomId)
         {
             _context.Members.Add(
                 new Member
@@ -34,10 +34,10 @@ namespace NewAppChatSS.DAL.Repositories
                     UserId = userId,
                     RoomId = roomId,
                 });
-            await Save();
+            await SaveAsync();
         }
 
-        public async Task DeleteMember(string userId, string roomId)
+        public async Task DeleteMemberAsync(string userId, string roomId)
         {
             Member member = _context.Members
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
@@ -45,7 +45,7 @@ namespace NewAppChatSS.DAL.Repositories
             _context.Remove(_context.Members
                 .FirstOrDefault(m => m.Id == member.Id));
 
-            await Save();
+            await SaveAsync();
         }
 
         public IEnumerable<User> GetMembers(string roomId)
@@ -79,7 +79,7 @@ namespace NewAppChatSS.DAL.Repositories
                 .ToList();
         }
 
-        public async Task Save()
+        public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
         }

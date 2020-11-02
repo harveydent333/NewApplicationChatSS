@@ -76,16 +76,12 @@ namespace NewApplicationChatSS.Controllers
             RoomDTO room = _roomService.GetRoomDTO(roomId);
 
             ViewBag.CurrentRoomName = room.RoomName;
-
             ViewBag.CurrentRoomId = roomId;
-
             ViewBag.TypeRoom = room.TypeRoom.TypeName;
-
             ViewBag.UserName = User.Identity.Name;
 
             string userId = (await _userService.GetUserDTObyUserNameAsync(User.Identity.Name)).Id;
 
-            var x = _mapper.Map<List<RoomViewModel>>(_memberService.GetRoomsUser(userId));
             ViewBag.RoomsUser = _mapper.Map<List<RoomViewModel>>(_memberService.GetRoomsUser(userId));
 
             return View("Chat");

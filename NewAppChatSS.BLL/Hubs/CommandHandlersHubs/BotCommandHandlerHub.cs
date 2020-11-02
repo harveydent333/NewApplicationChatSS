@@ -46,13 +46,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео 
         /// </summary>
-        private Task CreateRefOnVideo(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideo(string command, IHubCallerClients clients)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
             YouTubeRequest youTubeRequest = new YouTubeRequest();
-            youTubeRequest.Run();
+            await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo);
 
@@ -62,14 +62,14 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео и информацию о количестве просмотров под искомым видео
         /// </summary>
-        private Task CreateRefOnVideoAndGetCountViews(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideoAndGetCountViews(string command, IHubCallerClients clients)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             command = Regex.Replace(command, @"\s-v", "");
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\w\W]+)$").Groups[2].Value;
 
             YouTubeRequest youTubeRequest = new YouTubeRequest();
-            youTubeRequest.Run();
+            await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo, true);
 
@@ -79,14 +79,14 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео и информацию о количестве лайков под искомым видео
         /// </summary>
-        private Task CreateRefOnVideoAndGetCountLikes(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideoAndGetCountLikes(string command, IHubCallerClients clients)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w])+$").Groups[1].Value;
             command = Regex.Replace(command, @"\s-l", "");
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
             YouTubeRequest youTubeRequest = new YouTubeRequest();
-            youTubeRequest.Run();
+            await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo, false, true);
 
@@ -96,7 +96,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео и информацию о количестве просмотров и лайков под искомым видео
         /// </summary>
-        private Task CreateRefOnVideoAndGetCountViewsAndLikes(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideoAndGetCountViewsAndLikes(string command, IHubCallerClients clients)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             command = Regex.Replace(command, @"\s-l", "");
@@ -104,7 +104,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
             YouTubeRequest youTubeRequest = new YouTubeRequest();
-            youTubeRequest.Run();
+            await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo, true, true);
 
@@ -114,12 +114,12 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылки к 5 видео, имеющиеся на канале
         /// </summary>
-        private Task GetInfoAboutChannel(string command, IHubCallerClients clients)
+        private async Task<Task> GetInfoAboutChannel(string command, IHubCallerClients clients)
         {
             string nameChannel = Regex.Match(command, @"//info\s([\s\W\w]+)$").Groups[1].Value;
 
             YouTubeRequest youTubeRequest = new YouTubeRequest();
-            youTubeRequest.Run();
+            await youTubeRequest.Run();
 
             return clients.Caller.SendAsync("PrintInfoAboutChannel", YouTubeRequest.GetChannelInfo(nameChannel));
         }

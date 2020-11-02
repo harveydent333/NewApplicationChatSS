@@ -26,12 +26,12 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет заблокирован ли пользователь в приложении
         /// </summary>
-        public bool IsUserBlocked(User user)
+        public async Task<bool> IsUserBlocked(User user)
         {
             if (user.IsLocked && (DateTime.Now > user.DateUnblock))
             {
                 user.IsLocked = false;
-                _userManager.UpdateAsync(user);
+                await _userManager.UpdateAsync(user);
             }
 
             return user.IsLocked;
@@ -40,7 +40,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет, имеет ли пользователь возможность отправлять сообщения в чат в комнате
         /// </summary>
-        public bool IsUserMutedById(string userId, string roomId)
+        public async Task<bool> IsUserMutedById(string userId, string roomId)
         {
             List<MutedUser> listRoomWhereMutedUser = Database.MutedUsers.GetListMutedRoomForUser(userId).ToList();
 
@@ -54,7 +54,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    Database.MutedUsers.DeleteMutedUser(userId, roomId);
+                    await Database.MutedUsers.DeleteMutedUserAsync(userId, roomId);
                     return false;
                 }
             }
@@ -80,7 +80,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    Database.MutedUsers.DeleteMutedUser(userId, roomId);
+                    await Database.MutedUsers.DeleteMutedUserAsync(userId, roomId);
                     return false;
                 }
             }
@@ -93,7 +93,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет выгнан ли пользователь из комнаты
         /// </summary>
-        public bool IsUserKickedById(string userId, string roomId)
+        public async Task<bool> IsUserKickedById(string userId, string roomId)
         {
             List<KickedOut> listKickedOut = Database.KickedOuts.GetListKickedRoomForUser(userId).ToList();
 
@@ -107,7 +107,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    Database.KickedOuts.DeleteKickedUser(userId, roomId);
+                    await Database.KickedOuts.DeleteKickedUserAsync(userId, roomId);
                     return false;
                 }
             }
@@ -135,7 +135,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    Database.KickedOuts.DeleteKickedUser(user.Id, roomId);
+                    await Database.KickedOuts.DeleteKickedUserAsync(user.Id, roomId);
                     return false;
                 }
             }

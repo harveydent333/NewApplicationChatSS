@@ -190,6 +190,15 @@ connection.start().then(function () {
     return console.error(err.toString());
 });
 
+function deleteMessage(event) {
+    let userName = document.querySelector('#user-name').value;
+    let messageId = event.id
+    let roomId = document.querySelector('#current-room-id').value;
+    connection.invoke("DeleteMessage", userName, messageId, roomId).catch(function (err) {
+        return console.error(err.toString());
+    });
+}
+
 document.querySelector('.msg_send_btn').addEventListener("click", function (event) {
     let userName = document.querySelector('#user-name').value;
 

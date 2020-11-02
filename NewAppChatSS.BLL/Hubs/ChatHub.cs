@@ -47,14 +47,14 @@ namespace NewAppChatSS.BLL.Hubs
         {
             User user = await _userManager.FindByNameAsync(userName);
 
-            if (_userValidator.IsUserMutedById(user.Id, roomId))
+            if (await _userValidator.IsUserMutedById(user.Id, roomId))
             {
                 await Clients.Caller.SendAsync("ReceiveCommand",
                     CommandHandler.CreateCommandInfo(string.Format("Вы лишины возможности отправлять сообщения до: {0:U}.",
                         Database.MutedUsers.GetDateTimeUnmuteUser(user.Id, roomId))));
             }
 
-            if (_userValidator.IsUserBlocked(user))
+            if (await _userValidator.IsUserBlocked(user))
             {
                 await Clients.Caller.SendAsync("ReceiveCommand",
                     CommandHandler.CreateCommandInfo(string.Format("Вы заблокированы до: {0:U}.", user.DateUnblock)));
@@ -71,7 +71,7 @@ namespace NewAppChatSS.BLL.Hubs
         {
             Room room = Database.Rooms.GetAll().FirstOrDefault(r => r.Id == roomId);
          
-            string messageInfo = _messageHandler.SaveMessageIntoDatabase(user, message, room);
+            string messageInfo = await _messageHandler.SaveMessageIntoDatabase(user, message, room);
             List<string> members = Database.Members.GetMembersIds(roomId).ToList();
 
             await clients.Users(members).SendAsync("ReceiveMessage", messageInfo);
@@ -80,14 +80,42 @@ namespace NewAppChatSS.BLL.Hubs
         /// <summary>
         /// 
         /// </summary>
-        public async Task DeleteMessage(User user, string message, string roomId, IHubCallerClients clients)
+        public async Task DeleteMessage(string userName, string messageId, string roomId)
         {
-            Room room = Database.Rooms.GetAll().FirstOrDefault(r => r.Id == roomId);
+            User user = await _userManager.FindByNameAsync(userName);
 
-            string messageInfo = _messageHandler.SaveMessageIntoDatabase(user, message, room);
-            List<string> members = Database.Members.GetMembersIds(roomId).ToList();
+            if (user.IsLocked)
+            {
+                await Clients.Caller.SendAsync("ReceiveCommand",
+                    CommandHandler.CreateCommandInfo("Вы заблокированы и не можете удалять сообщения."));
+            }
 
-            await clients.Users(members).SendAsync("ReceiveMessage", messageInfo);
+            List<string> listLastMessagesIdRoom = Database.Rooms
+                .GetAll()
+                .Select(r => r.LastMessageId)
+                .ToList();
+
+            if (listLastMessagesIdRoom.Contains(messageId))
+            {
+                Room processedRoom = Database.Rooms
+                    .GetAll()
+                    .FirstOrDefault(r => r.LastMessageId == messageId);
+
+                await Database.Messages.DeleteMessageAsync(messageId);
+
+                Message proccessedMessage = Database.Messages
+                    .GetAll()
+                    .OrderByDescending(m => m.DatePublication)
+                    .FirstOrDefault(m => m.RoomId == roomId);
+
+                processedRoom.LastMessageId = proccessedMessage.Id;
+                await Database.Rooms.UpdateAsync(processedRoom);
+            }
+            else
+            {
+                await Database.Messages.DeleteMessageAsync(messageId);
+            }
+            
         }
 
         /// <summary>

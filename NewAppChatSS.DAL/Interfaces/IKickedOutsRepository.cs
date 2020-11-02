@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
@@ -9,12 +10,12 @@ namespace NewAppChatSS.DAL.Interfaces
     {
         IEnumerable<KickedOut> GetAll();
 
-        void AddKickedUser(string userId, string roomId, DateTime dateUnkick);
+        Task AddKickedUserAsync(string userId, string roomId, DateTime dateUnkick);
 
-        void DeleteKickedUser(string userId, string roomId);
+        Task DeleteKickedUserAsync(string userId, string roomId);
 
         IEnumerable<KickedOut> GetListKickedRoomForUser(string userId);
 
-        void Save();
+        Task SaveAsync();
     }
 }

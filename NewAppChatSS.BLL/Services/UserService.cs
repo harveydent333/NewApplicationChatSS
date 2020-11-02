@@ -77,7 +77,7 @@ namespace NewAppChatSS.BLL.Services
 
         public async Task AddingUserInMainRoom(string userId)
         {
-            await Database.Members.AddMember(userId, MAIN_ROOM_ID);
+            await Database.Members.AddMemberAsync(userId, MAIN_ROOM_ID);
         }
 
         public async Task AuthenticateUserAsync(UserDTO userDTO)

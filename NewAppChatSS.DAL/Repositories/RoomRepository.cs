@@ -43,45 +43,45 @@ namespace NewAppChatSS.DAL.Repositories
                 .FirstOrDefault(r => r.RoomName == roomName);
         }
 
-        public void Create(Room item)
+        public async Task CreateAsync(Room item)
         {
             _context.Rooms.Add(item);
-            Save();
+            await SaveAsync();
         }
 
-        public void Update(Room room)
+        public async Task UpdateAsync(Room room)
         {
             _context.Rooms.Update(room);
-            Save();
+            await SaveAsync();
         }
 
-        public void UpdateById(string roomId)
+        public async Task UpdateByIdAsync(string roomId)
         {
             _context.Rooms.Update(FindById(roomId));
-            Save();
+            await SaveAsync();
         }
 
-        public void Delete(Room room)
+        public async Task DeleteAsync(Room room)
         {
             _context.Rooms.Remove(room);
-            Save();
+            await SaveAsync();
         }
 
-        public void DeleteById(string roomId)
+        public async Task DeleteByIdAsync(string roomId)
         {
             _context.Rooms.Remove(FindById(roomId));
-            Save();
+            await SaveAsync();
         }
 
-        public void DeleteByName(string roomName)
+        public async Task DeleteByNameAsync(string roomName)
         {
             _context.Rooms.Remove(FindByName(roomName));
-            Save();
+            await SaveAsync();
         }
 
-        public void Save()
+        public async Task SaveAsync()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

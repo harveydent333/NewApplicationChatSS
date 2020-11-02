@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 {
@@ -27,7 +28,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// <summary>
         /// Метод сохраняет в базу данных информацию о сообщении написаным в пользователем в чат комнаты
         /// </summary>
-        public string SaveMessageIntoDatabase(User user, string textMessage, Room room)
+        public async Task<string> SaveMessageIntoDatabase(User user, string textMessage, Room room)
         {
             string messageId = Guid.NewGuid().ToString();
 
@@ -40,9 +41,9 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
                 RoomId = room.Id
             };
 
-            Database.Messages.AddMessage(message);
+            await Database.Messages.AddMessage(message);
 
-            AddInfoAboutLastMessage(messageId, room.Id);
+            await AddInfoAboutLastMessage(messageId, room.Id);
 
             return JsonSerializer.Serialize<object>(new
             {
@@ -57,12 +58,12 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// <summary>
         /// Метод добавляет информацию в базу данных о последем сообщении в комнате
         /// </summary>
-        private void AddInfoAboutLastMessage(string messageId, string roomId)
+        private async Task AddInfoAboutLastMessage(string messageId, string roomId)
         {
             Room room = Database.Rooms.FindById(roomId);
 
             room.LastMessageId = messageId;
-            Database.Rooms.Update(room);
+            await Database.Rooms.UpdateAsync(room);
         }
 
         /// <summary>

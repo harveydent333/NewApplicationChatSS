@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
 {
@@ -24,7 +25,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// <summary>
         /// Добавляет запись в таблицу базы данных
         /// </summary>
-        public void AddKickedUser(string userId, string roomId, DateTime dateUnkick)
+        public async Task AddKickedUserAsync(string userId, string roomId, DateTime dateUnkick)
         {
             _context.KickedOuts.Add(
                 new KickedOut
@@ -33,13 +34,13 @@ namespace NewAppChatSS.DAL.Repositories
                     RoomId = roomId,
                     DateUnkick = dateUnkick,
                 });
-            Save();
+            await SaveAsync();
         }
 
         /// <summary>
         /// Метод удаляет запись из таблицы базы данных
         /// </summary>
-        public void DeleteKickedUser(string userId, string roomId)
+        public async Task DeleteKickedUserAsync(string userId, string roomId)
         {
             KickedOut kickedOut = _context.KickedOuts
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
@@ -48,7 +49,7 @@ namespace NewAppChatSS.DAL.Repositories
             {
                 _context.Remove(kickedOut);
             }
-            Save();
+            await SaveAsync();
         }
 
         /// <summary>
@@ -64,9 +65,9 @@ namespace NewAppChatSS.DAL.Repositories
         /// <summary>
         /// Метод сохраняет изменения состояния в базе данных
         /// </summary>
-        public void Save()
+        public async Task SaveAsync()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

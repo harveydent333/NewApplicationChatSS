@@ -4,6 +4,7 @@ using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 {
@@ -19,7 +20,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// <summary>
         /// Метод создает новую комнату 
         /// </summary>
-        public string CreateRoom(string roomName, int typeRoomId, string userId)
+        public async Task<string> CreateRoom(string roomName, int typeRoomId, string userId)
         {
             string roomId = Guid.NewGuid().ToString();
 
@@ -31,8 +32,8 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
                 TypeId = typeRoomId
             };
 
-            Database.Rooms.Create(newRoom);
-            Database.Members.AddMember(userId, roomId);
+            await Database.Rooms.CreateAsync(newRoom);
+            await Database.Members.AddMemberAsync(userId, roomId);
 
             return JsonSerializer.Serialize<object>(
                 new

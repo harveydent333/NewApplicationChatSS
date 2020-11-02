@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces
 {
     public interface IMessageHandler
     {
-        string SaveMessageIntoDatabase(User user, string textMessage, Room room);
+        Task<string> SaveMessageIntoDatabase(User user, string textMessage, Room room);
     }
 }
