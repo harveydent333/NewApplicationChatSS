@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using AutoMapper;
 using NewApplicationChatSS.Mappings;
 using NewAppChatSS.BLL.Hubs.CommandHandlersHubs;
+using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
+using NewAppChatSS.BLL.Infrastructure.ModelHandlers;
 
 namespace NewApplicationChatSS
 {
@@ -50,10 +52,14 @@ namespace NewApplicationChatSS
 
             services.AddTransient<IUnitOfWork, EFUnitOfWork>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IRoomService, RoomService>();
+            services.AddTransient<IMemberService, MemberService>();
             services.AddTransient<IUserCommandHandler, UserCommandHandlerHub>();
             services.AddTransient<IRoomCommandHandler, RoomCommandHandlerHub>();
             services.AddTransient<IUserValidator, UserValidator>();
             services.AddTransient<IRoomValidator, RoomValidator>();
+            services.AddTransient<IMessageHandler, MessageHandler>();
+            services.AddTransient<IRoomHandler, RoomHandler>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                .AddCookie(options => {

@@ -14,6 +14,8 @@ namespace NewAppChatSS.BLL.Services
 {
     public class UserService : IUserService
     {
+        const string MAIN_ROOM_ID = "1";
+
         private IUnitOfWork Database { get; set; }
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
@@ -32,9 +34,19 @@ namespace NewAppChatSS.BLL.Services
             return _mapper.Map<IEnumerable<UserDTO>>(Database.Users.GetAll());
         }
 
-        public UserDTO GetUserDTO(string id)
+        public UserDTO GetUserDTObyId(string id)
         {
             return _mapper.Map<UserDTO>(_userManager.FindByIdAsync(id));
+        }
+        
+        public UserDTO GetUserDTObyUserName(string userName)
+        {
+            return _mapper.Map<UserDTO>(_userManager.FindByNameAsync(userName));
+        }
+        
+        public UserDTO GetUserDTObyEmail(string email)
+        {
+            return _mapper.Map<UserDTO>(_userManager.FindByEmailAsync(email));
         }
 
         public async Task RegisterUserAsync(UserDTO userDTO)
@@ -54,12 +66,18 @@ namespace NewAppChatSS.BLL.Services
 
             await _userManager.CreateAsync(user, userDTO.Password);
 
-            await AssignRoleForNewUserAsync(userDTO.Email);
+            await AssignRoleForNewUserAsync(user);
+            await AddingUserInMainRoom(user.Id);
         }
 
-        public async Task AssignRoleForNewUserAsync(string userEmail)
+        public async Task AssignRoleForNewUserAsync(User user)
         {
-            await _userManager.AddToRolesAsync(await _userManager.FindByEmailAsync(userEmail), new string[] { "RegularUser" });
+            await _userManager.AddToRolesAsync(user, new string[] { "RegularUser" });
+        }
+
+        public async Task AddingUserInMainRoom(string userId)
+        {
+            await Database.Members.AddMember(userId, MAIN_ROOM_ID);
         }
 
         public async Task AuthenticateUserAsync(UserDTO userDTO)

@@ -11,11 +11,17 @@ namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces
     {
         bool IsUserBlocked(User user);
 
-        bool IsUserMuted(string userId, string roomId);
+        bool IsUserMutedById(string userId, string roomId);
 
-        bool IsUserKicked(string userId, string roomId);
+        Task<bool> IsUserMutedByNameAsync(string userName, string roomId);
 
-        bool IsUserInGroup(string userId, string roomId);
+        bool IsUserKickedById(string userId, string roomId);
+
+        Task<bool> IsUserKickedByNameAsync(string userName, string roomId);
+
+        bool IsUserInGroupById(string userId, string roomId);
+
+        Task<bool> IsUserInGroupByNameAsync(string userName, string roomId);
 
         Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "");
     }

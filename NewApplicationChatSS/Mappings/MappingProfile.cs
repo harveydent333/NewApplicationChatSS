@@ -19,6 +19,8 @@ namespace NewApplicationChatSS.Mappings
 
             CreateMap<RegisterViewModel, UserDTO>().ReverseMap();
             CreateMap<LoginViewModel, UserDTO>().ReverseMap();
+
+            CreateMap<RoomDTO, Room>().ReverseMap();
         }
     }
 }

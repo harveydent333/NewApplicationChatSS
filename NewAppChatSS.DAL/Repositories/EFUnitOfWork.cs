@@ -19,6 +19,7 @@ namespace NewAppChatSS.DAL.Repositories
         private IMutedUserRepository mutedUserRepository;
         private IKickedOutsRepository kickedOutsRepository;
         private readonly UserManager<User> _userManager;
+        public IUnitOfWork Database { get; set; }
 
         public EFUnitOfWork(ApplicationDbContext dbContext, UserManager<User> manager)
         {
@@ -68,7 +69,7 @@ namespace NewAppChatSS.DAL.Repositories
             {
                 if (memberRepository == null)
                 {
-                    memberRepository = new MemberRepository(db);
+                    memberRepository = new MemberRepository(db, this);
                 }
                 return memberRepository;
             }

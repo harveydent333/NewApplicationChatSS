@@ -1,111 +1,84 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text.Json;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
-//namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
-//{
-//    /// <summary>
-//    /// Обработчик сообщений в чате
-//    /// </summary>
-//    public class MessageHandler
-//    {
-//        private static IMessageRepository messageRepository;
-//        private static IRoomRepository roomRepository;
-//        private static ISwearingUserRepository swearingUserRepository;
-//        private static IDictionaryBadWordsRepository dictionaryBadWordsRepository;
+namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
+{
+    /// <summary>
+    /// Обработчик сообщений в чате
+    /// </summary>
+    public class MessageHandler : IMessageHandler
+    {
+        public IUnitOfWork Database { get; set; }
+        private readonly UserManager<User> _userManager;
 
-//        public MessageHandler(IMessageRepository messageRep, IRoomRepository roomRep, ISwearingUserRepository swearingUserRep, IDictionaryBadWordsRepository dictionaryBadWordsRep)
-//        {
-//            messageRepository = messageRep;
-//            roomRepository = roomRep;
-//            swearingUserRepository = swearingUserRep;
-//            dictionaryBadWordsRepository = dictionaryBadWordsRep;
-//        }
+        public MessageHandler(IUnitOfWork uow, UserManager<User> userManager)
+        {
+            _userManager = userManager;
+            Database = uow;
+        }
 
-//        /// <summary>
-//        /// Метод сохраняет в базу данных информацию о сообщении написаным в пользователем в чат комнаты
-//        /// </summary>
-//        public String SaveMessageIntoDatabase(User user, String textMessage, Room room)
-//        {
-//            String messageId = Guid.NewGuid().ToString();
-//            Message message = new Message
-//            {
-//                Id = messageId,
-//                ContentMessage = textMessage,
-//                DatePublication = DateTime.Now,
-//                UserId = user.Id,
-//                RoomId = room.Id
-//            };
+        /// <summary>
+        /// Метод сохраняет в базу данных информацию о сообщении написаным в пользователем в чат комнаты
+        /// </summary>
+        public string SaveMessageIntoDatabase(User user, string textMessage, Room room)
+        {
+            string messageId = Guid.NewGuid().ToString();
 
-//            messageRepository.AddMessage(message);
-//            AddInfoAboutLastMessage(messageId, room.Id);
+            Message message = new Message
+            {
+                Id = messageId,
+                ContentMessage = textMessage,
+                DatePublication = DateTime.Now,
+                UserId = user.Id,
+                RoomId = room.Id
+            };
 
-//            if (ContainsSwearWords(textMessage))
-//            {
-//                HandleSwearingUser(user.Id);
-//            }
+            Database.Messages.AddMessage(message);
 
-//            return JsonSerializer.Serialize<object>(new
-//            {
-//                userLogin = user.Login,
-//                messageId = message.Id,
-//                messageContent = message.ContentMessage,
-//                datePublication = DateTime.Now,
-//                roomId = room.Id
-//            });
-//        }
+            AddInfoAboutLastMessage(messageId, room.Id);
 
-//        /// <summary>
-//        /// Метод добавляет информацию в базу данных о последем сообщении в комнате
-//        /// </summary>
-//        public static void AddInfoAboutLastMessage(String messageId, String roomId)
-//        {
-//            Room room = roomRepository.FindRoomById(roomId);
-//            room.LastMessageId = messageId;
-//            roomRepository.EditRoom(room);
-//        }
+            return JsonSerializer.Serialize<object>(new
+            {
+                userName = user.UserName,
+                messageId = message.Id,
+                messageContent = message.ContentMessage,
+                datePublication = DateTime.Now,
+                roomId = room.Id
+            });
+        }
 
-//        /// <summary>
-//        /// Метод добавляет информацию о ругающемся пользователе в базу данных
-//        /// </summary>
-//        private void HandleSwearingUser(Int32? userId)
-//        {
-//            SwearingUser swearingUser = swearingUserRepository.FindSwearingUserByUserId(userId);
-//            if (swearingUser != null)
-//            {
-//                swearingUser.CountSwear++;
-//                swearingUserRepository.EditSwearingUser(swearingUser);
-//            }
-//            else
-//            {
-//                swearingUser = new SwearingUser
-//                {
-//                    UserId = userId,
-//                    CountSwear = 1,
-//                };
-//                swearingUserRepository.AddSwearingUser(swearingUser);
-//            }
+        /// <summary>
+        /// Метод добавляет информацию в базу данных о последем сообщении в комнате
+        /// </summary>
+        public void AddInfoAboutLastMessage(string messageId, string roomId)
+        {
+            Room room = Database.Rooms.FindById(roomId);
 
-//        }
+            room.LastMessageId = messageId;
+            Database.Rooms.Update(room);
+        }
 
-//        /// <summary>
-//        /// Метод проверяет содержатся ли ругательские слова в тексте сообщения
-//        /// </summary>
-//        public static Boolean ContainsSwearWords(String textMessage)
-//        {
-//            List<String> wordsList = textMessage.Split(' ').ToList();
-//            List<String> dictionaryBadWords = dictionaryBadWordsRepository
-//                .DictionaryBadWords.Select(w => w.Word).ToList(); 
+        /// <summary>
+        /// Метод добавляет информацию о ругающемся пользователе в базу данных
+        /// </summary>
+        public void HandleSwearingUser(string userId)
+        {
+            throw new NotImplementedException();
+        }
 
-//            foreach(String word in wordsList)
-//            {
-//                if (dictionaryBadWords.Contains(word))
-//                {
-//                    return true;
-//                }
-//            }
-//            return false;
-//        }
-//    }
-//}
+        /// <summary>
+        /// Метод проверяет содержатся ли ругательские слова в тексте сообщения
+        /// </summary>
+        public static bool ContainsSwearWords(string textMessage)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

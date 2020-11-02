@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.BLL.Infrastructure;
+using NewAppChatSS.BLL.Infrastructure.ModelHandlers;
 using NewAppChatSS.BLL.Interfaces.HubInterfaces;
+using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
@@ -31,8 +33,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         private readonly UserManager<User> _userManager;
         private readonly IUserValidator _userValidator;
         private readonly IRoomValidator _roomValidator;
+        private readonly IRoomHandler _roomHandler;
 
-        public RoomCommandHandlerHub(UserManager<User> userManager, IUserValidator userValidator, IRoomValidator roomValidator, IUnitOfWork uow)
+        public RoomCommandHandlerHub(UserManager<User> userManager, IUserValidator userValidator, IRoomValidator roomValidator, IUnitOfWork uow, IRoomHandler roomHandler)
         {
             roomCommands = new Dictionary<Regex, Func<User, Room, string, IHubCallerClients, Task>>
             {
@@ -55,6 +58,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             _userManager = userManager;
             _userValidator = userValidator;
             _roomValidator = roomValidator;
+            _roomHandler = roomHandler;
         }
 
         /// <summary>
@@ -87,7 +91,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 //                CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
 
-            //string roomInfo = RoomHandler.CreateRoom(nameProcessedRoom, REGULAR_TYPE_ROOM, currentUser.Id);
+            string roomInfo = _roomHandler.CreateRoom(nameProcessedRoom, REGULAR_TYPE_ROOM, currentUser.Id);
 
             //        return clients.Caller.SendAsync("CreateRoom",
             //            CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} успешно создана."), roomInfo);
@@ -107,7 +111,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 //                CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
 
-            //        String roomInfo = RoomHandler.CreateRoom(nameProcessedRoom, PRITVATE_TYPE_ROOM, currentUser.Id);
+            string roomInfo = _roomHandler.CreateRoom(nameProcessedRoom, PRITVATE_TYPE_ROOM, currentUser.Id);
 
             //        return clients.Caller.SendAsync("CreateRoom",
             //            CommandHandler.CreateCommandInfo($"Приватная комната {nameProcessedRoom} успешно создана."), roomInfo);
@@ -126,7 +130,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 //            return clients.Caller.SendAsync("ReceiveCommand",
                 //                CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
-            //        String roomInfo = RoomHandler.CreateRoom(nameProcessedRoom, BOT_TYPE_ROOM, currentUser.Id);
+            string roomInfo = _roomHandler.CreateRoom(nameProcessedRoom, BOT_TYPE_ROOM, currentUser.Id);
 
             //        return clients.Caller.SendAsync("CreateRoom",
             //            CommandHandler.CreateCommandInfo($"Чат-бот комната {nameProcessedRoom} успешно создана."), roomInfo);
@@ -160,7 +164,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom).Id;
 
-            List<string> members = Database.Members.GetMembers(idProcessedRoom).ToList();
+            List<string> members = Database.Members.GetMembersIds(idProcessedRoom).ToList();
 
             await clients.Users(members).SendAsync("RemoveRoomUsers",
                 CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} была удалена."), idProcessedRoom);
@@ -185,23 +189,24 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             }
 
             string nameProcessedRoom = Regex.Match(command, @"//room\srename\s(\w+)$").Groups[1].Value;
-            //        if (!RoomValidator.CommandAccessCheck(currentUser, new String[] { "Administrator" }, currentRoom.RoomName))
-            //        {
-            //            return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
-            //        }
+            if (await _roomValidator.CommandAccessCheckAsync(currentUser, new string[] { "Administrator" }, currentRoom.RoomName))
+            {
+                //            return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
+            }
 
-            //        if (RoomValidator.UniquenessCheckRoom(nameProcessedRoom))
-            //        {
-            //            currentRoom.RoomName = nameProcessedRoom;
-            //            roomRepository.EditRoom(currentRoom);
-            //            List<String> members = memberRepository.GetMembers(currentRoom.Id);
+            if (_roomValidator.UniquenessCheckRoom(nameProcessedRoom))
+            {
+                currentRoom.RoomName = nameProcessedRoom;
+                Database.Rooms.Update(currentRoom);
 
-            //            clients.Users(members).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
+                List<string> members = Database.Members.GetMembersIds(currentRoom.Id).ToList();
 
-            //            return clients.Caller.SendAsync("RenameRoom",
-            //                CommandHandler.CreateCommandInfo($"Имя комнаты было успешно изменено на {nameProcessedRoom}"),
-            //                currentRoom.Id, nameProcessedRoom);
-            //        }
+                await clients.Users(members).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
+
+                //            return clients.Caller.SendAsync("RenameRoom",
+                //                CommandHandler.CreateCommandInfo($"Имя комнаты было успешно изменено на {nameProcessedRoom}"),
+                //                currentRoom.Id, nameProcessedRoom);
+            }
 
             //        return clients.Caller.SendAsync("ReceiveCommand",
             //            CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
@@ -254,7 +259,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 }
             }
 
-            if (_userValidator.IsUserInGroup(idProcessedUser, idProcessedRoom))
+            if (_userValidator.IsUserInGroupById(idProcessedUser, idProcessedRoom))
             {
                 //return clients.Caller.SendAsync("ReceiveCommand",
                 //    CommandHandler.CreateCommandInfo($"Пользователь уже состоит в этой группе"));
@@ -262,8 +267,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             Database.Members.AddMember(idProcessedUser, idProcessedRoom);
 
-            //        clients.User(idProcessedUser.ToString()).SendAsync("ConnectRoom",
-            //            JsonSerializer.Serialize<object>(new { roomId = idProcessedRoom, roomName = nameProcessedRoom }));
+            await clients.User(idProcessedUser.ToString()).SendAsync("ConnectRoom",
+                JsonSerializer.Serialize<object>(new { roomId = idProcessedRoom, roomName = nameProcessedRoom }));
 
             //        return clients.Caller.SendAsync("ReceiveCommand",
             //            CommandHandler.CreateCommandInfo($"Пользователь {loginProcessedUser} был добавлен в комнату {nameProcessedRoom}"));
@@ -309,7 +314,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 //                CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} не найдена."));
             }
 
-            if (_userValidator.IsUserInGroup(currentUser.Id, idProcessedRoom))
+            if (_userValidator.IsUserInGroupById(currentUser.Id, idProcessedRoom))
             {
                 //            return clients.Caller.SendAsync("ReceiveCommand",
                 //                CommandHandler.CreateCommandInfo($"Вы не состоите в комнате {nameProcessedRoom}."));
@@ -420,7 +425,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", $"Пользователь {userNameProcessedUser} не найден.");
             }
 
-            if (_userValidator.IsUserInGroup(idProcessedUser, currentRoom.Id))
+            if (_userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
                 //            return clients.Caller.SendAsync("ReceiveCommand",
                 //                CommandHandler.CreateCommandInfo($"Пользователь {loginProcessedUser} не состоит комнате."));
@@ -458,7 +463,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", $"Пользователь {userNameProcessedUser} не найден.");
             }
 
-            if (_userValidator.IsUserInGroup(idProcessedUser, currentRoom.Id))
+            if (_userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
                 //            return clients.Caller.SendAsync("ReceiveCommand",
                 //                CommandHandler.CreateCommandInfo($"Пользователь {loginProcessedUser} не состоит комнате."));
@@ -499,7 +504,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 //            return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (_userValidator.IsUserInGroup(idProcessedUser, currentRoom.Id))
+            if (_userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
                 //            return clients.Caller.SendAsync("ReceiveCommand",
                 //                CommandHandler.CreateCommandInfo($"Пользователь {loginProcessedUser} не состоит группе."));
@@ -531,7 +536,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return $"Пользователь {userNameProcessedUser} не найден.";
             }
 
-            if (_userValidator.IsUserInGroup(idProcessedUser, idProcessedRoom))
+            if (_userValidator.IsUserInGroupById(idProcessedUser, idProcessedRoom))
             {
                 return $"Пользователь {userNameProcessedUser} не состоит комнате.";
             }

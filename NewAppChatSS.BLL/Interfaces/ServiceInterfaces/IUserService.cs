@@ -1,4 +1,5 @@
 ﻿using NewAppChatSS.BLL.DTO;
+using NewAppChatSS.DAL.Entities;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -11,11 +12,15 @@ namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
     {
         Task RegisterUserAsync(UserDTO userDTO);
 
-        Task AssignRoleForNewUserAsync(string userEmail);
+        Task AssignRoleForNewUserAsync(User user);
 
         IEnumerable<UserDTO> GetUsersDTO();
 
-        UserDTO GetUserDTO(string id);
+        UserDTO GetUserDTObyId(string id);
+
+        UserDTO GetUserDTObyEmail(string email);
+
+        UserDTO GetUserDTObyUserName(string userName);
 
         Task AuthenticateUserAsync(UserDTO userDTO);
     }

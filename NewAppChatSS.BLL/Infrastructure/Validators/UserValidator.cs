@@ -16,13 +16,11 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
     {
         public IUnitOfWork Database { get; set; }
         private readonly UserManager<User> _userManager;
-        private readonly IMapper _mapper;
 
-        public UserValidator(IUnitOfWork uow, UserManager<User> userManager, IMapper mapper)
+        public UserValidator(IUnitOfWork uow, UserManager<User> userManager)
         {
             Database = uow;
             _userManager = userManager;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -42,8 +40,34 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет, имеет ли пользователь возможность отправлять сообщения в чат в комнате
         /// </summary>
-        public bool IsUserMuted(string userId, string roomId)
+        public bool IsUserMutedById(string userId, string roomId)
         {
+            List<MutedUser> listRoomWhereMutedUser = Database.MutedUsers.GetListMutedRoomForUser(userId).ToList();
+
+            MutedUser mutedUser = listRoomWhereMutedUser.FirstOrDefault(m => m.RoomId == roomId);
+
+            if (mutedUser != null)
+            {
+                if (mutedUser.DateUnmute > DateTime.Now)
+                {
+                    return true;
+                }
+                else
+                {
+                    Database.MutedUsers.DeleteMutedUser(userId, roomId);
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> IsUserMutedByNameAsync(string userName, string roomId)
+        {
+            string userId = (await _userManager.FindByNameAsync(userName))?.Id;
+
             List<MutedUser> listRoomWhereMutedUser = Database.MutedUsers.GetListMutedRoomForUser(userId).ToList();
 
             MutedUser mutedUser = listRoomWhereMutedUser.FirstOrDefault(m => m.RoomId == roomId);
@@ -69,7 +93,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет выгнан ли пользователь из комнаты
         /// </summary>
-        public bool IsUserKicked(string userId, string roomId)
+        public bool IsUserKickedById(string userId, string roomId)
         {
             List<KickedOut> listKickedOut = Database.KickedOuts.GetListKickedRoomForUser(userId).ToList();
 
@@ -94,13 +118,49 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         }
 
         /// <summary>
-        /// Метод проверяет, является ли пользователь участником комнаты
+        /// Метод проверяет выгнан ли пользователь из комнаты
         /// </summary>
-        public bool IsUserInGroup(string userId, string roomId)
+        public async Task<bool> IsUserKickedByNameAsync(string userName, string roomId)
         {
-            return Database.Members.GetRooms(userId).Contains(roomId);
+            User user = await _userManager.FindByNameAsync(userName);
+            List<KickedOut> listKickedOut = Database.KickedOuts.GetListKickedRoomForUser(user.Id).ToList();
+
+            KickedOut kicked = listKickedOut.FirstOrDefault(k => k.RoomId == roomId);
+
+            if (kicked != null)
+            {
+                if (kicked.DateUnkick > DateTime.Now)
+                {
+                    return true;
+                }
+                else
+                {
+                    Database.KickedOuts.DeleteKickedUser(user.Id, roomId);
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
 
+        /// <summary>
+        /// Метод проверяет, является ли пользователь участником комнаты
+        /// </summary>
+        public bool IsUserInGroupById(string userId, string roomId)
+        {
+            return Database.Members.GetRoomsIds(userId).Contains(roomId);
+        }
+
+        /// <summary>
+        /// Метод проверяет, является ли пользователь участником комнаты
+        /// </summary>
+        public async Task<bool> IsUserInGroupByNameAsync(string userName, string roomId)
+        {
+            User user = await _userManager.FindByNameAsync(userName);
+            return Database.Members.GetRoomsIds(user.Id).Contains(roomId);
+        }
 
         public async Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
         {
@@ -119,5 +179,8 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
 
             return false;  
         }
+
+
+
     }
 }

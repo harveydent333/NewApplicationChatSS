@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using NewAppChatSS.BLL.DTO;
 using NewAppChatSS.BLL.Infrastructure;
 using NewAppChatSS.BLL.Interfaces;
+using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewApplicationChatSS.ViewModels;
 

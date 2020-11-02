@@ -37,9 +37,9 @@ namespace NewAppChatSS.BLL.Hubs
         /// Вызываемый метод клиентом, получает объект пользователя по принятому id пользователя.
         /// Перенаправляет команду в обработчик команд взаимодействия с пользователями.
         /// </summary>
-        public async Task ReceivingUserInteractionCommand(string userEmail, string comamand)
+        public async Task ReceivingUserInteractionCommand(string userName, string comamand)
         {
-            User user = await _userManager.FindByEmailAsync(userEmail);
+            User user = await _userManager.FindByNameAsync(userName);
             await _userCommandHandler.SearchCommandAsync(user, comamand, Clients);
         }
 
@@ -48,9 +48,9 @@ namespace NewAppChatSS.BLL.Hubs
         /// Вызываемый метод клиентом, получает объект пользователя по принятому id пользователя, а также комнаты
         /// Перенаправляет команду в обработчик команд взаимодействия с комнатами
         /// </summary>
-        public async Task ReceivingRoomInteractionCommand(string userEmail, string roomId, string command)
+        public async Task ReceivingRoomInteractionCommand(string userName, string roomId, string command)
         {
-            User user = await _userManager.FindByEmailAsync(userEmail);
+            User user = await _userManager.FindByNameAsync(userName);
             Room room = Database.Rooms.FindById(roomId);
             await _roomCommandHandler.SearchCommandAsync(user, room, command, Clients);
         }

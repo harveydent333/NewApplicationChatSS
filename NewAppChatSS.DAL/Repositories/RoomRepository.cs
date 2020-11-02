@@ -1,4 +1,5 @@
-﻿using NewAppChatSS.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +18,29 @@ namespace NewAppChatSS.DAL.Repositories
 
         public IEnumerable<Room> GetAll()
         {
-            return _context.Rooms.ToList();
+            return _context.Rooms
+                .Include(r=>r.Owner)
+                .Include(r=>r.LastMessage)
+                .Include(r => r.TypeRoom)
+                .ToList();
         }
 
         public Room FindById(string id)
         {
-            return _context.Rooms.FirstOrDefault(r => r.Id == id);
+            return _context.Rooms
+                .Include(r => r.Owner)
+                .Include(r => r.LastMessage)
+                .Include(r=>r.TypeRoom)
+                .FirstOrDefault(r => r.Id == id);
         }
 
         public Room FindByName(string roomName)
         {
-            return _context.Rooms.FirstOrDefault(r => r.RoomName == roomName);
+            return _context.Rooms
+                .Include(r => r.Owner)
+                .Include(r => r.LastMessage)
+                .Include(r => r.TypeRoom)
+                .FirstOrDefault(r => r.RoomName == roomName);
         }
 
         public void Create(Room item)

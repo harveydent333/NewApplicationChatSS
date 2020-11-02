@@ -10,6 +10,8 @@ namespace NewAppChatSS.DAL
 {
     public class DataInitializer
     {
+        const string MAIN_ROOM_ID = "1";
+
         public static async Task InitializeAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext dbContext)
         {
             if (await roleManager.FindByNameAsync("RegularUser") == null)
@@ -73,6 +75,17 @@ namespace NewAppChatSS.DAL
                         RoomName = "MainRoom",
                         OwnerId = (await userManager.FindByEmailAsync("admin@gmail.com")).Id,
                         TypeId = 1,
+                    });
+                dbContext.SaveChanges();
+            }
+
+            if (!dbContext.Members.Any())
+            {
+                dbContext.Members.Add(
+                    new Member
+                    {
+                        UserId = (await userManager.FindByEmailAsync("admin@gmail.com")).Id,
+                        RoomId = MAIN_ROOM_ID
                     });
                 dbContext.SaveChanges();
             }
