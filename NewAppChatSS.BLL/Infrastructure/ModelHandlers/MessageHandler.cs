@@ -57,7 +57,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// <summary>
         /// Метод добавляет информацию в базу данных о последем сообщении в комнате
         /// </summary>
-        public void AddInfoAboutLastMessage(string messageId, string roomId)
+        private void AddInfoAboutLastMessage(string messageId, string roomId)
         {
             Room room = Database.Rooms.FindById(roomId);
 
@@ -68,7 +68,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// <summary>
         /// Метод добавляет информацию о ругающемся пользователе в базу данных
         /// </summary>
-        public void HandleSwearingUser(string userId)
+        private void HandleSwearingUser(string userId)
         {
             throw new NotImplementedException();
         }
@@ -76,7 +76,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// <summary>
         /// Метод проверяет содержатся ли ругательские слова в тексте сообщения
         /// </summary>
-        public static bool ContainsSwearWords(string textMessage)
+        private bool ContainsSwearWords(string textMessage)
         {
             throw new NotImplementedException();
         }

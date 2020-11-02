@@ -1,4 +1,5 @@
-﻿using NewAppChatSS.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -53,9 +54,21 @@ namespace NewAppChatSS.DAL.Repositories
         }
 
         /// <summary>
-        /// Метод сохраняет изменения состояния в базе данных
+        /// 
         /// </summary>
-        public void Save()
+        public IEnumerable<Message> GetRoomMessages(string roomId)
+        {
+            return _context.Messages
+                .Include(m => m.User)
+                .Include(m => m.Room)
+                .Where(m => m.RoomId == roomId)
+                .OrderBy(m => m.DatePublication)
+                .ToList();
+        }
+            /// <summary>
+            /// Метод сохраняет изменения состояния в базе данных
+            /// </summary>
+            public void Save()
         {
             _context.SaveChanges();
         }

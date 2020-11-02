@@ -16,11 +16,11 @@ namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 
         IEnumerable<UserDTO> GetUsersDTO();
 
-        UserDTO GetUserDTObyId(string id);
+        Task<UserDTO> GetUserDTObyIdAsync(string id);
 
-        UserDTO GetUserDTObyEmail(string email);
+        Task<UserDTO> GetUserDTObyEmailAsync(string email);
 
-        UserDTO GetUserDTObyUserName(string userName);
+        Task<UserDTO> GetUserDTObyUserNameAsync(string userName);
 
         Task AuthenticateUserAsync(UserDTO userDTO);
     }

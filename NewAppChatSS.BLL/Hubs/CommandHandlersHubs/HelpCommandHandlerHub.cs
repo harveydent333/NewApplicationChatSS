@@ -1,0 +1,154 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using NewAppChatSS.BLL.Interfaces.HubInterfaces;
+using NewAppChatSS.DAL.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
+{
+    /// <summary>
+    /// Обработчик команды help
+    /// </summary>
+    public sealed class HelpCommandHandlerHub : IHelpCommandHandlerHub
+    {
+        const int BOT_TYPE_ROOM = 3;
+
+        private readonly UserManager<User> _userManager;
+
+        public HelpCommandHandlerHub(UserManager<User> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        /// <summary>
+        /// Метод проверяет корректность команды и перенаправляет на метод сбора доступных команд
+        /// </summary>
+        public Task SearchCommand(User currentUser, Room currentRoom, string command, IHubCallerClients calledClients)
+        {
+            if (new Regex(@"^//help$").IsMatch(command))
+            {
+                return GetAllowedCommands(currentUser, currentRoom, calledClients);
+            }
+            else
+            {
+                return calledClients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Неверная команда"));
+            }
+        }
+
+        /// <summary>
+        /// Метод собирает список доступных команд пользователю
+        /// </summary>
+        private async Task<Task> GetAllowedCommands(User currentUser, Room currentRoom, IHubCallerClients clients)
+        {
+            List<string> allowedCommands = new List<string>();
+
+            GetCommonCommands(ref allowedCommands);
+
+            if ((await _userManager.IsInRoleAsync(currentUser, "Moderator")) || (await _userManager.IsInRoleAsync(currentUser, "Administrator")))
+            {
+                GetModerCommands(ref allowedCommands);
+            }
+
+            if (await _userManager.IsInRoleAsync(currentUser, "Administrator"))
+            {
+                GetAdminCommands(ref allowedCommands);
+            }
+
+            if ((await _userManager.IsInRoleAsync(currentUser, "RegularUser")) && (currentUser.Id == currentRoom.OwnerId))
+            {
+                GetCommandsForOwnerRoom(ref allowedCommands);
+            }
+
+            allowedCommands = allowedCommands.OrderByDescending(l => l).ToList();
+
+            if (currentRoom.TypeId == BOT_TYPE_ROOM)
+            {
+                GetCommandsForBotRoom(ref allowedCommands);
+            }
+
+            return clients.Caller.SendAsync("PrintAllowedCommands", CommandHandler.CreateCommandInfo(allowedCommands));
+        }
+
+        /// <summary>
+        /// Выдать общие команды
+        /// Метод добавляет в список доступных команд, команды которые может использовать каждый пользователь в комнате
+        /// </summary>
+        private void GetCommonCommands(ref List<string> allowedCommands)
+        {
+            allowedCommands.AddRange(new string[]
+            {
+                "//user rename {login пользователя}||{Новый login пользователя}",
+                "//room create {Название комнаты} [-c] or [-b]",
+                "//room remove {Название комнаты}",
+                "//room disconnect",
+                "//room disconnect {Название комнаты}",
+                "//room connect {Название комнаты} -l {login пользователя}",
+            });
+        }
+
+        /// <summary>
+        /// Выдать команды доступные модератору.
+        /// Метод добавляет в список доступных команд, команды пользователю с ролью "Модератор"
+        /// </summary>
+        public void GetModerCommands(ref List<string> allowedCommands)
+        {
+            allowedCommands.AddRange(new string[]
+            {
+                "//user ban {login пользователя} [-m {Количество минут}]",
+                "//user pardon {login пользователя}",
+                "//room mute -l {login пользователя} [-m {Количество минут}]",
+                "//room speak -l {login пользователя}",
+                "//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]",
+            });
+        }
+
+        /// <summary>
+        /// Выдать команды доступные администратору.
+        /// Метод добавляет в список доступных команд, команды пользователю с ролью "Администратор"
+        /// </summary>
+        private void GetAdminCommands(ref List<string> allowedCommands)
+        {
+            allowedCommands.AddRange(new string[]
+            {
+                "//user moderator {login пользователя} [-n] or [-d]",
+                "//room remove {Название комнаты}",
+                "//room rename {Название комнаты}",
+            });
+        }
+
+        /// <summary>
+        /// Выдать команды доступные в чат-бот комнате.
+        /// Метод добавляет в список доступных команд, команды которые можно использовать только в чат-бот комнате
+        /// </summary>
+        private void GetCommandsForBotRoom(ref List<string> allowedCommands)
+        {
+            allowedCommands.InsertRange(0, new string[]
+            {
+                "//find {название канала}||{название видео} [-v] [-l]",
+                "//info {название канала}",
+                "//videoCommentRandom {название канала}||{Название ролика}"
+            });
+        }
+
+        /// <summary>
+        /// Выдать команды владельцу комнаты.
+        /// Метод добавляет в список доступных команд, команды доступные только владельцу комнаты
+        /// </summary>
+        private void GetCommandsForOwnerRoom(ref List<string> allowedCommands)
+        {
+            allowedCommands.AddRange(new string[]
+            {
+                "//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]",
+                "//room speak -l {login пользователя}",
+                "//room mute -l {login пользователя} [-m {Количество минут}]",
+                "//room remove {Название комнаты}",
+                "//room rename {Название комнаты}",
+            });
+        }
+    }
+}

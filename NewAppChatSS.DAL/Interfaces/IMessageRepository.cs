@@ -15,6 +15,8 @@ namespace NewAppChatSS.DAL.Interfaces
 
         IEnumerable<Message> FindMessagesByRoomId(string roomId);
 
+        IEnumerable<Message> GetRoomMessages(string roomId);
+
         void Save();
     }
 }

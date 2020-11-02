@@ -1,4 +1,5 @@
-﻿using NewAppChatSS.DAL.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -62,9 +63,12 @@ namespace NewAppChatSS.DAL.Repositories
 
         public IEnumerable<Room> GetRooms(string userId)
         {
-            var x = _context.Members.Where(m=>m.UserId == userId).Select(m => m.RoomId).ToList();
-            var y = Database.Rooms.GetAll().Select(r=>r.Id);
-            return Database.Rooms.GetAll().Where(r => x.Contains(r.Id));
+            List<string> roomIds = _context.Members
+                .Where(m=>m.UserId == userId)
+                .Select(m => m.RoomId)
+                .ToList();
+
+            return Database.Rooms.GetAll().Where(r => roomIds.Contains(r.Id));
         }
 
         public IEnumerable<string> GetRoomsIds(string userId)

@@ -54,8 +54,11 @@ namespace NewApplicationChatSS
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IRoomService, RoomService>();
             services.AddTransient<IMemberService, MemberService>();
+            services.AddTransient<IMessageService, MessageService>();
             services.AddTransient<IUserCommandHandler, UserCommandHandlerHub>();
             services.AddTransient<IRoomCommandHandler, RoomCommandHandlerHub>();
+            services.AddTransient<IHelpCommandHandlerHub, HelpCommandHandlerHub>();
+            services.AddTransient<IBotCommandHandlerHub, BotCommandHandlerHub>();
             services.AddTransient<IUserValidator, UserValidator>();
             services.AddTransient<IRoomValidator, RoomValidator>();
             services.AddTransient<IMessageHandler, MessageHandler>();
@@ -103,7 +106,7 @@ namespace NewApplicationChatSS
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapHub<ChatHub>("/Chat/chathub");
             });
         }
     }

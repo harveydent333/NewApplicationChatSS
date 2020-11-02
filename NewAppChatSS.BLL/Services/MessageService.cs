@@ -8,20 +8,20 @@ using System.Text;
 
 namespace NewAppChatSS.BLL.Services
 {
-    public sealed class MemberService : IMemberService
+    public sealed class MessageService : IMessageService
     {
         public IUnitOfWork Database { get; set; }
         private readonly IMapper _mapper;
 
-        public MemberService(IUnitOfWork uow, IMapper mapper)
+        public MessageService(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
             _mapper = mapper;
         }
 
-        public IEnumerable<RoomDTO> GetRoomsUser(string userId)
+        public IEnumerable<MessageDTO> GetRoomMessagesDTO(string roomId)
         {
-            return _mapper.Map<IEnumerable<RoomDTO>>(Database.Members.GetRooms(userId));
+            return _mapper.Map<IEnumerable<MessageDTO>>(Database.Messages.GetRoomMessages(roomId));
         }
     }
 }

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace NewAppChatSS.BLL.Services
 {
-    public class RoomService : IRoomService
+    public sealed class RoomService : IRoomService
     {
         private IUnitOfWork Database { get; set; }
         private readonly IMapper _mapper;

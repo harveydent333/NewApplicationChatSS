@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Services
 {
-    public class UserService : IUserService
+    public sealed class UserService : IUserService
     {
         const string MAIN_ROOM_ID = "1";
 
@@ -34,19 +34,19 @@ namespace NewAppChatSS.BLL.Services
             return _mapper.Map<IEnumerable<UserDTO>>(Database.Users.GetAll());
         }
 
-        public UserDTO GetUserDTObyId(string id)
+        public async Task<UserDTO> GetUserDTObyIdAsync(string id)
         {
-            return _mapper.Map<UserDTO>(_userManager.FindByIdAsync(id));
+            return _mapper.Map<UserDTO>(await _userManager.FindByIdAsync(id));
         }
         
-        public UserDTO GetUserDTObyUserName(string userName)
+        public async Task<UserDTO> GetUserDTObyUserNameAsync(string userName)
         {
-            return _mapper.Map<UserDTO>(_userManager.FindByNameAsync(userName));
+            return _mapper.Map<UserDTO>(await _userManager.FindByNameAsync(userName));
         }
         
-        public UserDTO GetUserDTObyEmail(string email)
+        public async Task<UserDTO> GetUserDTObyEmailAsync(string email)
         {
-            return _mapper.Map<UserDTO>(_userManager.FindByEmailAsync(email));
+            return _mapper.Map<UserDTO>(await _userManager.FindByEmailAsync(email));
         }
 
         public async Task RegisterUserAsync(UserDTO userDTO)

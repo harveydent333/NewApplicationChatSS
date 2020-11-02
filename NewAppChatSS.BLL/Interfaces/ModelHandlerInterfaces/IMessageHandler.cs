@@ -8,9 +8,5 @@ namespace NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces
     public interface IMessageHandler
     {
         string SaveMessageIntoDatabase(User user, string textMessage, Room room);
-
-        void AddInfoAboutLastMessage(string messageId, string roomId);
-
-        void HandleSwearingUser(string userId);
     }
 }
