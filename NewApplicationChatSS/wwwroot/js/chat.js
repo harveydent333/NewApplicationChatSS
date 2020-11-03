@@ -176,6 +176,12 @@ connection.on("UserRenameClient", function (newUserName, command) {
     createIncomigElemMessage(JSON.parse(command), true);
 });
 
+// Caller: Delete Message
+connection.on("DeleteMessage", function (messageId) {
+    document.getElementById(messageId).remove();
+});
+
+
 function redirectToMainRoom() {
     document.location.href = "/Chat/1";
 }

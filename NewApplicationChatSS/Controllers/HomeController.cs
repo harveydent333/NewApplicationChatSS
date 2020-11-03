@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NewAppChatSS.DAL.Entities;
-using NewApplicationChatSS.Models;
 using NewAppChatSS.BLL.DTO;
 using AutoMapper;
 using NewApplicationChatSS.ViewModels;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.BLL.Services;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewApplicationChatSS.Controllers
 {
@@ -21,6 +21,8 @@ namespace NewApplicationChatSS.Controllers
     public class HomeController : Controller
     {
         const string MAIN_ROOM_ID = "1";
+
+        public IUnitOfWork Database { get; set; }
 
         private readonly ILogger<HomeController> _logger;
         private readonly IUserService _userService;
@@ -31,8 +33,10 @@ namespace NewApplicationChatSS.Controllers
         private readonly IUserValidator _userValidator;
         private readonly IMapper _mapper;
 
-        public HomeController(ILogger<HomeController> logger, IUserService serv, UserManager<User> manager, IMapper mapper, IUserValidator userValidator, IRoomService roomService, IMemberService memberService, IMessageService messageService)
+        public HomeController(IUnitOfWork uow, ILogger<HomeController> logger, IUserService serv, UserManager<User> manager, IMapper mapper, IUserValidator userValidator, IRoomService roomService, IMemberService memberService, IMessageService messageService)
         {
+            Database = uow;
+
             _logger = logger;
             _userService = serv;
             _userManager = manager;
@@ -44,7 +48,7 @@ namespace NewApplicationChatSS.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public  IActionResult IndexAsync()
         {
             IEnumerable<UserDTO> usersDtos = _userService.GetUsersDTO();
             return View(_mapper.Map<List<RegisterViewModel>>(usersDtos));

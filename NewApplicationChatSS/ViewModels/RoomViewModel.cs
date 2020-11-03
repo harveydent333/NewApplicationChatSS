@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NewApplicationChatSS.ViewModels
 {
-    public class RoomViewModel
+    public sealed class RoomViewModel
     {
         public string Id { get; set; }
 
@@ -23,7 +23,7 @@ namespace NewApplicationChatSS.ViewModels
         /// <summary>
         /// Владелец пользователя
         /// </summary>
-        public virtual User Owner { get; set; }
+        public User Owner { get; set; }
 
         /// <summary>
         /// Id типа комнаты
@@ -33,7 +33,7 @@ namespace NewApplicationChatSS.ViewModels
         /// <summary>
         /// Тип комнаты
         /// </summary>
-        public virtual TypeRoom TypeRoom { get; set; }
+        public TypeRoom TypeRoom { get; set; }
 
         /// <summary>
         /// Id последнего сообщения в комнате
@@ -43,6 +43,6 @@ namespace NewApplicationChatSS.ViewModels
         /// <summary>
         /// Последнее сообщение в комнате
         /// </summary>
-        public virtual Message LastMessage { get; set; }
+        public Message LastMessage { get; set; }
     }
 }

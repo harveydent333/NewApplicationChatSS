@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace NewApplicationChatSS.ViewModels
@@ -6,7 +7,7 @@ namespace NewApplicationChatSS.ViewModels
     /// <summary>
     /// Данны авторизации пользователя
     /// </summary>
-    public class LoginViewModel
+    public sealed class LoginViewModel
     {
         [Required]
         [Display(Name = "Email")]

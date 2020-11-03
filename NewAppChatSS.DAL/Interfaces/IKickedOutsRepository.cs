@@ -16,6 +16,8 @@ namespace NewAppChatSS.DAL.Interfaces
 
         IEnumerable<KickedOut> GetListKickedRoomForUser(string userId);
 
+        IEnumerable<string> GetListIdsKickedRoomForUser(string userId);
+
         Task SaveAsync();
     }
 }

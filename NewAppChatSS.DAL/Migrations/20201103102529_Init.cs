@@ -40,10 +40,8 @@ namespace NewAppChatSS.DAL.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    Login = table.Column<string>(maxLength: 35, nullable: false),
                     IsLocked = table.Column<bool>(nullable: false),
-                    DateUnblock = table.Column<DateTime>(nullable: true),
-                    RoleId = table.Column<string>(nullable: false)
+                    DateUnblock = table.Column<DateTime>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -152,7 +150,7 @@ namespace NewAppChatSS.DAL.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -428,7 +426,7 @@ namespace NewAppChatSS.DAL.Migrations
                 column: "RoomId",
                 principalTable: "Rooms",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Members_Rooms_RoomId",
@@ -436,7 +434,7 @@ namespace NewAppChatSS.DAL.Migrations
                 column: "RoomId",
                 principalTable: "Rooms",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Messages_Rooms_RoomId",
@@ -444,7 +442,7 @@ namespace NewAppChatSS.DAL.Migrations
                 column: "RoomId",
                 principalTable: "Rooms",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

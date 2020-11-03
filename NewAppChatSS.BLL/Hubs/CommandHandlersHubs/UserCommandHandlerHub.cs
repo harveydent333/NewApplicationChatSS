@@ -35,12 +35,12 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             userCommands = new Dictionary<Regex, Func<User, string, IHubCallerClients, Task>>
             {
-                [new Regex(@"^//user\srename\s\w+\W\W\w+\S$")] = UserRenameAsync,
-                [new Regex(@"^//user\sban\s\w+\S$")] = UserBanAsync,
-                [new Regex(@"^//user\sban\s\w+\s-m\s\d*$")] = TemporaryUserBlockAsync,
-                [new Regex(@"^//user\spardon\s\w+\S$")] = UserPardonAsync,
-                [new Regex(@"^//user\smoderator\s\w+\s-n$")] = SetModerationRoleAsync,
-                [new Regex(@"^//user\smoderator\s\w+\s-d$")] = RemoveModerationRoleAsync,
+                [new Regex(@"^//user\srename\s.+\w\W{2}\w.+\S$")] = UserRenameAsync,
+                [new Regex(@"^//user\sban\s.+\S$")] = UserBanAsync,
+                [new Regex(@"^//user\sban\s.+\s-m\s\d*$")] = TemporaryUserBlockAsync,
+                [new Regex(@"^//user\spardon\s.+\S$")] = UserPardonAsync,
+                [new Regex(@"^//user\smoderator\s.+\s-n$")] = SetModerationRoleAsync,
+                [new Regex(@"^//user\smoderator\s.+\s-d$")] = RemoveModerationRoleAsync,
             };
 
             Database = uow;
@@ -167,7 +167,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Match(command, @"//user\sban\s(\w+)\s-m\s\d*$").Groups[1].Value;
+            userName = Regex.Match(command, @"//user\sban\s(.+)\s-m\s\d*$").Groups[1].Value;
 
             if (await _userManager.FindByNameAsync(userName) == null)
             {
@@ -191,7 +191,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Match(command, @"//user\smoderator\s(\w+)\s-n$").Groups[1].Value;
+            userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-n$").Groups[1].Value;
 
             if (await _userManager.FindByNameAsync(userName) == null)
             {
@@ -216,7 +216,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Match(command, @"//user\smoderator\s(\w+)\s-d$").Groups[1].Value;
+            userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-d$").Groups[1].Value;
 
             if (await _userManager.FindByNameAsync(userName) == null)
             {
@@ -238,8 +238,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             return new Dictionary<string, string>
             {
-                ["oldUserName"] = Regex.Match(stringNames, @"//user rename (\w+)\W\W(\w+)$").Groups[1].Value,
-                ["newUserName"] = Regex.Match(stringNames, @"//user rename (\w+)\W\W(\w+)$").Groups[2].Value
+                ["oldUserName"] = Regex.Match(stringNames, @"//user rename (.+\w)\W{2}(\w.+)$").Groups[1].Value,
+                ["newUserName"] = Regex.Match(stringNames, @"//user rename (.+\w)\W{2}(\w.+)$").Groups[2].Value
             };
         }
 
@@ -257,7 +257,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             }
             else
             {
-                user.DateUnblock = TimeComputer.CalculateUnlockDate(command, @"//user\sban\s\w+\s-m\s(\d*)$");
+                user.DateUnblock = TimeComputer.CalculateUnlockDate(command, @"//user\sban\s.+\s-m\s(\d*)$");
             }
 
             await _userManager.UpdateAsync(user);

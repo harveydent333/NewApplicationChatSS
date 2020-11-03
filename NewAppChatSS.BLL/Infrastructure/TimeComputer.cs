@@ -10,9 +10,7 @@ namespace NewAppChatSS.BLL.Infrastructure
         /// </summary>
         public static DateTime CalculateUnlockDate(string command, string timeValueInString)
         {
-            int blockTime;
-            int.TryParse(Regex.Match(command, timeValueInString).Groups[1].Value, out blockTime);
-
+            int.TryParse(Regex.Match(command, timeValueInString).Groups[1].Value, out int blockTime);
             return DateTime.Now.AddMinutes(blockTime);
         }
     }

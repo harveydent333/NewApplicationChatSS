@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 using System;

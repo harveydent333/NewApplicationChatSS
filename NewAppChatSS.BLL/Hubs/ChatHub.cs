@@ -110,10 +110,12 @@ namespace NewAppChatSS.BLL.Hubs
 
                 processedRoom.LastMessageId = proccessedMessage.Id;
                 await Database.Rooms.UpdateAsync(processedRoom);
+                await Clients.Caller.SendAsync("DeleteMessage", messageId);
             }
             else
             {
                 await Database.Messages.DeleteMessageAsync(messageId);
+                await Clients.Caller.SendAsync("DeleteMessage", messageId);
             }
             
         }

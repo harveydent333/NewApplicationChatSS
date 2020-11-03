@@ -1,6 +1,6 @@
 using System;
 
-namespace NewApplicationChatSS.Models
+namespace NewApplicationChatSS.ViewModels
 {
     public class ErrorViewModel
     {

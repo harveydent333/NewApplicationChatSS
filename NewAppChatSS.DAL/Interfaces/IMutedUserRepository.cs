@@ -18,6 +18,8 @@ namespace NewAppChatSS.DAL.Interfaces
 
         IEnumerable<MutedUser> GetListMutedRoomForUser(string userId);
 
+        IEnumerable<string> GetListIdsMutedRoomForUser(string userId);
+
         Task SaveAsync();
     }
 }

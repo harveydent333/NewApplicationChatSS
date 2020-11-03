@@ -45,6 +45,7 @@ namespace NewAppChatSS.DAL
                     await userManager.AddToRoleAsync(admin, "Administrator");
                 }
             }
+
             if (!dbContext.TypesRooms.Any())
             {
                 dbContext.TypesRooms.AddRange(

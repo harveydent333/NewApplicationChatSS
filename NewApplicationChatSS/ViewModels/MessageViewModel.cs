@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NewApplicationChatSS.ViewModels
 {
-    public class MessageViewModel
+    public sealed class MessageViewModel
     {
         public string Id { get; set; }
 

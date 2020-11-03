@@ -27,6 +27,7 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
             viewCount = "";
             likeCount = "";
             UserCredential credential;
+
             using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))
             {
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(

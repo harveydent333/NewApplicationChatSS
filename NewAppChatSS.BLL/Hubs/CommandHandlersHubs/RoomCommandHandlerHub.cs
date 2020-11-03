@@ -39,19 +39,19 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             roomCommands = new Dictionary<Regex, Func<User, Room, string, IHubCallerClients, Task>>
             {
-                [new Regex(@"^//room\screate\s\w+$")] = CreateRoom,
-                [new Regex(@"^//room\screate\s\w+\s-c$")] = CreatePrivateRoom,
-                [new Regex(@"^//room\screate\s\w+\s-b$")] = CreateBotRoom,
-                [new Regex(@"^//room\sremove\s\w+$")] = RemoveRoom,
-                [new Regex(@"^//room\srename\s\w+$")] = RenameRoom,
-                [new Regex(@"^//room\sconnect\s\w+\s-l\s\w+$")] = ConnectionToRoom,
+                [new Regex(@"^//room\screate\s.+\s-b$")] = CreateBotRoom,
+                [new Regex(@"^//room\screate\s.+\s-c$")] = CreatePrivateRoom,
+                [new Regex(@"^//room\screate\s.+$")] = CreateRoom,
+                [new Regex(@"^//room\sremove\s.+$")] = RemoveRoom,
+                [new Regex(@"^//room\srename\s.+$")] = RenameRoom,
+                [new Regex(@"^//room\sconnect\s.+\s-l\s.+$")] = ConnectionToRoom,
                 [new Regex(@"^//room\sdisconnect$")] = DisconnectFromCurrenctRoom,
-                [new Regex(@"^//room\sdisconnect\s\w+$")] = DisconnectFromRoom,
-                [new Regex(@"^//room\sdisconnect\s\w+\s-l\s\w+$")] = KickUserOutRoom,
-                [new Regex(@"^//room\sdisconnect\s\w+\s-l\s\w+\s-m\s\d*$")] = TemporaryKickUserOutRoom,
-                [new Regex(@"^//room\smute\s-l\s\w+$")] = MuteUser,
-                [new Regex(@"^//room\smute\s-l\s\w+\s-m\s\d*$")] = TemporaryMuteUser,
-                [new Regex(@"^//room\sspeak\s-l\s\w+$")] = UnmuteUser,
+                [new Regex(@"^//room\sdisconnect\s.+$")] = DisconnectFromRoom,
+                [new Regex(@"^//room\sdisconnect\s.+\s-l\s.+$")] = KickUserOutRoom,
+                [new Regex(@"^//room\sdisconnect\s.+\s-l\s.+\s-m\s\d*$")] = TemporaryKickUserOutRoom,
+                [new Regex(@"^//room\smute\s-l\s.+$")] = MuteUser,
+                [new Regex(@"^//room\smute\s-l\s.+\s-m\s\d*$")] = TemporaryMuteUser,
+                [new Regex(@"^//room\sspeak\s-l\s.+$")] = UnmuteUser,
             };
 
             Database = uow;
@@ -121,7 +121,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> CreateBotRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
-            string nameProcessedRoom = Regex.Match(command, @"//room\screate\s(\w+)\s-b$").Groups[1].Value;
+            string nameProcessedRoom = Regex.Match(command, @"//room\screate\s(.+)\s-b$").Groups[1].Value;
             if (_roomValidator.UniquenessCheckRoom(nameProcessedRoom))
             {
                 return clients.Caller.SendAsync("ReceiveCommand",
@@ -155,7 +155,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             if (await _roomValidator.CommandAccessCheckAsync(currentUser, new string[] { "Administrator" }, nameProcessedRoom))
             {
-                //            return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
             string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom).Id;
@@ -325,14 +325,14 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> KickUserOutRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
-            string nameProcessedRoom = Regex.Match(command, @"//room\sdisconnect\s(\w+)\s-l\s(\w+)$").Groups[1].Value;
+            string nameProcessedRoom = Regex.Match(command, @"//room\sdisconnect\s(.+)\s-l\s(.+)$").Groups[1].Value;
             if (Database.Rooms.FindByName(nameProcessedRoom).Id == MAIN_ROOM_ID)
             {
-                //            return clients.Caller.SendAsync("ReceiveCommand",
-                //                CommandHandler.CreateCommandInfo($"Невозможно применить к главной комнате."));
+                return clients.Caller.SendAsync("ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Невозможно применить к главной комнате."));
             }
 
-            string userNameProcessedUser = Regex.Match(command, @"//room\sdisconnect\s(\w+)\s-l\s(\w+)$").Groups[2].Value;
+            string userNameProcessedUser = Regex.Match(command, @"//room\sdisconnect\s(.+)\s-l\s(.+)$").Groups[2].Value;
 
             string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom)?.Id;
             string idProcessedUser = (await _userManager.FindByNameAsync(userNameProcessedUser))?.Id;
@@ -347,6 +347,11 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             if (await _roomValidator.CommandAccessCheckAsync(currentUser, new string[] { "Administrator", "Moderator" }, nameProcessedRoom))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
+            }
+
+            if (Database.KickedOuts.GetListIdsKickedRoomForUser(idProcessedUser).Contains(idProcessedRoom))
+            {
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был исключен из этой команты"));
             }
 
             DateTime dateUnkick = TimeComputer.CalculateUnlockDate(command + " -m 60", @"//room\sdisconnect\s\w+\s-l\s\w+\s-m\s(60)$");
@@ -389,15 +394,19 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
+            if (Database.KickedOuts.GetListIdsKickedRoomForUser(idProcessedUser).Contains(idProcessedRoom))
+            {
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был исключен из этой команты"));
+            }
+
             DateTime dateUnkick = TimeComputer.CalculateUnlockDate(command, @"//room\sdisconnect\s\w+\s-l\s\w+\s-m\s(\d*)$");
             await Database.KickedOuts.AddKickedUserAsync(idProcessedUser, idProcessedRoom, dateUnkick);
 
             await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", idProcessedRoom);
 
-            //        return clients.Caller.SendAsync("ReceiveCommand",
-            //            CommandHandler.CreateCommandInfo($"Пользователь {loginProcessedUser} был исключен из комнаты {nameProcessedRoom} на " +
-            //                $"{Math.Round((dateUnkick - DateTime.Now).TotalMinutes)} минут."));
-            return clients.Caller.SendAsync("ReceiveCommand", $"Пользователь {userNameProcessedUser} был исключен из комнаты");
+            return clients.Caller.SendAsync("ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был исключен из комнаты {nameProcessedRoom} на " +
+                    $"{Math.Round((dateUnkick - DateTime.Now).TotalMinutes)} минут."));
         }
 
         /// <summary>
@@ -426,15 +435,19 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
+            if (Database.MutedUsers.GetListIdsMutedRoomForUser(idProcessedUser).Contains(currentRoom.Id))
+            {
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был приглушен в этой команате"));
+            }
+
             DateTime dateUnmute = TimeComputer.CalculateUnlockDate(command + " -m 10", @"//room\smute\s-l\s\w+\s-m\s(10)$");
             await Database.MutedUsers.AddMutedUserAsync(idProcessedUser, currentRoom.Id, dateUnmute);
 
             await clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
-            //        return clients.Caller.SendAsync("ReceiveCommand",
-            //            CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был приглушен на " +
-            //                $"{Math.Round((dateUnmute - DateTime.Now).TotalMinutes)} минут."));
-            return clients.Caller.SendAsync("ReceiveCommand", $"Пользователь {userNameProcessedUser} был приглушен");
+            return clients.Caller.SendAsync("ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был приглушен на " +
+                    $"{Math.Round((dateUnmute - DateTime.Now).TotalMinutes)} минут."));
         }
 
         /// <summary>
@@ -448,20 +461,24 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             if (idProcessedUser == null)
             {
-                //return clients.Caller.SendAsync("ReceiveCommand",
-                //    CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не найден."));
-                return clients.Caller.SendAsync("ReceiveCommand", $"Пользователь {userNameProcessedUser} не найден.");
+                return clients.Caller.SendAsync("ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не найден."));
             }
 
             if (_userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
-                //            return clients.Caller.SendAsync("ReceiveCommand",
-                //                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не состоит комнате."));
+                return clients.Caller.SendAsync("ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не состоит комнате."));
             }
 
             if (await _roomValidator.CommandAccessCheckAsync(currentUser, new string[] { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
-                //            return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
+            }
+
+            if (Database.MutedUsers.GetListIdsMutedRoomForUser(idProcessedUser).Contains(currentRoom.Id))
+            {
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был приглушен в этой команате"));
             }
 
             DateTime dateUnmute = TimeComputer.CalculateUnlockDate(command, @"//room\smute\s-l\s\w+\s-m\s(\d*)$");
@@ -469,10 +486,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             await clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
-            //        return clients.Caller.SendAsync("ReceiveCommand",
-            //            CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был приглушен на " +
-            //                $"{Math.Round((dateUnmute - DateTime.Now).TotalMinutes)} минут."));
-            return clients.Caller.SendAsync("ReceiveCommand", $"Пользователь {userNameProcessedUser} был приглушен");
+            return clients.Caller.SendAsync("ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был приглушен на " +
+                    $"{Math.Round((dateUnmute - DateTime.Now).TotalMinutes)} минут."));
         }
 
         /// <summary>

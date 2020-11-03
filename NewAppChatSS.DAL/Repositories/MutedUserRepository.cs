@@ -75,6 +75,17 @@ namespace NewAppChatSS.DAL.Repositories
              .ToList();
         }
 
+        /// <summary>
+        /// Метод возвращает коллекцию id комнат где пользователь лишен права отправлять сообщения
+        /// </summary>
+        public IEnumerable<string> GetListIdsMutedRoomForUser(string userId)
+        {
+            return _context.MutedUsers
+                .Where(m => m.UserId == userId)
+                .Select(k => k.RoomId)
+                .ToList();
+        }
+
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

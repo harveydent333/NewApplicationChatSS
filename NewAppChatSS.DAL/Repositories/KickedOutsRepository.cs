@@ -63,6 +63,17 @@ namespace NewAppChatSS.DAL.Repositories
         }
 
         /// <summary>
+        /// Метод возвращает коллекцию id комнат из которых выгнали пользователя
+        /// </summary>
+        public IEnumerable<string> GetListIdsKickedRoomForUser(string userId)
+        {
+            return _context.KickedOuts
+               .Where(k => k.UserId == userId)
+               .Select(k=>k.RoomId)
+               .ToList();
+        }
+
+        /// <summary>
         /// Метод сохраняет изменения состояния в базе данных
         /// </summary>
         public async Task SaveAsync()
