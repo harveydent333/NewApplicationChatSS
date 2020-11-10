@@ -1,7 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage;
-using NewAppChatSS.BLL.DTO;
+﻿using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
@@ -164,20 +161,20 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
 
         public async Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
         {
-            foreach(string role in allowedRoles)
+            foreach (string role in allowedRoles)
             {
                 if (await _userManager.IsInRoleAsync(user, role))
                 {
                     return true;
                 }
-             }
-            
+            }
+
             if (checkOnOwner)
             {
                 return user.UserName == processingUserName;
             }
 
-            return false;  
+            return false;
         }
 
 

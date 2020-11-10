@@ -1,5 +1,3 @@
-using System;
-
 namespace NewApplicationChatSS.ViewModels
 {
     public class ErrorViewModel

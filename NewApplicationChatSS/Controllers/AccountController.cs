@@ -12,14 +12,12 @@ namespace NewApplicationChatSS.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IUserService userService, IMapper mapper)
+        public AccountController(SignInManager<User> signInManager, IUserService userService, IMapper mapper)
         {
-            _userManager = userManager;
             _signInManager = signInManager;
             _userService = userService;
             _mapper = mapper;
@@ -36,7 +34,7 @@ namespace NewApplicationChatSS.Controllers
         {
             return View("Login");
         }
-            
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel loginUserModel)
@@ -53,9 +51,9 @@ namespace NewApplicationChatSS.Controllers
                 {
                     ModelState.AddModelError(ex.Property, ex.Message);
                     return View(loginUserModel);
-                } 
+                }
             }
-             return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -68,7 +66,7 @@ namespace NewApplicationChatSS.Controllers
                     await _userService.RegisterUserAsync(_mapper.Map<UserDTO>(registerUserModel));
                     await _signInManager.PasswordSignInAsync(registerUserModel.Email, registerUserModel.Password, true, false);
 
-                    return RedirectToAction("Index","Home");
+                    return RedirectToAction("Index", "Home");
                 }
                 catch (ValidationException ex)
                 {

@@ -25,13 +25,11 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
         private static string userName;
 
-
         private IUnitOfWork Database { get; set; }
         private readonly UserManager<User> _userManager;
-        private readonly IMapper _mapper;
         private readonly IUserValidator _userValidator;
 
-        public UserCommandHandlerHub(UserManager<User> userManager, IMapper mapper, IUserValidator userValidator, IUnitOfWork uow)
+        public UserCommandHandlerHub(UserManager<User> userManager, IUserValidator userValidator, IUnitOfWork uow)
         {
             userCommands = new Dictionary<Regex, Func<User, string, IHubCallerClients, Task>>
             {
@@ -45,7 +43,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             Database = uow;
             _userManager = userManager;
-            _mapper = mapper;
             _userValidator = userValidator;
         }
 

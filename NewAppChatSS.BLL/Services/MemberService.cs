@@ -2,9 +2,7 @@
 using NewAppChatSS.BLL.DTO;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.DAL.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NewAppChatSS.BLL.Services
 {

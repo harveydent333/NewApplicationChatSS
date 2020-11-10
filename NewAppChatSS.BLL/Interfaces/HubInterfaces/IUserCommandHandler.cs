@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.DAL.Entities;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Interfaces.HubInterfaces

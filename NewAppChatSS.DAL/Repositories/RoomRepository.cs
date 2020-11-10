@@ -19,8 +19,8 @@ namespace NewAppChatSS.DAL.Repositories
         public IEnumerable<Room> GetAll()
         {
             return _context.Rooms
-                .Include(r=>r.Owner)
-                .Include(r=>r.LastMessage)
+                .Include(r => r.Owner)
+                .Include(r => r.LastMessage)
                 .Include(r => r.TypeRoom)
                 .ToList();
         }
@@ -30,7 +30,7 @@ namespace NewAppChatSS.DAL.Repositories
             return _context.Rooms
                 .Include(r => r.Owner)
                 .Include(r => r.LastMessage)
-                .Include(r=>r.TypeRoom)
+                .Include(r => r.TypeRoom)
                 .FirstOrDefault(r => r.Id == id);
         }
 

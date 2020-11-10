@@ -44,7 +44,7 @@ namespace NewAppChatSS.DAL.Repositories
         {
             KickedOut kickedOut = _context.KickedOuts
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
-            
+
             if (kickedOut != null)
             {
                 _context.Remove(kickedOut);
@@ -69,7 +69,7 @@ namespace NewAppChatSS.DAL.Repositories
         {
             return _context.KickedOuts
                .Where(k => k.UserId == userId)
-               .Select(k=>k.RoomId)
+               .Select(k => k.RoomId)
                .ToList();
         }
 

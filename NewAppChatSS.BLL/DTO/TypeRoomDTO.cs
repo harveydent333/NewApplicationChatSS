@@ -7,11 +7,6 @@ namespace NewAppChatSS.BLL.DTO
 {
     public class TypeRoomDTO
     {
-        public TypeRoomDTO()
-        {
-            Rooms = new List<Room>();
-        }
-
         public int Id { get; set; }
 
         /// <summary>
@@ -22,6 +17,6 @@ namespace NewAppChatSS.BLL.DTO
         /// <summary>
         /// Список комнат
         /// </summary>
-        public List<Room> Rooms { get; set; }
+        public List<Room> Rooms { get; set; } = new List<Room>();
     }
 }

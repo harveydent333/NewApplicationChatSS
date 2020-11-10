@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +11,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
-using NewAppChatSS.BLL.Services;
 using NewAppChatSS.DAL.Interfaces;
 
 namespace NewApplicationChatSS.Controllers
@@ -48,7 +46,7 @@ namespace NewApplicationChatSS.Controllers
         }
 
         [HttpGet]
-        public  IActionResult IndexAsync()
+        public IActionResult IndexAsync()
         {
             IEnumerable<UserDTO> usersDtos = _userService.GetUsersDTO();
             return View(_mapper.Map<List<RegisterViewModel>>(usersDtos));

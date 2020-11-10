@@ -33,7 +33,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task<User> FindByEmailAsync(string email)
         {
-            return await _userManager.FindByEmailAsync(email); 
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task CreateAsync(User item)

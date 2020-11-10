@@ -10,7 +10,7 @@ namespace NewAppChatSS.DAL.Repositories
     public class EFUnitOfWork : IUnitOfWork
     {
         private bool disposed = false;
-        private ApplicationDbContext db;
+        private readonly ApplicationDbContext db;
         private RoleRepository roleRepository;
         private RoomRepository roomRepository;
         private UserRepository userRepository;

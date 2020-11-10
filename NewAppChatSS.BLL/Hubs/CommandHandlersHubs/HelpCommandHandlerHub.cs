@@ -18,6 +18,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
     {
         const int BOT_TYPE_ROOM = 3;
 
+        private List<string> allowedCommands = new List<string>();
+
         private readonly UserManager<User> _userManager;
 
         public HelpCommandHandlerHub(UserManager<User> userManager)
@@ -45,7 +47,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> GetAllowedCommands(User currentUser, Room currentRoom, IHubCallerClients clients)
         {
-            List<string> allowedCommands = new List<string>();
+            allowedCommands.Clear();
 
             GetCommonCommands(ref allowedCommands);
 
@@ -80,15 +82,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetCommonCommands(ref List<string> allowedCommands)
         {
-            allowedCommands.AddRange(new string[]
-            {
-                "//user rename {login пользователя}||{Новый login пользователя}",
-                "//room create {Название комнаты} [-c] or [-b]",
-                "//room remove {Название комнаты}",
-                "//room disconnect",
-                "//room disconnect {Название комнаты}",
-                "//room connect {Название комнаты} -l {login пользователя}",
-            });
+            allowedCommands.Add("//user rename {login пользователя}||{Новый login пользователя}");
+            allowedCommands.Add("//user rename {login пользователя}||{Новый login пользователя}");
+            allowedCommands.Add("//room create {Название комнаты} [-c] or [-b]");
+            allowedCommands.Add("//room remove {Название комнаты}");
+            allowedCommands.Add("//room disconnect");
+            allowedCommands.Add("//room disconnect {Название комнаты}");
+            allowedCommands.Add("//room connect {Название комнаты} -l {login пользователя}");
         }
 
         /// <summary>
@@ -97,14 +97,11 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public void GetModerCommands(ref List<string> allowedCommands)
         {
-            allowedCommands.AddRange(new string[]
-            {
-                "//user ban {login пользователя} [-m {Количество минут}]",
-                "//user pardon {login пользователя}",
-                "//room mute -l {login пользователя} [-m {Количество минут}]",
-                "//room speak -l {login пользователя}",
-                "//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]",
-            });
+            allowedCommands.Add("//user ban {login пользователя} [-m {Количество минут}]");
+            allowedCommands.Add("//user pardon {login пользователя}");
+            allowedCommands.Add("//room mute -l {login пользователя} [-m {Количество минут}]");
+            allowedCommands.Add("//room speak -l {login пользователя}");
+            allowedCommands.Add("//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]");
         }
 
         /// <summary>
@@ -113,12 +110,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetAdminCommands(ref List<string> allowedCommands)
         {
-            allowedCommands.AddRange(new string[]
-            {
-                "//user moderator {login пользователя} [-n] or [-d]",
-                "//room remove {Название комнаты}",
-                "//room rename {Название комнаты}",
-            });
+            allowedCommands.Add("//user moderator {login пользователя} [-n] or [-d]");
+            allowedCommands.Add("//room remove {Название комнаты}");
+            allowedCommands.Add("//room rename {Название комнаты}");
         }
 
         /// <summary>
@@ -127,12 +121,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetCommandsForBotRoom(ref List<string> allowedCommands)
         {
-            allowedCommands.InsertRange(0, new string[]
-            {
-                "//find {название канала}||{название видео} [-v] [-l]",
-                "//info {название канала}",
-                "//videoCommentRandom {название канала}||{Название ролика}"
-            });
+            allowedCommands.Add("//find {название канала}||{название видео} [-v] [-l]");
+            allowedCommands.Add("//info {название канала}");
+            allowedCommands.Add("//videoCommentRandom {название канала}||{Название ролика}");
         }
 
         /// <summary>
@@ -141,14 +132,11 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetCommandsForOwnerRoom(ref List<string> allowedCommands)
         {
-            allowedCommands.AddRange(new string[]
-            {
-                "//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]",
-                "//room speak -l {login пользователя}",
-                "//room mute -l {login пользователя} [-m {Количество минут}]",
-                "//room remove {Название комнаты}",
-                "//room rename {Название комнаты}",
-            });
+            allowedCommands.Add("//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]");
+            allowedCommands.Add("//room speak -l {login пользователя}");
+            allowedCommands.Add("//room mute -l {login пользователя} [-m {Количество минут}]");
+            allowedCommands.Add("//room remove {Название комнаты}");
+            allowedCommands.Add("//room rename {Название комнаты}");
         }
     }
 }

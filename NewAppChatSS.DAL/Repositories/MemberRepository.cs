@@ -4,8 +4,6 @@ using NewAppChatSS.DAL.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
@@ -48,11 +46,6 @@ namespace NewAppChatSS.DAL.Repositories
             await SaveAsync();
         }
 
-        public IEnumerable<User> GetMembers(string roomId)
-        {
-            throw new NotImplementedException();        ///!!!
-        }
-
         public IEnumerable<string> GetMembersIds(string roomId)
         {
             return _context.Members
@@ -64,7 +57,7 @@ namespace NewAppChatSS.DAL.Repositories
         public IEnumerable<Room> GetRooms(string userId)
         {
             List<string> roomIds = _context.Members
-                .Where(m=>m.UserId == userId)
+                .Where(m => m.UserId == userId)
                 .Select(m => m.RoomId)
                 .ToList();
 

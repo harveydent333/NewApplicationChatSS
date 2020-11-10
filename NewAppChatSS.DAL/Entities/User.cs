@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Entities
 {
@@ -20,10 +17,5 @@ namespace NewAppChatSS.DAL.Entities
         /// </summary>
         [DataType(DataType.DateTime)]
         public DateTime? DateUnblock { get; set; }
-
-        //[ForeignKey("RoleId")]
-        //public IdentityRole Role { get; set; }
-
-        //public string RoleId { get; set; }
     }
 }

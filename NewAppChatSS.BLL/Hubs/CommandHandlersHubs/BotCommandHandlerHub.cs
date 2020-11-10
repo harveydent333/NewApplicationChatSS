@@ -11,11 +11,11 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
     public sealed class BotCommandHandlerHub : IBotCommandHandlerHub
     {
-        private static Dictionary<Regex, Func<String, IHubCallerClients, Task>> botCommands;
+        private readonly Dictionary<Regex, Func<string, IHubCallerClients, Task>> botCommands;
 
         public BotCommandHandlerHub()
         {
-            botCommands = new Dictionary<Regex, Func<String, IHubCallerClients, Task>>
+            botCommands = new Dictionary<Regex, Func<string, IHubCallerClients, Task>>
             {
                 [new Regex(@"^//find\s[\w\s]+\W{2}.+[^-v|^-l]$")] = CreateRefOnVideo,
                 [new Regex(@"^//find\s[\s\w\d]+\W{2}.+[^-l]\s-v$")] = CreateRefOnVideoAndGetCountViews,

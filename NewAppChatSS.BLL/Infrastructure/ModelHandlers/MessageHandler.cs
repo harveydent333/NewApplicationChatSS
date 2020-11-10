@@ -17,11 +17,9 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
     public class MessageHandler : IMessageHandler
     {
         public IUnitOfWork Database { get; set; }
-        private readonly UserManager<User> _userManager;
 
-        public MessageHandler(IUnitOfWork uow, UserManager<User> userManager)
+        public MessageHandler(IUnitOfWork uow)
         {
-            _userManager = userManager;
             Database = uow;
         }
 
@@ -64,22 +62,6 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 
             room.LastMessageId = messageId;
             await Database.Rooms.UpdateAsync(room);
-        }
-
-        /// <summary>
-        /// Метод добавляет информацию о ругающемся пользователе в базу данных
-        /// </summary>
-        private void HandleSwearingUser(string userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Метод проверяет содержатся ли ругательские слова в тексте сообщения
-        /// </summary>
-        private bool ContainsSwearWords(string textMessage)
-        {
-            throw new NotImplementedException();
         }
     }
 }

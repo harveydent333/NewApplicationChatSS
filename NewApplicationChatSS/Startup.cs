@@ -43,7 +43,7 @@ namespace NewApplicationChatSS
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllersWithViews();
-            
+
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -65,7 +65,8 @@ namespace NewApplicationChatSS
             services.AddTransient<IRoomHandler, RoomHandler>();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-               .AddCookie(options => {
+               .AddCookie(options =>
+               {
                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                });
         }
@@ -83,9 +84,9 @@ namespace NewApplicationChatSS
             }
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
-            
+
             app.UseStaticFiles();
-            
+
             app.UseFileServer(new FileServerOptions()
             {
                 FileProvider = new PhysicalFileProvider(

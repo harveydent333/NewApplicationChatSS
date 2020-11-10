@@ -10,7 +10,7 @@ using NewAppChatSS.DAL;
 namespace NewAppChatSS.DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201103102529_Init")]
+    [Migration("20201110051508_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,6 +46,29 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "424e159c-025a-4e11-bf5b-c98daa180047",
+                            ConcurrencyStamp = "58b46a8b-f923-48df-bbd2-ae752ceea327",
+                            Name = "RegularUser",
+                            NormalizedName = "REGULARUSER"
+                        },
+                        new
+                        {
+                            Id = "8845cfb1-3caa-45b4-8934-0629a16fac1b",
+                            ConcurrencyStamp = "683023fe-4cb7-4d82-9e82-adbe9def1222",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
+                        },
+                        new
+                        {
+                            Id = "781d7927-3e9e-486f-9fbe-223b8d068724",
+                            ConcurrencyStamp = "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8",
+                            Name = "Moderator",
+                            NormalizedName = "MODERATOR"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -131,6 +154,13 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "31828d47-0f4d-4281-a03f-b48677fc7f69",
+                            RoleId = "8845cfb1-3caa-45b4-8934-0629a16fac1b"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -216,6 +246,14 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Members");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            RoomId = "1",
+                            UserId = "31828d47-0f4d-4281-a03f-b48677fc7f69"
+                        });
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.Message", b =>
@@ -302,6 +340,15 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasIndex("TypeId");
 
                     b.ToTable("Rooms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "1",
+                            OwnerId = "31828d47-0f4d-4281-a03f-b48677fc7f69",
+                            RoomName = "MainRoom",
+                            TypeId = 1
+                        });
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.SwearingUser", b =>
@@ -337,6 +384,23 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("TypesRooms");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            TypeName = "RegularRoom"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            TypeName = "PrivateRoom"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            TypeName = "BotRoom"
+                        });
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.User", b =>
@@ -408,6 +472,25 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "31828d47-0f4d-4281-a03f-b48677fc7f69",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "af10709c-ab87-4c8a-badc-2d1e0421adfa",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = false,
+                            IsLocked = false,
+                            LockoutEnabled = true,
+                            NormalizedEmail = "ADMIN@GMAIL.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPp5IfNNpKxmZneDEq+E9JlFLrCvuZVewUvPr/gyAhxLdouVInuOzQUdc8fPbhJvlg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "",
+                            TwoFactorEnabled = false,
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

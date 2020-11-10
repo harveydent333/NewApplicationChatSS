@@ -150,7 +150,7 @@ namespace NewAppChatSS.DAL.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -320,6 +320,46 @@ namespace NewAppChatSS.DAL.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "424e159c-025a-4e11-bf5b-c98daa180047", "58b46a8b-f923-48df-bbd2-ae752ceea327", "RegularUser", "REGULARUSER" },
+                    { "8845cfb1-3caa-45b4-8934-0629a16fac1b", "683023fe-4cb7-4d82-9e82-adbe9def1222", "Administrator", "ADMINISTRATOR" },
+                    { "781d7927-3e9e-486f-9fbe-223b8d068724", "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8", "Moderator", "MODERATOR" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "DateUnblock", "Email", "EmailConfirmed", "IsLocked", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[] { "31828d47-0f4d-4281-a03f-b48677fc7f69", 0, "af10709c-ab87-4c8a-badc-2d1e0421adfa", null, "admin@gmail.com", false, false, true, null, "ADMIN@GMAIL.COM", "ADMIN", "AQAAAAEAACcQAAAAEPp5IfNNpKxmZneDEq+E9JlFLrCvuZVewUvPr/gyAhxLdouVInuOzQUdc8fPbhJvlg==", null, false, "", false, "admin" });
+
+            migrationBuilder.InsertData(
+                table: "TypesRooms",
+                columns: new[] { "Id", "TypeName" },
+                values: new object[,]
+                {
+                    { 1, "RegularRoom" },
+                    { 2, "PrivateRoom" },
+                    { 3, "BotRoom" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "UserId", "RoleId" },
+                values: new object[] { "31828d47-0f4d-4281-a03f-b48677fc7f69", "8845cfb1-3caa-45b4-8934-0629a16fac1b" });
+
+            migrationBuilder.InsertData(
+                table: "Rooms",
+                columns: new[] { "Id", "LastMessageId", "OwnerId", "RoomName", "TypeId" },
+                values: new object[] { "1", null, "31828d47-0f4d-4281-a03f-b48677fc7f69", "MainRoom", 1 });
+
+            migrationBuilder.InsertData(
+                table: "Members",
+                columns: new[] { "Id", "RoomId", "UserId" },
+                values: new object[] { 1, "1", "31828d47-0f4d-4281-a03f-b48677fc7f69" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

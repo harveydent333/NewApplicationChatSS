@@ -1,8 +1,5 @@
-﻿using NewAppChatSS.BLL.DTO;
-using NewAppChatSS.DAL.Entities;
-using System;
+﻿using NewAppChatSS.DAL.Entities;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces

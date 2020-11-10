@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Infrastructure.Validators

@@ -38,12 +38,12 @@ namespace NewAppChatSS.BLL.Services
         {
             return _mapper.Map<UserDTO>(await _userManager.FindByIdAsync(id));
         }
-        
+
         public async Task<UserDTO> GetUserDTObyUserNameAsync(string userName)
         {
             return _mapper.Map<UserDTO>(await _userManager.FindByNameAsync(userName));
         }
-        
+
         public async Task<UserDTO> GetUserDTObyEmailAsync(string email)
         {
             return _mapper.Map<UserDTO>(await _userManager.FindByEmailAsync(email));

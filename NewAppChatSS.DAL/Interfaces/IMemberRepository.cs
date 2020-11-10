@@ -1,7 +1,5 @@
 ﻿using NewAppChatSS.DAL.Entities;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Interfaces
@@ -13,8 +11,6 @@ namespace NewAppChatSS.DAL.Interfaces
         Task AddMemberAsync(string userId, string roomId);
 
         Task DeleteMemberAsync(string userId, string roomId);
-
-        IEnumerable<User> GetMembers(string roomId);
 
         IEnumerable<string> GetMembersIds(string roomId);
 
