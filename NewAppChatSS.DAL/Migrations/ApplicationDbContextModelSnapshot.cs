@@ -15,9 +15,9 @@ namespace NewAppChatSS.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.9")
+                .UseIdentityColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "5.0.1");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -29,18 +29,18 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasName("RoleNameIndex")
+                        .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
@@ -48,21 +48,21 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "424e159c-025a-4e11-bf5b-c98daa180047",
+                            Id = "0e47f739963a4ff19dc44e6da2bdd19f",
                             ConcurrencyStamp = "58b46a8b-f923-48df-bbd2-ae752ceea327",
                             Name = "RegularUser",
                             NormalizedName = "REGULARUSER"
                         },
                         new
                         {
-                            Id = "8845cfb1-3caa-45b4-8934-0629a16fac1b",
+                            Id = "5456461b1c694ffba161cc83ad7042ae",
                             ConcurrencyStamp = "683023fe-4cb7-4d82-9e82-adbe9def1222",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "781d7927-3e9e-486f-9fbe-223b8d068724",
+                            Id = "9aee0c5298b74c3f909a44848db366f5",
                             ConcurrencyStamp = "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
@@ -74,7 +74,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -98,7 +98,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -156,8 +156,8 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "31828d47-0f4d-4281-a03f-b48677fc7f69",
-                            RoleId = "8845cfb1-3caa-45b4-8934-0629a16fac1b"
+                            UserId = "b80d934c40cd440291e0108ca0d4ade2",
+                            RoleId = "5456461b1c694ffba161cc83ad7042ae"
                         });
                 });
 
@@ -185,7 +185,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("Word")
                         .HasColumnType("nvarchar(max)");
@@ -200,7 +200,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<DateTime>("DateUnkick")
                         .HasColumnType("datetime2");
@@ -227,7 +227,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<string>("RoomId")
                         .IsRequired()
@@ -250,7 +250,7 @@ namespace NewAppChatSS.DAL.Migrations
                         {
                             Id = 1,
                             RoomId = "1",
-                            UserId = "31828d47-0f4d-4281-a03f-b48677fc7f69"
+                            UserId = "b80d934c40cd440291e0108ca0d4ade2"
                         });
                 });
 
@@ -288,7 +288,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<DateTime>("DateUnmute")
                         .HasColumnType("datetime2");
@@ -343,7 +343,7 @@ namespace NewAppChatSS.DAL.Migrations
                         new
                         {
                             Id = "1",
-                            OwnerId = "31828d47-0f4d-4281-a03f-b48677fc7f69",
+                            OwnerId = "b80d934c40cd440291e0108ca0d4ade2",
                             RoomName = "MainRoom",
                             TypeId = 1
                         });
@@ -354,7 +354,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .UseIdentityColumn();
 
                     b.Property<int>("CountSwear")
                         .HasColumnType("int");
@@ -417,8 +417,8 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
@@ -433,12 +433,12 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -456,17 +456,17 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(256)")
-                        .HasMaxLength(256);
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
+                        .HasDatabaseName("EmailIndex");
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex")
+                        .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
@@ -474,7 +474,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "31828d47-0f4d-4281-a03f-b48677fc7f69",
+                            Id = "b80d934c40cd440291e0108ca0d4ade2",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "af10709c-ab87-4c8a-badc-2d1e0421adfa",
                             Email = "admin@gmail.com",
@@ -555,6 +555,10 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.Member", b =>
@@ -570,6 +574,10 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.Message", b =>
@@ -585,6 +593,10 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.MutedUser", b =>
@@ -600,6 +612,10 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Room");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.Room", b =>
@@ -619,6 +635,12 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasForeignKey("TypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("LastMessage");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("TypeRoom");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.SwearingUser", b =>
@@ -628,6 +650,13 @@ namespace NewAppChatSS.DAL.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("NewAppChatSS.DAL.Entities.TypeRoom", b =>
+                {
+                    b.Navigation("Rooms");
                 });
 #pragma warning restore 612, 618
         }
