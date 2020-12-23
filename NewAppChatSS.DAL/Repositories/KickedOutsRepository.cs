@@ -10,16 +10,16 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class KickedOutsRepository : IKickedOutsRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public KickedOutsRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         public IEnumerable<KickedOut> GetAll()
         {
-            return _context.KickedOuts.ToList();
+            return context.KickedOuts.ToList();
         }
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task AddKickedUserAsync(string userId, string roomId, DateTime dateUnkick)
         {
-            _context.KickedOuts.Add(
+            context.KickedOuts.Add(
                 new KickedOut
                 {
                     UserId = userId,
@@ -42,13 +42,14 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task DeleteKickedUserAsync(string userId, string roomId)
         {
-            KickedOut kickedOut = _context.KickedOuts
+            KickedOut kickedOut = context.KickedOuts
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
 
             if (kickedOut != null)
             {
-                _context.Remove(kickedOut);
+                context.Remove(kickedOut);
             }
+
             await SaveAsync();
         }
 
@@ -57,7 +58,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<KickedOut> GetListKickedRoomForUser(string userId)
         {
-            return _context.KickedOuts
+            return context.KickedOuts
                .Where(k => k.UserId == userId)
                .ToList();
         }
@@ -67,7 +68,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<string> GetListIdsKickedRoomForUser(string userId)
         {
-            return _context.KickedOuts
+            return context.KickedOuts
                .Where(k => k.UserId == userId)
                .Select(k => k.RoomId)
                .ToList();
@@ -78,7 +79,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

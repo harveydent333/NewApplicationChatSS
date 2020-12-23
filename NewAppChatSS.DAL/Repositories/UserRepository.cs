@@ -12,49 +12,49 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly ApplicationDbContext context;
+        private readonly UserManager<User> userManager;
 
-        public UserRepository(ApplicationDbContext context, UserManager<User> manager)
+        public UserRepository(ApplicationDbContext context, UserManager<User> userManager)
         {
-            _context = context;
-            _userManager = manager;
+            this.context = context;
+            this.userManager = userManager;
         }
 
         public IEnumerable<User> GetAll()
         {
-            return _context.Users.ToList();
+            return context.Users.ToList();
         }
 
         public async Task<User> FindById(string id)
         {
-            return await _userManager.FindByIdAsync(id);
+            return await userManager.FindByIdAsync(id);
         }
 
         public async Task<User> FindByEmailAsync(string email)
         {
-            return await _userManager.FindByEmailAsync(email);
+            return await userManager.FindByEmailAsync(email);
         }
 
         public async Task CreateAsync(User item)
         {
             item.Id = Guid.NewGuid().ToString();
-            await _userManager.CreateAsync(item, item.PasswordHash);
+            await userManager.CreateAsync(item, item.PasswordHash);
         }
 
         public async Task UpdateAsync(User item)
         {
-            await _userManager.UpdateAsync(item);
+            await userManager.UpdateAsync(item);
         }
 
         public async Task DeleteAsync(User item)
         {
-            await _userManager.DeleteAsync(item);
+            await userManager.DeleteAsync(item);
         }
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

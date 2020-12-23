@@ -10,23 +10,24 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class MemberRepository : IMemberRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
+
         public IUnitOfWork Database { get; set; }
 
         public MemberRepository(ApplicationDbContext context, IUnitOfWork uow)
         {
-            _context = context;
+            this.context = context;
             Database = uow;
         }
 
         public IEnumerable<Member> GetAll()
         {
-            return _context.Members.ToList();
+            return context.Members.ToList();
         }
 
         public async Task AddMemberAsync(string userId, string roomId)
         {
-            _context.Members.Add(
+            context.Members.Add(
                 new Member
                 {
                     UserId = userId,
@@ -37,10 +38,10 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task DeleteMemberAsync(string userId, string roomId)
         {
-            Member member = _context.Members
+            Member member = context.Members
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
 
-            _context.Remove(_context.Members
+            context.Remove(context.Members
                 .FirstOrDefault(m => m.Id == member.Id));
 
             await SaveAsync();
@@ -48,7 +49,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public IEnumerable<string> GetMembersIds(string roomId)
         {
-            return _context.Members
+            return context.Members
                 .Where(m => m.RoomId == roomId)
                 .Select(m => m.UserId)
                 .ToList();
@@ -56,7 +57,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public IEnumerable<Room> GetRooms(string userId)
         {
-            List<string> roomIds = _context.Members
+            List<string> roomIds = context.Members
                 .Where(m => m.UserId == userId)
                 .Select(m => m.RoomId)
                 .ToList();
@@ -66,7 +67,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public IEnumerable<string> GetRoomsIds(string userId)
         {
-            return _context.Members
+            return context.Members
                 .Where(m => m.UserId == userId)
                 .Select(m => m.RoomId)
                 .ToList();
@@ -74,7 +75,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

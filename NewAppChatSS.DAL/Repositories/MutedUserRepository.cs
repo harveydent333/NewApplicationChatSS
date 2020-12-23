@@ -10,11 +10,11 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class MutedUserRepository : IMutedUserRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public MutedUserRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<MutedUser> GetAll()
         {
-            return _context.MutedUsers.ToList();
+            return context.MutedUsers.ToList();
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task AddMutedUserAsync(string userId, string roomId, DateTime dateUnmute)
         {
-            _context.MutedUsers.Add(
+            context.MutedUsers.Add(
                 new MutedUser
                 {
                     UserId = userId,
@@ -45,13 +45,14 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task DeleteMutedUserAsync(string userId, string roomId)
         {
-            MutedUser mutedUser = _context.MutedUsers
+            MutedUser mutedUser = context.MutedUsers
                 .FirstOrDefault(m => m.UserId == userId && m.RoomId == roomId);
 
             if (mutedUser != null)
             {
-                _context.Remove(mutedUser);
+                context.Remove(mutedUser);
             }
+
             await SaveAsync();
         }
 
@@ -60,7 +61,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public DateTime GetDateTimeUnmuteUser(string userId, string roomId)
         {
-            return _context.MutedUsers
+            return context.MutedUsers
                 .FirstOrDefault(k => k.UserId == userId && k.RoomId == roomId)
                 .DateUnmute;
         }
@@ -70,7 +71,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<MutedUser> GetListMutedRoomForUser(string userId)
         {
-            return _context.MutedUsers
+            return context.MutedUsers
              .Where(m => m.UserId == userId)
              .ToList();
         }
@@ -80,7 +81,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<string> GetListIdsMutedRoomForUser(string userId)
         {
-            return _context.MutedUsers
+            return context.MutedUsers
                 .Where(m => m.UserId == userId)
                 .Select(k => k.RoomId)
                 .ToList();
@@ -88,7 +89,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

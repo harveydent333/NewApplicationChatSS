@@ -18,13 +18,14 @@ namespace NewAppChatSS.DAL.Repositories
         private IMessageRepository messageRepository;
         private IMutedUserRepository mutedUserRepository;
         private IKickedOutsRepository kickedOutsRepository;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<User> userManager;
+
         public IUnitOfWork Database { get; set; }
 
-        public EFUnitOfWork(ApplicationDbContext dbContext, UserManager<User> manager)
+        public EFUnitOfWork(ApplicationDbContext dbContext, UserManager<User> userManager)
         {
             db = dbContext;
-            _userManager = manager;
+            this.userManager = userManager;
         }
 
         public IKickedOutsRepository KickedOuts
@@ -35,6 +36,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     kickedOutsRepository = new KickedOutsRepository(db);
                 }
+
                 return kickedOutsRepository;
             }
         }
@@ -47,6 +49,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     mutedUserRepository = new MutedUserRepository(db);
                 }
+
                 return mutedUserRepository;
             }
         }
@@ -59,6 +62,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     messageRepository = new MessageRepository(db);
                 }
+
                 return messageRepository;
             }
         }
@@ -71,6 +75,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     memberRepository = new MemberRepository(db, this);
                 }
+
                 return memberRepository;
             }
         }
@@ -81,8 +86,9 @@ namespace NewAppChatSS.DAL.Repositories
             {
                 if (userRepository == null)
                 {
-                    userRepository = new UserRepository(db, _userManager);
+                    userRepository = new UserRepository(db, userManager);
                 }
+
                 return userRepository;
             }
         }
@@ -95,6 +101,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     roomRepository = new RoomRepository(db);
                 }
+
                 return roomRepository;
             }
         }
@@ -107,6 +114,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     roleRepository = new RoleRepository(db);
                 }
+
                 return roleRepository;
             }
         }
@@ -119,6 +127,7 @@ namespace NewAppChatSS.DAL.Repositories
                 {
                     db.Dispose();
                 }
+
                 disposed = true;
             }
         }

@@ -9,11 +9,11 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class MessageRepository : IMessageRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public MessageRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<Message> GetAll()
         {
-            return _context.Messages.ToList();
+            return context.Messages.ToList();
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task AddMessage(Message item)
         {
-            _context.Messages.Add(item);
+            context.Messages.Add(item);
             await SaveAsync();
         }
 
@@ -38,8 +38,8 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task DeleteMessageAsync(string id)
         {
-            _context.Messages.Remove(
-                _context.Messages.FirstOrDefault(m => m.Id == id));
+            context.Messages.Remove(
+                context.Messages.FirstOrDefault(m => m.Id == id));
 
             await SaveAsync();
         }
@@ -49,17 +49,17 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public IEnumerable<Message> FindMessagesByRoomId(string roomId)
         {
-            return _context.Messages
+            return context.Messages
                 .Where(m => m.RoomId == roomId)
                 .ToList();
         }
 
         /// <summary>
-        /// 
+        /// Метод возвращает сообщения комнаты
         /// </summary>
         public IEnumerable<Message> GetRoomMessages(string roomId)
         {
-            return _context.Messages
+            return context.Messages
                 .Include(m => m.User)
                 .Include(m => m.Room)
                 .Where(m => m.RoomId == roomId)
@@ -72,7 +72,7 @@ namespace NewAppChatSS.DAL.Repositories
         /// </summary>
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

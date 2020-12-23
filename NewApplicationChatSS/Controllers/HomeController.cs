@@ -1,90 +1,99 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.BLL.DTO;
-using AutoMapper;
-using NewApplicationChatSS.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
+using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewApplicationChatSS.ViewModels;
 
 namespace NewApplicationChatSS.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
-        const string MAIN_ROOM_ID = "1";
+        private const string MainRoomId = "1";
 
-        public IUnitOfWork Database { get; set; }
+        private readonly ILogger<HomeController> logger;
+        private readonly IUserService userService;
+        private readonly IRoomService roomService;
+        private readonly IMemberService memberService;
+        private readonly IMessageService messageService;
+        private readonly UserManager<User> userManager;
+        private readonly IUserValidator userValidator;
+        private readonly IMapper mapper;
 
-        private readonly ILogger<HomeController> _logger;
-        private readonly IUserService _userService;
-        private readonly IRoomService _roomService;
-        private readonly IMemberService _memberService;
-        private readonly IMessageService _messageService;
-        private readonly UserManager<User> _userManager;
-        private readonly IUserValidator _userValidator;
-        private readonly IMapper _mapper;
-
-        public HomeController(IUnitOfWork uow, ILogger<HomeController> logger, IUserService serv, UserManager<User> manager, IMapper mapper, IUserValidator userValidator, IRoomService roomService, IMemberService memberService, IMessageService messageService)
+        public HomeController(
+            IUnitOfWork uow,
+            ILogger<HomeController> logger,
+            IUserService userService,
+            UserManager<User> userManager,
+            IMapper mapper,
+            IUserValidator userValidator,
+            IRoomService roomService,
+            IMemberService memberService,
+            IMessageService messageService)
         {
-            Database = uow;
-
-            _logger = logger;
-            _userService = serv;
-            _userManager = manager;
-            _mapper = mapper;
-            _userValidator = userValidator;
-            _roomService = roomService;
-            _memberService = memberService;
-            _messageService = messageService;
+            this.logger = logger;
+            this.userService = userService;
+            this.userManager = userManager;
+            this.mapper = mapper;
+            this.userValidator = userValidator;
+            this.roomService = roomService;
+            this.memberService = memberService;
+            this.messageService = messageService;
         }
 
         [HttpGet]
         public IActionResult IndexAsync()
         {
-            IEnumerable<UserDTO> usersDtos = _userService.GetUsersDTO();
-            return View(_mapper.Map<List<RegisterViewModel>>(usersDtos));
+            IEnumerable<UserDTO> usersDtos = userService.GetUsersDTO();
+            return View(mapper.Map<List<RegisterViewModel>>(usersDtos));
         }
 
         [HttpGet("/Chat/{Id?}")]
         public async Task<IActionResult> ChatAsync()
         {
-            string roomId = MAIN_ROOM_ID;
+            string roomId = MainRoomId;
 
-            if (await _userValidator.IsUserInGroupByNameAsync(User.Identity.Name, roomId))
+            if (await userValidator.IsUserInGroupByNameAsync(User.Identity.Name, roomId))
             {
                 ViewBag.UserNotMemberRoom = 1;
-                roomId = MAIN_ROOM_ID;
+                roomId = MainRoomId;
             }
             else
+            {
                 ViewBag.UserNotMemberRoom = 0;
+            }
 
-            if (await _userValidator.IsUserKickedByNameAsync(User.Identity.Name, roomId))
+            if (await userValidator.IsUserKickedByNameAsync(User.Identity.Name, roomId))
             {
                 ViewBag.IsKicked = 1;
-                roomId = MAIN_ROOM_ID;
+                roomId = MainRoomId;
             }
             else
+            {
                 ViewBag.IsKicked = 0;
+            }
 
-            ViewBag.Messages = _mapper.Map<List<MessageViewModel>>(_messageService.GetRoomMessagesDTO(roomId));
+            ViewBag.Messages = mapper.Map<List<MessageViewModel>>(messageService.GetRoomMessagesDTO(roomId));
 
-            RoomDTO room = _roomService.GetRoomDTO(roomId);
+            RoomDTO room = roomService.GetRoomDTO(roomId);
 
             ViewBag.CurrentRoomName = room.RoomName;
             ViewBag.CurrentRoomId = roomId;
             ViewBag.TypeRoom = room.TypeRoom.TypeName;
             ViewBag.UserName = User.Identity.Name;
 
-            string userId = (await _userService.GetUserDTObyUserNameAsync(User.Identity.Name)).Id;
+            string userId = (await userService.GetUserDTObyUserNameAsync(User.Identity.Name)).Id;
 
-            ViewBag.RoomsUser = _mapper.Map<List<RoomViewModel>>(_memberService.GetRoomsUser(userId));
+            ViewBag.RoomsUser = mapper.Map<List<RoomViewModel>>(memberService.GetRoomsUser(userId));
 
             return View("Chat");
         }

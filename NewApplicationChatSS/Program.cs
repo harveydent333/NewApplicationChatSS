@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
 namespace NewApplicationChatSS
@@ -10,13 +10,15 @@ namespace NewApplicationChatSS
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>()
-                      .UseDefaultServiceProvider(options =>
-                      options.ValidateScopes = false);
-                });
+            {
+                webBuilder.UseStartup<Startup>()
+                    .UseDefaultServiceProvider(options =>
+                    options.ValidateScopes = false);
+            });
+        }
     }
 }

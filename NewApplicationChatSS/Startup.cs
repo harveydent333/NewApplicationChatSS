@@ -1,28 +1,28 @@
+﻿using System.IO;
+using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.BLL.Hubs;
-using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
-using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
-using NewAppChatSS.BLL.Interfaces.HubInterfaces;
-using NewAppChatSS.BLL.Services;
-using NewAppChatSS.DAL.Interfaces;
-using NewAppChatSS.BLL.Infrastructure.Validators;
-using NewAppChatSS.DAL.Repositories;
-using NewAppChatSS.DAL;
 using Microsoft.Extensions.FileProviders;
-using System.IO;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using AutoMapper;
-using NewApplicationChatSS.Mappings;
+using Microsoft.Extensions.Hosting;
+using NewAppChatSS.BLL.Hubs;
 using NewAppChatSS.BLL.Hubs.CommandHandlersHubs;
-using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Infrastructure.ModelHandlers;
+using NewAppChatSS.BLL.Infrastructure.Validators;
+using NewAppChatSS.BLL.Interfaces.HubInterfaces;
+using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
+using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
+using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
+using NewAppChatSS.BLL.Services;
+using NewAppChatSS.DAL;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories;
+using NewApplicationChatSS.Mappings;
 
 namespace NewApplicationChatSS
 {
@@ -82,19 +82,11 @@ namespace NewApplicationChatSS
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseDefaultFiles();
 
             app.UseStaticFiles();
-
-            app.UseFileServer(new FileServerOptions()
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(env.ContentRootPath, "node_modules")
-                ),
-                RequestPath = "/node_modules",
-                EnableDirectoryBrowsing = false
-            });
 
             app.UseRouting();
 

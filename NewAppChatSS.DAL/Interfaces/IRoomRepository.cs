@@ -28,4 +28,3 @@ namespace NewAppChatSS.DAL.Interfaces
         Task SaveAsync();
     }
 }
-

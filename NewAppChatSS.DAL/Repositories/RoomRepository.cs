@@ -9,16 +9,16 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class RoomRepository : IRoomRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public RoomRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         public IEnumerable<Room> GetAll()
         {
-            return _context.Rooms
+            return context.Rooms
                 .Include(r => r.Owner)
                 .Include(r => r.LastMessage)
                 .Include(r => r.TypeRoom)
@@ -27,7 +27,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public Room FindById(string id)
         {
-            return _context.Rooms
+            return context.Rooms
                 .Include(r => r.Owner)
                 .Include(r => r.LastMessage)
                 .Include(r => r.TypeRoom)
@@ -36,7 +36,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public Room FindByName(string roomName)
         {
-            return _context.Rooms
+            return context.Rooms
                 .Include(r => r.Owner)
                 .Include(r => r.LastMessage)
                 .Include(r => r.TypeRoom)
@@ -45,43 +45,43 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task CreateAsync(Room item)
         {
-            _context.Rooms.Add(item);
+            context.Rooms.Add(item);
             await SaveAsync();
         }
 
         public async Task UpdateAsync(Room room)
         {
-            _context.Rooms.Update(room);
+            context.Rooms.Update(room);
             await SaveAsync();
         }
 
         public async Task UpdateByIdAsync(string roomId)
         {
-            _context.Rooms.Update(FindById(roomId));
+            context.Rooms.Update(FindById(roomId));
             await SaveAsync();
         }
 
         public async Task DeleteAsync(Room room)
         {
-            _context.Rooms.Remove(room);
+            context.Rooms.Remove(room);
             await SaveAsync();
         }
 
         public async Task DeleteByIdAsync(string roomId)
         {
-            _context.Rooms.Remove(FindById(roomId));
+            context.Rooms.Remove(FindById(roomId));
             await SaveAsync();
         }
 
         public async Task DeleteByNameAsync(string roomName)
         {
-            _context.Rooms.Remove(FindByName(roomName));
+            context.Rooms.Remove(FindByName(roomName));
             await SaveAsync();
         }
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

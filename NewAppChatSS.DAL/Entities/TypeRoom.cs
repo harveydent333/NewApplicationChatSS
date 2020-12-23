@@ -10,11 +10,6 @@ namespace NewAppChatSS.DAL.Entities
     /// </summary>
     public class TypeRoom
     {
-        public TypeRoom()
-        {
-            Rooms = new List<Room>();
-        }
-
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
@@ -28,8 +23,6 @@ namespace NewAppChatSS.DAL.Entities
         /// <summary>
         /// Список комнат
         /// </summary>
-        public List<Room> Rooms { get; set; }
+        public List<Room> Rooms { get; set; } = new List<Room>();
     }
 }
-
-

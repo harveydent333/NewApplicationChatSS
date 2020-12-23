@@ -45,7 +45,6 @@ namespace NewApplicationChatSS.Controllers
                 {
                     await _userService.AuthenticateUserAsync(_mapper.Map<UserDTO>(loginUserModel));
                     return RedirectToAction("Index", "Home");
-
                 }
                 catch (ValidationException ex)
                 {
@@ -53,6 +52,7 @@ namespace NewApplicationChatSS.Controllers
                     return View(loginUserModel);
                 }
             }
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -75,6 +75,7 @@ namespace NewApplicationChatSS.Controllers
                     return View(registerUserModel);
                 }
             }
+
             return View(registerUserModel);
         }
 
