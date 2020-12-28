@@ -1,4 +1,4 @@
-﻿namespace NewApplicationChatSS.ViewModels
+﻿namespace NewApplicationChatSS.Models
 {
     public class ErrorViewModel
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
 
-namespace NewApplicationChatSS.ViewModels
+namespace NewApplicationChatSS.Models
 {
     public sealed class MessageViewModel
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
@@ -10,38 +10,16 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using Newtonsoft.Json;
 
-namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
+namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
 {
     public class YouTubeRequest
     {
-        private static string API_KEY;
-        private static string viewCount;
-        private static string likeCount;
+        private static string _viewCount;
+        private static string _likeCount;
+        private static string _apiKey;
 
         /// <summary>
-        /// Метод авторизирует профиль в ютюбе.
-        /// </summary>
-        public async Task Run()
-        {
-            API_KEY = "";
-            viewCount = "";
-            likeCount = "";
-            UserCredential credential;
-
-            using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))
-            {
-                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.Load(stream).Secrets,
-                    new[] { YouTubeService.Scope.YoutubeReadonly },
-                    "admin",
-                    CancellationToken.None,
-                    new FileDataStore(this.GetType().ToString())
-                );
-            }
-        }
-
-        /// <summary>
-        /// Метод получает API KEI из файла JSON 
+        /// Метод получает API KEI из файла JSON
         /// </summary>
         public static void GetApiKey()
         {
@@ -49,7 +27,7 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
             {
                 string json = r.ReadToEnd();
                 var items = JsonConvert.DeserializeObject<Secret>(json);
-                API_KEY = items.API_KEY;
+                _apiKey = items.API_KEY;
             }
         }
 
@@ -60,7 +38,7 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
         {
             return new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = API_KEY,
+                ApiKey = _apiKey,
             });
         }
 
@@ -108,13 +86,13 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
                 {
                     datePublication = DateTime.Now,
                     title = $"Канал с названием {nameChannel} не найден",
-                    view = viewCount,
-                    likes = likeCount,
+                    view = _viewCount,
+                    likes = _likeCount,
                 });
         }
 
         /// <summary>
-        /// Метод возвращает информацию при отсутствии видео на ютюб-канале 
+        /// Метод возвращает информацию при отсутствии видео на ютюб-канале
         /// </summary>
         public static string GetInformationAboutEmptySearch(string nameChannel)
         {
@@ -123,8 +101,8 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
                 {
                     datePublication = DateTime.Now,
                     title = $"На канале {nameChannel} не найдено данного видео",
-                    view = viewCount,
-                    likes = likeCount,
+                    view = _viewCount,
+                    likes = _likeCount,
                 });
         }
 
@@ -212,12 +190,12 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
 
             if (views)
             {
-                viewCount = videoInfoResponse.Items[0].Statistics.ViewCount.ToString();
+                _viewCount = videoInfoResponse.Items[0].Statistics.ViewCount.ToString();
             }
 
             if (likes)
             {
-                likeCount = videoInfoResponse.Items[0].Statistics.LikeCount.ToString();
+                _likeCount = videoInfoResponse.Items[0].Statistics.LikeCount.ToString();
             }
 
             return System.Text.Json.JsonSerializer.Serialize<object>(
@@ -225,8 +203,8 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
                 {
                     datePublication = DateTime.Now,
                     title = "https://www.youtube.com/watch?v=" + videoListResponse?.Items[0]?.Id.VideoId,
-                    view = viewCount,
-                    likes = likeCount,
+                    view = _viewCount,
+                    likes = _likeCount,
                 });
         }
 
@@ -267,6 +245,27 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTube_API
                     authorComment = commentResponse.Items[commentIndex].Snippet.TopLevelComment.Snippet.AuthorDisplayName,
                     commentContext = commentResponse.Items[commentIndex].Snippet.TopLevelComment.Snippet.TextDisplay,
                 });
+        }
+
+        /// <summary>
+        /// Метод авторизирует профиль в ютюбе.
+        /// </summary>
+        public async Task Run()
+        {
+            _apiKey = "";
+            _viewCount = "";
+            _likeCount = "";
+            UserCredential credential;
+
+            using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))
+            {
+                credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                    GoogleClientSecrets.Load(stream).Secrets,
+                    new[] { YouTubeService.Scope.YoutubeReadonly },
+                    "admin",
+                    CancellationToken.None,
+                    new FileDataStore(GetType().ToString()));
+            }
         }
     }
 }

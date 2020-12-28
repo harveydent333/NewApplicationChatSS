@@ -1,8 +1,8 @@
 ﻿using NewAppChatSS.DAL.Entities;
 
-namespace NewAppChatSS.BLL.DTO
+namespace NewApplicationChatSS.Models
 {
-    public class RoomDTO
+    public sealed class RoomViewModel
     {
         public string Id { get; set; }
 
@@ -19,7 +19,7 @@ namespace NewAppChatSS.BLL.DTO
         /// <summary>
         /// Владелец пользователя
         /// </summary>
-        public virtual User Owner { get; set; }
+        public User Owner { get; set; }
 
         /// <summary>
         /// Id типа комнаты
@@ -29,7 +29,7 @@ namespace NewAppChatSS.BLL.DTO
         /// <summary>
         /// Тип комнаты
         /// </summary>
-        public virtual TypeRoom TypeRoom { get; set; }
+        public TypeRoom TypeRoom { get; set; }
 
         /// <summary>
         /// Id последнего сообщения в комнате
@@ -39,6 +39,6 @@ namespace NewAppChatSS.BLL.DTO
         /// <summary>
         /// Последнее сообщение в комнате
         /// </summary>
-        public virtual Message LastMessage { get; set; }
+        public Message LastMessage { get; set; }
     }
 }

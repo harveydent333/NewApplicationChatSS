@@ -1,7 +1,7 @@
 ﻿using System;
 using NewAppChatSS.DAL.Entities;
 
-namespace NewAppChatSS.BLL.DTO
+namespace NewAppChatSS.BLL.Models
 {
     public class MessageDTO
     {

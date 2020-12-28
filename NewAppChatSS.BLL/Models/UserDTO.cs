@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NewAppChatSS.BLL.DTO
+namespace NewAppChatSS.BLL.Models
 {
     public class UserDTO
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NewApplicationChatSS.ViewModels
+namespace NewApplicationChatSS.Models
 {
     /// <summary>
     /// Данны авторизации пользователя
