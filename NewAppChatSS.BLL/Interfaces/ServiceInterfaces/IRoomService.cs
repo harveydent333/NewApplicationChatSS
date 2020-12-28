@@ -7,8 +7,8 @@ namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {
     public interface IRoomService
     {
-        List<RoomDTO> GetRoomsDTO();
+        List<RoomDTO> GetRooms();
 
-        RoomDTO GetRoomDTO(string id);
+        RoomDTO GetRoom(string id);
     }
 }

@@ -18,7 +18,7 @@ namespace NewAppChatSS.BLL.Services
             this.mapper = mapper;
         }
 
-        public List<RoomDTO> GetRoomsUser(string userId)
+        public List<RoomDTO> GetUserRooms(string userId)
         {
             return mapper.Map<List<RoomDTO>>(Database.Members.GetRooms(userId));
         }

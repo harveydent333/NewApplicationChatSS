@@ -18,12 +18,12 @@ namespace NewAppChatSS.BLL.Services
             this.mapper = mapper;
         }
 
-        public List<RoomDTO> GetRoomsDTO()
+        public List<RoomDTO> GetRooms()
         {
             return mapper.Map<List<RoomDTO>>(Database.Rooms.GetAll());
         }
 
-        public RoomDTO GetRoomDTO(string id)
+        public RoomDTO GetRoom(string id)
         {
             return mapper.Map<RoomDTO>(Database.Rooms.FindById(id));
         }

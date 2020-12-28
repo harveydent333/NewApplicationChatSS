@@ -18,7 +18,7 @@ namespace NewAppChatSS.BLL.Services
             this.mapper = mapper;
         }
 
-        public List<MessageDTO> GetRoomMessagesDTO(string roomId)
+        public List<MessageDTO> GetRoomMessages(string roomId)
         {
             return mapper.Map<List<MessageDTO>>(Database.Messages.GetRoomMessages(roomId));
         }

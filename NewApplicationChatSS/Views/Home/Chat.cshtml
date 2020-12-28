@@ -36,7 +36,7 @@
                     <div class="inbox_chat">
                         @foreach (RoomModel room in ViewBag.RoomsUser)
                         {
-                            <a asp-controller="Home" asp-action="Chat" asp-route-id="@room.Id" class="chat-ref-@room.Id">
+                            <a asp-controller="Home" asp-action="Chat" asp-route-roomId="@room.Id" class="chat-ref-@room.Id">
                                 <div class="chat_list @room.Id">
                                     <div class="chat_people">
                                         <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png"> </div>

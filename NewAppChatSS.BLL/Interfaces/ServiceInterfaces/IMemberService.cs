@@ -8,6 +8,6 @@ namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {
     public interface IMemberService
     {
-        List<RoomDTO> GetRoomsUser(string userId);
+        List<RoomDTO> GetUserRooms(string userId);
     }
 }
