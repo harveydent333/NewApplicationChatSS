@@ -1,9 +1,7 @@
 ﻿namespace NewAppChatSS.DAL.Entities
 {
-    public class DictionaryBadWords
+    public class DictionaryBadWords : EntityBase<int>
     {
-        public int Id { get; set; }
-
         public string Word { get; set; }
     }
 }

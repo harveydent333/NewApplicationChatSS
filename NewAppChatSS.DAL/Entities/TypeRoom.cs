@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace NewAppChatSS.DAL.Entities
 {
     /// <summary>
     /// Тип комнаты
     /// </summary>
-    public class TypeRoom
+    public class TypeRoom : EntityBase<int>
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
-
         /// <summary>
         /// Название типа комнаты
         /// </summary>

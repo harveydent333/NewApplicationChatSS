@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NewAppChatSS.DAL.Entities
 {
     /// <summary>
     /// Модель изгнанных пользователей из комнат
     /// </summary>
-    public class KickedOut
+    public class KickedOut : EntityBase<int>
     {
-        [HiddenInput(DisplayValue = false)]
-        [Key]
-        public int Id { get; set; }
-
         /// <summary>
         /// Объект пользователя исключенного из комнаты
         /// </summary>

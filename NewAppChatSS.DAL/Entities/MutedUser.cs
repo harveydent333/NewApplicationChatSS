@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NewAppChatSS.DAL.Entities
 {
     /// <summary>
     /// Пользователи лишенные права отправлять сообщения
     /// </summary>
-    public class MutedUser
+    public class MutedUser : EntityBase<int>
     {
-        [HiddenInput(DisplayValue = false)]
-        [Key]
-        public int Id { get; set; }
-
         [ForeignKey("UserId")]
         public User User { get; set; }
 

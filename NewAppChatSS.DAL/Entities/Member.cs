@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NewAppChatSS.DAL.Entities
 {
     /// <summary>
     /// Состав пользователя в комнате
     /// </summary>
-    public class Member
+    public class Member : EntityBase<int>
     {
-        [HiddenInput(DisplayValue = false)]
-        [Key]
-        public int Id { get; set; }
-
         /// <summary>
         /// Объект пользователя состоящего в комнате
         /// </summary>

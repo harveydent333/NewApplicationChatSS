@@ -1,18 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc;
 
 namespace NewAppChatSS.DAL.Entities
 {
     /// <summary>
     /// Ругающийся пользователь
     /// </summary>
-    public class SwearingUser
+    public class SwearingUser : EntityBase<int>
     {
-        [HiddenInput(DisplayValue = false)]
-        [Key]
-        public int Id { get; set; }
-
         [ForeignKey("UserId")]
         public User User { get; set; }
 

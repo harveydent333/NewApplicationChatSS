@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NewAppChatSS.DAL.Entities
@@ -7,11 +6,8 @@ namespace NewAppChatSS.DAL.Entities
     /// <summary>
     /// Комната чата
     /// </summary>
-    public class Room
+    public class Room : EntityBase<string>
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string Id { get; set; }
-        
         /// <summary>
         /// Название комнаты
         /// </summary>
