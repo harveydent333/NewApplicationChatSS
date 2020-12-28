@@ -14,13 +14,13 @@ namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 
         Task AssignRoleForNewUserAsync(User user);
 
-        List<UserDTO> GetUsersDTO();
+        List<UserDTO> GetUsers();
 
-        Task<UserDTO> GetUserDTObyIdAsync(string id);
+        Task<UserDTO> GetUserbyIdAsync(string id);
 
-        Task<UserDTO> GetUserDTObyEmailAsync(string email);
+        Task<UserDTO> GetUserbyEmailAsync(string email);
 
-        Task<UserDTO> GetUserDTObyUserNameAsync(string userName);
+        Task<UserDTO> GetUserbyUserNameAsync(string userName);
 
         Task AuthenticateUserAsync(UserDTO userDTO);
     }

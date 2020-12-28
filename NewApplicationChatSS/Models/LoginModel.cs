@@ -5,7 +5,7 @@ namespace NewApplicationChatSS.Models
     /// <summary>
     /// Данны авторизации пользователя
     /// </summary>
-    public sealed class LoginViewModel
+    public sealed class LoginModel
     {
         [Required]
         [Display(Name = "Email")]

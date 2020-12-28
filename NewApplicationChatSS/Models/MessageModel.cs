@@ -6,7 +6,7 @@ using NewAppChatSS.DAL.Entities;
 
 namespace NewApplicationChatSS.Models
 {
-    public sealed class MessageViewModel
+    public sealed class MessageModel
     {
         public string Id { get; set; }
 

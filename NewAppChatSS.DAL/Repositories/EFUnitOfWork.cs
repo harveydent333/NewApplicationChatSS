@@ -9,33 +9,29 @@ namespace NewAppChatSS.DAL.Repositories
 {
     public class EFUnitOfWork : IUnitOfWork
     {
-        private readonly UserManager<User> userManager;
         private readonly ApplicationDbContext db;
         private bool disposed = false;
 
-        private RoleRepository roleRepository;
         private RoomRepository roomRepository;
-        private UserRepository userRepository;
         private IMemberRepository memberRepository;
         private IMessageRepository messageRepository;
         private IMutedUserRepository mutedUserRepository;
-        private IKickedOutsRepository kickedOutsRepository;
+        private IKickedOutRepository kickedOutsRepository;
 
-        public EFUnitOfWork(ApplicationDbContext dbContext, UserManager<User> userManager)
+        public EFUnitOfWork(ApplicationDbContext dbContext)
         {
             db = dbContext;
-            this.userManager = userManager;
         }
 
         public IUnitOfWork Database { get; set; }
 
-        public IKickedOutsRepository KickedOuts
+        public IKickedOutRepository KickedOuts
         {
             get
             {
                 if (kickedOutsRepository == null)
                 {
-                    kickedOutsRepository = new KickedOutsRepository(db);
+                    kickedOutsRepository = new KickedOutRepository(db);
                 }
 
                 return kickedOutsRepository;
@@ -81,19 +77,6 @@ namespace NewAppChatSS.DAL.Repositories
             }
         }
 
-        public IUserRepository Users
-        {
-            get
-            {
-                if (userRepository == null)
-                {
-                    userRepository = new UserRepository(db, userManager);
-                }
-
-                return userRepository;
-            }
-        }
-
         public IRoomRepository Rooms
         {
             get
@@ -104,19 +87,6 @@ namespace NewAppChatSS.DAL.Repositories
                 }
 
                 return roomRepository;
-            }
-        }
-
-        public IRoleRepository Roles
-        {
-            get
-            {
-                if (roleRepository == null)
-                {
-                    roleRepository = new RoleRepository(db);
-                }
-
-                return roleRepository;
             }
         }
 

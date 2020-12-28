@@ -16,7 +16,10 @@ namespace NewApplicationChatSS.Controllers
         private readonly IUserService userService;
         private readonly IMapper mapper;
 
-        public AccountController(SignInManager<User> signInManager, IUserService userService, IMapper mapper)
+        public AccountController(
+            SignInManager<User> signInManager,
+            IUserService userService,
+            IMapper mapper)
         {
             this.signInManager = signInManager;
             this.userService = userService;
@@ -37,7 +40,7 @@ namespace NewApplicationChatSS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel loginUserModel)
+        public async Task<IActionResult> Login(LoginModel loginUserModel)
         {
             if (ModelState.IsValid)
             {
@@ -57,7 +60,7 @@ namespace NewApplicationChatSS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterViewModel registerUserModel)
+        public async Task<IActionResult> Register(RegisterModel registerUserModel)
         {
             if (ModelState.IsValid)
             {

@@ -30,22 +30,22 @@ namespace NewAppChatSS.BLL.Services
             this.mapper = mapper;
         }
 
-        public List<UserDTO> GetUsersDTO()
+        public List<UserDTO> GetUsers()
         {
-            return mapper.Map<List<UserDTO>>(Database.Users.GetAll());
+            return mapper.Map<List<UserDTO>>(userManager.Users);
         }
 
-        public async Task<UserDTO> GetUserDTObyIdAsync(string id)
+        public async Task<UserDTO> GetUserbyIdAsync(string id)
         {
             return mapper.Map<UserDTO>(await userManager.FindByIdAsync(id));
         }
 
-        public async Task<UserDTO> GetUserDTObyUserNameAsync(string userName)
+        public async Task<UserDTO> GetUserbyUserNameAsync(string userName)
         {
             return mapper.Map<UserDTO>(await userManager.FindByNameAsync(userName));
         }
 
-        public async Task<UserDTO> GetUserDTObyEmailAsync(string email)
+        public async Task<UserDTO> GetUserbyEmailAsync(string email)
         {
             return mapper.Map<UserDTO>(await userManager.FindByEmailAsync(email));
         }

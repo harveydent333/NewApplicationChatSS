@@ -4,8 +4,6 @@ namespace NewAppChatSS.DAL.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IUserRepository Users { get; }
-
         IRoomRepository Rooms { get; }
 
         IMessageRepository Messages { get; }
@@ -14,6 +12,6 @@ namespace NewAppChatSS.DAL.Interfaces
 
         IMutedUserRepository MutedUsers { get; }
 
-        IKickedOutsRepository KickedOuts { get; }
+        IKickedOutRepository KickedOuts { get; }
     }
 }

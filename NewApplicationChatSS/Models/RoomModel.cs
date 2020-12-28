@@ -2,7 +2,7 @@
 
 namespace NewApplicationChatSS.Models
 {
-    public sealed class RoomViewModel
+    public sealed class RoomModel
     {
         public string Id { get; set; }
 

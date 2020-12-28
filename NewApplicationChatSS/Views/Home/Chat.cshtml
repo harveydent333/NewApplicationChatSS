@@ -34,7 +34,7 @@
                         </div>
                     </div>
                     <div class="inbox_chat">
-                        @foreach (RoomViewModel room in ViewBag.RoomsUser)
+                        @foreach (RoomModel room in ViewBag.RoomsUser)
                         {
                             <a asp-controller="Home" asp-action="Chat" asp-route-id="@room.Id" class="chat-ref-@room.Id">
                                 <div class="chat_list @room.Id">
@@ -52,7 +52,7 @@
                 </div>
                 <div class="mesgs">
                     <div class="msg_history">
-                        @foreach (MessageViewModel message in ViewBag.Messages) 
+                        @foreach (MessageModel message in ViewBag.Messages) 
                         {
                             if (User.Identity.Name != message.User.UserName)
                             {

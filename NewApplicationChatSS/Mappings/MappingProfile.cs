@@ -15,10 +15,10 @@ namespace NewApplicationChatSS.Mappings
             CreateMap<UserDTO, User>()
                 .ForMember(x => x.PasswordHash, opt => opt.MapFrom(src => src.Password));
 
-            CreateMap<RegisterViewModel, UserDTO>().ReverseMap();
-            CreateMap<LoginViewModel, UserDTO>().ReverseMap();
-            CreateMap<RoomViewModel, RoomDTO>().ReverseMap();
-            CreateMap<MessageViewModel, MessageDTO>().ReverseMap();
+            CreateMap<RegisterModel, UserDTO>().ReverseMap();
+            CreateMap<LoginModel, UserDTO>().ReverseMap();
+            CreateMap<RoomModel, RoomDTO>().ReverseMap();
+            CreateMap<MessageModel, MessageDTO>().ReverseMap();
         }
     }
 }

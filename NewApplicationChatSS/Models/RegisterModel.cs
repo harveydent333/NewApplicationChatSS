@@ -5,7 +5,7 @@ namespace NewApplicationChatSS.Models
     /// <summary>
     /// Регистрационные данные пользователя
     /// </summary>
-    public class RegisterViewModel
+    public class RegisterModel
     {
         /// <summary>
         /// Имя пользователя
