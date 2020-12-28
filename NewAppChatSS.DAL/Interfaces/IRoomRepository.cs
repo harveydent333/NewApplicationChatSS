@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IRoomRepository
+    public interface IRoomRepository : IBaseRepository<Room, string, ApplicationDbContext, RoomModel>
     {
         List<Room> GetAll();
 
@@ -19,7 +20,7 @@ namespace NewAppChatSS.DAL.Interfaces
 
         Task UpdateByIdAsync(string roomId);
 
-        Task DeleteAsync(Room item);
+        Task DeleteAsync2(Room item);
 
         Task DeleteByIdAsync(string roomId);
 

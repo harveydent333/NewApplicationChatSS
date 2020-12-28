@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IMemberRepository
+    public interface IMemberRepository : IBaseRepository<Member, int, ApplicationDbContext, MemberModel>
     {
         List<Member> GetAll();
 

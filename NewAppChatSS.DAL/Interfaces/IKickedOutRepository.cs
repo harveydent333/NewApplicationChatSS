@@ -1,14 +1,13 @@
-﻿using NewAppChatSS.DAL.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IKickedOutsRepository
+    public interface IKickedOutRepository : IBaseRepository<KickedOut, int, ApplicationDbContext, KickedOutModel>
     {
-        IEnumerable<KickedOut> GetAll();
-
         Task AddKickedUserAsync(string userId, string roomId, DateTime dateUnkick);
 
         Task DeleteKickedUserAsync(string userId, string roomId);

@@ -4,14 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : BaseRepository<Room, string, ApplicationDbContext, RoomModel>, IRoomRepository
     {
         private readonly ApplicationDbContext context;
 
         public RoomRepository(ApplicationDbContext context)
+            : base(context)
         {
             this.context = context;
         }
@@ -61,7 +63,7 @@ namespace NewAppChatSS.DAL.Repositories
             await SaveAsync();
         }
 
-        public async Task DeleteAsync(Room room)
+        public async Task DeleteAsync2(Room room)
         {
             context.Rooms.Remove(room);
             await SaveAsync();

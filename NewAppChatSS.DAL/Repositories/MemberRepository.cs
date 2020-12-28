@@ -5,14 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class MemberRepository : IMemberRepository
+    public class MemberRepository : BaseRepository<Member, int, ApplicationDbContext, MemberModel>, IMemberRepository
     {
         private readonly ApplicationDbContext context;
 
         public MemberRepository(ApplicationDbContext context, IUnitOfWork uow)
+            : base(context)
         {
             this.context = context;
             Database = uow;

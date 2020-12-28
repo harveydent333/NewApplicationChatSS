@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IMutedUserRepository
+    public interface IMutedUserRepository : IBaseRepository<MutedUser, int, ApplicationDbContext, MutedUserModel>
     {
         IEnumerable<MutedUser> GetAll();
 

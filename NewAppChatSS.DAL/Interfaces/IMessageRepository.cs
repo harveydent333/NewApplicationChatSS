@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IMessageRepository
+    public interface IMessageRepository : IBaseRepository<Message, string, ApplicationDbContext, MessageModel>
     {
         IEnumerable<Message> GetAll();
 

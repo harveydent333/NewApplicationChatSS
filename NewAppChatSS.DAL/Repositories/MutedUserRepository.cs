@@ -5,14 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class MutedUserRepository : IMutedUserRepository
+    public class MutedUserRepository : BaseRepository<MutedUser, int, ApplicationDbContext, MutedUserModel>, IMutedUserRepository
     {
         private readonly ApplicationDbContext context;
 
         public MutedUserRepository(ApplicationDbContext context)
+            : base(context)
         {
             this.context = context;
         }

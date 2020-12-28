@@ -4,14 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class MessageRepository : IMessageRepository
+    public class MessageRepository : BaseRepository<Message, string, ApplicationDbContext, MessageModel>, IMessageRepository
     {
         private readonly ApplicationDbContext context;
 
         public MessageRepository(ApplicationDbContext context)
+            : base(context)
         {
             this.context = context;
         }
