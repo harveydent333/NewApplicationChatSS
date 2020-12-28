@@ -13,6 +13,7 @@ using NewAppChatSS.BLL.Hubs;
 using NewAppChatSS.BLL.Hubs.CommandHandlersHubs;
 using NewAppChatSS.BLL.Infrastructure.ModelHandlers;
 using NewAppChatSS.BLL.Infrastructure.Validators;
+using NewAppChatSS.BLL.Infrastructure.YouTubeAPI;
 using NewAppChatSS.BLL.Interfaces.HubInterfaces;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
@@ -63,6 +64,7 @@ namespace NewApplicationChatSS
             services.AddTransient<IRoomValidator, RoomValidator>();
             services.AddTransient<IMessageHandler, MessageHandler>();
             services.AddTransient<IRoomHandler, RoomHandler>();
+            services.AddTransient(typeof(YouTubeRequest));
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                .AddCookie(options =>

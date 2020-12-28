@@ -1,20 +1,23 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using NewAppChatSS.BLL.Infrastructure.YouTube_API;
-using NewAppChatSS.BLL.Interfaces.HubInterfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using NewAppChatSS.BLL.Infrastructure.YouTubeAPI;
+using NewAppChatSS.BLL.Interfaces.HubInterfaces;
 
 namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
     public sealed class BotCommandHandlerHub : IBotCommandHandlerHub
     {
         private readonly Dictionary<Regex, Func<string, IHubCallerClients, Task>> botCommands;
+        private readonly YouTubeRequest youTubeRequest;
 
-        public BotCommandHandlerHub()
+        public BotCommandHandlerHub(YouTubeRequest youTubeRequest)
         {
+            this.youTubeRequest = youTubeRequest;
+
             botCommands = new Dictionary<Regex, Func<string, IHubCallerClients, Task>>
             {
                 [new Regex(@"^//find\s[\w\s]+\W{2}.+[^-v|^-l]$")] = CreateRefOnVideo,
@@ -44,14 +47,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         }
 
         /// <summary>
-        /// Метод возвращает ссылку на искомое видео 
+        /// Метод возвращает ссылку на искомое видео
         /// </summary>
         private async Task<Task> CreateRefOnVideo(string command, IHubCallerClients clients)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
-            YouTubeRequest youTubeRequest = new YouTubeRequest();
             await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo);
@@ -68,7 +70,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             command = Regex.Replace(command, @"\s-v", "");
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\w\W]+)$").Groups[2].Value;
 
-            YouTubeRequest youTubeRequest = new YouTubeRequest();
             await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo, true);
@@ -85,7 +86,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             command = Regex.Replace(command, @"\s-l", "");
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
-            YouTubeRequest youTubeRequest = new YouTubeRequest();
             await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo, false, true);
@@ -103,7 +103,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             command = Regex.Replace(command, @"\s-v", "");
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
-            YouTubeRequest youTubeRequest = new YouTubeRequest();
             await youTubeRequest.Run();
 
             var referenceVideo = YouTubeRequest.GetRefOnVideo(nameChannel, nameVideo, true, true);
@@ -118,7 +117,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string nameChannel = Regex.Match(command, @"//info\s([\s\W\w]+)$").Groups[1].Value;
 
-            YouTubeRequest youTubeRequest = new YouTubeRequest();
             await youTubeRequest.Run();
 
             return clients.Caller.SendAsync("PrintInfoAboutChannel", YouTubeRequest.GetChannelInfo(nameChannel));
@@ -132,7 +130,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             string nameChannel = Regex.Match(command, @"//videoCommentRandom\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             string nameVideo = Regex.Match(command, @"//videoCommentRandom\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
-            return clients.Caller.SendAsync("PrintCommentInfo",
+            return clients.Caller.SendAsync(
+                "PrintCommentInfo",
                 YouTubeRequest.GetCommentVideo(nameChannel, nameVideo));
         }
     }
