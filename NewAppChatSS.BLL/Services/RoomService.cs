@@ -1,30 +1,31 @@
-﻿using AutoMapper;
-using NewAppChatSS.BLL.DTO;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
+using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Interfaces;
-using System.Collections.Generic;
 
 namespace NewAppChatSS.BLL.Services
 {
     public sealed class RoomService : IRoomService
     {
         private IUnitOfWork Database { get; set; }
-        private readonly IMapper _mapper;
+
+        private readonly IMapper mapper;
 
         public RoomService(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
-            _mapper = mapper;
+            this.mapper = mapper;
         }
 
-        public IEnumerable<RoomDTO> GetRoomsDTO()
+        public List<RoomDTO> GetRoomsDTO()
         {
-            return _mapper.Map<List<RoomDTO>>(Database.Rooms.GetAll());
+            return mapper.Map<List<RoomDTO>>(Database.Rooms.GetAll());
         }
 
         public RoomDTO GetRoomDTO(string id)
         {
-            return _mapper.Map<RoomDTO>(Database.Rooms.FindById(id));
+            return mapper.Map<RoomDTO>(Database.Rooms.FindById(id));
         }
     }
 }

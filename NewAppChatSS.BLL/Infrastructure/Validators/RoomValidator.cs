@@ -25,13 +25,15 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <returns>Возвращает True если записей нет и False если уже присутсвуют</returns>
         public bool UniquenessCheckRoom(string roomName)
         {
-            return Database.Rooms.FindByName(roomName) == null;
+            // TODO: Сделать проверку по кол-во, реализовать общий метод и если возвращает не 0, то вернуть true
+            var rooms = Database.Rooms.FindByName(roomName);
+            return rooms != null;
         }
 
         /// <summary>
         /// Метод проверяет доступ к командам взаимодействия с комнатой у пользователя
         /// </summary>
-        public async Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, string nameProcessedRoom)
+        public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, string nameProcessedRoom)
         {
             if (IsOwnerRoom(user.Id, nameProcessedRoom))
             {

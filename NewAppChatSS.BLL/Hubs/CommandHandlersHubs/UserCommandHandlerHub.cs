@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.SignalR;
-using NewAppChatSS.BLL.Interfaces.HubInterfaces;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using NewAppChatSS.DAL.Entities;
-using AutoMapper;
 using System.Linq;
-using NewAppChatSS.DAL.Interfaces;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using NewAppChatSS.BLL.Constants;
 using NewAppChatSS.BLL.Infrastructure;
+using NewAppChatSS.BLL.Interfaces.HubInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
@@ -19,31 +20,27 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
     /// </summary>
     public class UserCommandHandlerHub : Hub, IUserCommandHandler
     {
+        private static string _userName;
+
         private readonly Dictionary<Regex, Func<User, string, IHubCallerClients, Task>> userCommands;
 
-        const int INDEFINITE_BLOCKING = 100;
+        private readonly UserManager<User> userManager;
+        private readonly IUserValidator userValidator;
 
-        private static string userName;
-
-        private IUnitOfWork Database { get; set; }
-        private readonly UserManager<User> _userManager;
-        private readonly IUserValidator _userValidator;
-
-        public UserCommandHandlerHub(UserManager<User> userManager, IUserValidator userValidator, IUnitOfWork uow)
+        public UserCommandHandlerHub(UserManager<User> userManager, IUserValidator userValidator)
         {
             userCommands = new Dictionary<Regex, Func<User, string, IHubCallerClients, Task>>
             {
-                [new Regex(@"^//user\srename\s.+\w\W{2}\w.+\S$")] = UserRenameAsync,
-                [new Regex(@"^//user\sban\s.+\S$")] = UserBanAsync,
-                [new Regex(@"^//user\sban\s.+\s-m\s\d*$")] = TemporaryUserBlockAsync,
-                [new Regex(@"^//user\spardon\s.+\S$")] = UserPardonAsync,
-                [new Regex(@"^//user\smoderator\s.+\s-n$")] = SetModerationRoleAsync,
-                [new Regex(@"^//user\smoderator\s.+\s-d$")] = RemoveModerationRoleAsync,
+                [new Regex(@"^//user\srename\s([0-9A-z])+\w\W{2}\w([0-9A-z])+\S$")] = UserRenameAsync,
+                [new Regex(@"^//user\sban\s([0-9A-z])+\S$")] = UserBanAsync,
+                [new Regex(@"^//user\sban\s([0-9A-z])+\s-m\s\d*$")] = TemporaryUserBlockAsync,
+                [new Regex(@"^//user\spardon\s([0-9A-z])+\S$")] = UserPardonAsync,
+                [new Regex(@"^//user\smoderator\s([0-9A-z])+\s-n$")] = SetModerationRoleAsync,
+                [new Regex(@"^//user\smoderator\s([0-9A-z])+\s-d$")] = RemoveModerationRoleAsync,
             };
 
-            Database = uow;
-            _userManager = userManager;
-            _userValidator = userValidator;
+            this.userManager = userManager;
+            this.userValidator = userValidator;
         }
 
         /// <summary>
@@ -59,6 +56,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     return userCommands[keyCommand](user, command, calledClients);
                 }
             }
+
             return calledClients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Неверная команда"));
         }
 
@@ -71,39 +69,44 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             Dictionary<string, string> userNames = ParsingUserNames(command);
 
-            if (!await _userValidator.CommandAccessCheckAsync(user,
-                new string[] { "Administrator", "Moderator" }, true, userNames["oldUserName"]))
+            if (!await userValidator.CommandAccessCheckAsync(user, new List<string> { "Administrator", "Moderator" }, true, userNames["oldUserName"]))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            user = await _userManager.FindByNameAsync(userNames["oldUserName"]);
+            user = await userManager.FindByNameAsync(userNames["oldUserName"]);
 
-            if (await _userManager.FindByNameAsync(userNames["newUserName"]) == null)
+            if (await userManager.FindByNameAsync(userNames["newUserName"]) == null)
             {
-                if (await _userManager.FindByNameAsync(userNames["oldUserName"]) == null)
+                if (await userManager.FindByNameAsync(userNames["oldUserName"]) == null)
                 {
-                    return clients.Caller.SendAsync("ReceiveCommand",
+                    return clients.Caller.SendAsync(
+                        "ReceiveCommand",
                         CommandHandler.CreateCommandInfo($"Пользователь с именем {userNames["oldUserName"]} не найден."));
                 }
 
                 user.UserName = userNames["newUserName"];
-                await _userManager.UpdateAsync(user);
-
+                await userManager.UpdateAsync(user);
 
                 if (ownerUserName == userNames["oldUserName"])
                 {
-                    return clients.Caller.SendAsync("UserRenameClient", userNames["newUserName"],
+                    return clients.Caller.SendAsync(
+                        "UserRenameClient",
+                        userNames["newUserName"],
                         CommandHandler.CreateCommandInfo($"Имя было успешно изменено на {userNames["newUserName"]}"));
                 }
                 else
-                    return clients.Caller.SendAsync("ReceiveCommand",
+                {
+                    return clients.Caller.SendAsync(
+                        "ReceiveCommand",
                         CommandHandler.CreateCommandInfo($"Имя пользователя {userNames["oldUserName"]} было успешно изменен " +
                             $"на {userNames["newUserName"]}"));
+                }
             }
 
-            return clients.Caller.SendAsync("ReceiveCommand",
-              CommandHandler.CreateCommandInfo($"Имя пользователя {userNames["oldUserName"]} уже занято"));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Имя пользователя {userNames["oldUserName"]} уже занято"));
         }
 
         /// <summary>
@@ -111,23 +114,25 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> UserBanAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
+            if (!await userValidator.CommandAccessCheckAsync(user, new List<string> { "Administrator", "Moderator" }, false, ""))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Replace(command, @"^//user\sban\s", string.Empty);
+            _userName = Regex.Replace(command, @"^//user\sban\s", string.Empty);
 
-            if (await _userManager.FindByNameAsync(userName) == null)
+            if (await userManager.FindByNameAsync(_userName) == null)
             {
-                return clients.Caller.SendAsync("ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {userName} не найден."));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
             }
 
-            userName = await ChangedStatusBlockingUserAsync(userName, command, true, true);
+            _userName = await ChangedStatusBlockingUserAsync(_userName, command, true, true);
 
-            return clients.Caller.SendAsync("ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userName} заблокирован."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {_userName} заблокирован."));
         }
 
         /// <summary>
@@ -135,23 +140,25 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> UserPardonAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
+            if (!await userValidator.CommandAccessCheckAsync(user, new List<string> { "Administrator", "Moderator" }, false, ""))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Replace(command, @"^//user\spardon\s", string.Empty);
+            _userName = Regex.Replace(command, @"^//user\spardon\s", string.Empty);
 
-            if (await _userManager.FindByNameAsync(userName) == null)
+            if (await userManager.FindByNameAsync(_userName) == null)
             {
-                return clients.Caller.SendAsync("ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {userName} не найден."));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
             }
 
-            userName = await ChangedStatusBlockingUserAsync(userName, command, false);
+            _userName = await ChangedStatusBlockingUserAsync(_userName, command, false);
 
-            return clients.Caller.SendAsync("ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userName} разблокирован."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {_userName} разблокирован."));
         }
 
         /// <summary>
@@ -159,23 +166,25 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> TemporaryUserBlockAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
+            if (!await userValidator.CommandAccessCheckAsync(user, new List<string> { "Administrator", "Moderator" }, false, ""))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Match(command, @"//user\sban\s(.+)\s-m\s\d*$").Groups[1].Value;
+            _userName = Regex.Match(command, @"//user\sban\s(.+)\s-m\s\d*$").Groups[1].Value;
 
-            if (await _userManager.FindByNameAsync(userName) == null)
+            if (await userManager.FindByNameAsync(_userName) == null)
             {
-                return clients.Caller.SendAsync("ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {userName} не найден."));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
             }
 
-            userName = await ChangedStatusBlockingUserAsync(userName, command, true);
+            _userName = await ChangedStatusBlockingUserAsync(_userName, command, true);
 
-            return clients.Caller.SendAsync("ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userName} заблокирован."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {_userName} заблокирован."));
         }
 
         /// <summary>
@@ -183,24 +192,26 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> SetModerationRoleAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
+            if (!await userValidator.CommandAccessCheckAsync(user, new List<string> { "Administrator", "Moderator" }, false, ""))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-n$").Groups[1].Value;
+            _userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-n$").Groups[1].Value;
 
-            if (await _userManager.FindByNameAsync(userName) == null)
+            if (await userManager.FindByNameAsync(_userName) == null)
             {
-                return clients.Caller.SendAsync("ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {userName} не найден."));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
             }
 
-            user = await _userManager.FindByNameAsync(userName);
-            await _userManager.AddToRoleAsync(user, "Moderator");
+            user = await userManager.FindByNameAsync(_userName);
+            await userManager.AddToRoleAsync(user, "Moderator");
 
-            return clients.Caller.SendAsync("ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userName} был назначен модератором."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {_userName} был назначен модератором."));
         }
 
         /// <summary>
@@ -208,24 +219,26 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<Task> RemoveModerationRoleAsync(User user, string command, IHubCallerClients clients)
         {
-            if (!await _userValidator.CommandAccessCheckAsync(user, new string[] { "Administrator", "Moderator" }))
+            if (!await userValidator.CommandAccessCheckAsync(user, new List<string> { "Administrator", "Moderator" }, false, ""))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-d$").Groups[1].Value;
+            _userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-d$").Groups[1].Value;
 
-            if (await _userManager.FindByNameAsync(userName) == null)
+            if (await userManager.FindByNameAsync(_userName) == null)
             {
-                return clients.Caller.SendAsync("ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {userName} не найден."));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
             }
 
-            user = await _userManager.FindByNameAsync(userName);
-            await _userManager.RemoveFromRoleAsync(user, "Moderator");
+            user = await userManager.FindByNameAsync(_userName);
+            await userManager.RemoveFromRoleAsync(user, "Moderator");
 
-            return clients.Caller.SendAsync("ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userName} был разжалован до обычного пользователя."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand",
+                CommandHandler.CreateCommandInfo($"Пользователь {_userName} был разжалован до обычного пользователя."));
         }
 
         /// <summary>
@@ -245,19 +258,19 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task<string> ChangedStatusBlockingUserAsync(string userName, string command, bool blockStatus, bool isIndefiniteBlock = false)
         {
-            User user = await _userManager.FindByNameAsync(userName);
+            User user = await userManager.FindByNameAsync(userName);
             user.IsLocked = blockStatus;
 
             if (isIndefiniteBlock)
             {
-                user.DateUnblock = DateTime.Now.AddYears(INDEFINITE_BLOCKING);
+                user.DateUnblock = DateTime.Now.AddYears(GlobalConstants.IndefininiteBlocking);
             }
             else
             {
                 user.DateUnblock = TimeComputer.CalculateUnlockDate(command, @"//user\sban\s.+\s-m\s(\d*)$");
             }
 
-            await _userManager.UpdateAsync(user);
+            await userManager.UpdateAsync(user);
 
             return user.UserName;
         }

@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Linq;
 using NewAppChatSS.DAL.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace NewAppChatSS.DAL.Repositories
 {

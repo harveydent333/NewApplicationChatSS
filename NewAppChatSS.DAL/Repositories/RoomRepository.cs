@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.DAL.Repositories
 {
@@ -16,7 +16,7 @@ namespace NewAppChatSS.DAL.Repositories
             this.context = context;
         }
 
-        public IEnumerable<Room> GetAll()
+        public List<Room> GetAll()
         {
             return context.Rooms
                 .Include(r => r.Owner)

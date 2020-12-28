@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using NewAppChatSS.DAL.Entities;
-using System.Collections.Generic;
 
 namespace NewAppChatSS.DAL.Interfaces
 {

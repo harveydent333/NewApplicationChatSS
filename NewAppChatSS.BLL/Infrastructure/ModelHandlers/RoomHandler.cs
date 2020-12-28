@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
+using NewAppChatSS.Common.CommonHelpers;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 
@@ -21,7 +22,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// </summary>
         public async Task<string> CreateRoom(string roomName, int typeRoomId, string userId)
         {
-            string roomId = Guid.NewGuid().ToString();
+            string roomId = NewAppChatGuidHelper.GetNewGuid();
 
             Room newRoom = new Room
             {
@@ -34,12 +35,13 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
             await Database.Rooms.CreateAsync(newRoom);
             await Database.Members.AddMemberAsync(userId, roomId);
 
-            return JsonSerializer.Serialize<object>(
-                new
-                {
-                    roomId = newRoom.Id,
-                    roomName = newRoom.RoomName
-                });
+            var roomInfo = new
+            {
+                roomId = newRoom.Id,
+                roomName = newRoom.RoomName
+            };
+
+            return JsonSerializer.Serialize<object>(roomInfo);
         }
     }
 }

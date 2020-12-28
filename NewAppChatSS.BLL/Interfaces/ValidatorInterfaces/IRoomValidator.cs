@@ -8,7 +8,7 @@ namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces
     {
         bool UniquenessCheckRoom(string roomName);
 
-        Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, string nameProcessedRoom);
+        Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, string nameProcessedRoom);
 
         bool IsOwnerRoom(string userId, string nameProcessedRoom);
     }

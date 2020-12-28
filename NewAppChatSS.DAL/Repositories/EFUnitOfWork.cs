@@ -1,16 +1,18 @@
-﻿using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.DAL.Repositories
 {
     public class EFUnitOfWork : IUnitOfWork
     {
-        private bool disposed = false;
+        private readonly UserManager<User> userManager;
         private readonly ApplicationDbContext db;
+        private bool disposed = false;
+
         private RoleRepository roleRepository;
         private RoomRepository roomRepository;
         private UserRepository userRepository;
@@ -18,15 +20,14 @@ namespace NewAppChatSS.DAL.Repositories
         private IMessageRepository messageRepository;
         private IMutedUserRepository mutedUserRepository;
         private IKickedOutsRepository kickedOutsRepository;
-        private readonly UserManager<User> userManager;
-
-        public IUnitOfWork Database { get; set; }
 
         public EFUnitOfWork(ApplicationDbContext dbContext, UserManager<User> userManager)
         {
             db = dbContext;
             this.userManager = userManager;
         }
+
+        public IUnitOfWork Database { get; set; }
 
         public IKickedOutsRepository KickedOuts
         {

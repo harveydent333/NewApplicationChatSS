@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.DAL.Repositories
 {
@@ -12,15 +12,15 @@ namespace NewAppChatSS.DAL.Repositories
     {
         private readonly ApplicationDbContext context;
 
-        public IUnitOfWork Database { get; set; }
-
         public MemberRepository(ApplicationDbContext context, IUnitOfWork uow)
         {
             this.context = context;
             Database = uow;
         }
 
-        public IEnumerable<Member> GetAll()
+        public IUnitOfWork Database { get; set; }
+
+        public List<Member> GetAll()
         {
             return context.Members.ToList();
         }
@@ -47,7 +47,7 @@ namespace NewAppChatSS.DAL.Repositories
             await SaveAsync();
         }
 
-        public IEnumerable<string> GetMembersIds(string roomId)
+        public List<string> GetMembersIds(string roomId)
         {
             return context.Members
                 .Where(m => m.RoomId == roomId)
@@ -55,17 +55,21 @@ namespace NewAppChatSS.DAL.Repositories
                 .ToList();
         }
 
-        public IEnumerable<Room> GetRooms(string userId)
+        public List<Room> GetRooms(string userId)
         {
             List<string> roomIds = context.Members
                 .Where(m => m.UserId == userId)
                 .Select(m => m.RoomId)
                 .ToList();
 
-            return Database.Rooms.GetAll().Where(r => roomIds.Contains(r.Id));
+            return Database.Rooms.GetAll().Where(r => roomIds.Contains(r.Id)).ToList();
         }
 
-        public IEnumerable<string> GetRoomsIds(string userId)
+        /// <summary>
+        /// Метод возвращает Id всех комнат, в которых состоит пользователь
+        /// </summary>
+        /// <param name="userId">Id пользователя</param>
+        public List<string> GetRoomsIds(string userId)
         {
             return context.Members
                 .Where(m => m.UserId == userId)

@@ -20,6 +20,6 @@ namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces
 
         Task<bool> IsUserInGroupByNameAsync(string userName, string roomId);
 
-        Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "");
+        Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, bool checkOnOwner, string processingUserName);
     }
 }

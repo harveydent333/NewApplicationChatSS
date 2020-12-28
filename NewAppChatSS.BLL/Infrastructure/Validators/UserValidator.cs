@@ -13,12 +13,12 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
     {
         public IUnitOfWork Database { get; set; }
 
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<User> userManager;
 
         public UserValidator(IUnitOfWork uow, UserManager<User> userManager)
         {
             Database = uow;
-            _userManager = userManager;
+            this.userManager = userManager;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
             if (user.IsLocked && (DateTime.Now > user.DateUnblock))
             {
                 user.IsLocked = false;
-                await _userManager.UpdateAsync(user);
+                await userManager.UpdateAsync(user);
             }
 
             return user.IsLocked;
@@ -64,7 +64,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
 
         public async Task<bool> IsUserMutedByNameAsync(string userName, string roomId)
         {
-            string userId = (await _userManager.FindByNameAsync(userName))?.Id;
+            string userId = (await userManager.FindByNameAsync(userName))?.Id;
 
             List<MutedUser> listRoomWhereMutedUser = Database.MutedUsers.GetListMutedRoomForUser(userId).ToList();
 
@@ -120,7 +120,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// </summary>
         public async Task<bool> IsUserKickedByNameAsync(string userName, string roomId)
         {
-            User user = await _userManager.FindByNameAsync(userName);
+            User user = await userManager.FindByNameAsync(userName);
             List<KickedOut> listKickedOut = Database.KickedOuts.GetListKickedRoomForUser(user.Id).ToList();
 
             KickedOut kicked = listKickedOut.FirstOrDefault(k => k.RoomId == roomId);
@@ -156,15 +156,16 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// </summary>
         public async Task<bool> IsUserInGroupByNameAsync(string userName, string roomId)
         {
-            User user = await _userManager.FindByNameAsync(userName);
-            return Database.Members.GetRoomsIds(user.Id).Contains(roomId);
+            var user = await userManager.FindByNameAsync(userName);
+            var roomIds = Database.Members.GetRoomsIds(user.Id);
+            return roomIds.Contains(roomId);
         }
 
-        public async Task<bool> CommandAccessCheckAsync(User user, IEnumerable<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
+        public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
         {
             foreach (string role in allowedRoles)
             {
-                if (await _userManager.IsInRoleAsync(user, role))
+                if (await userManager.IsInRoleAsync(user, role))
                 {
                     return true;
                 }

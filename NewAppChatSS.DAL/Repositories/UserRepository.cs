@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using NewAppChatSS.Common.CommonHelpers;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NewAppChatSS.DAL.Repositories
 {
@@ -38,7 +36,7 @@ namespace NewAppChatSS.DAL.Repositories
 
         public async Task CreateAsync(User item)
         {
-            item.Id = Guid.NewGuid().ToString();
+            item.Id = NewAppChatGuidHelper.GetNewGuid();
             await userManager.CreateAsync(item, item.PasswordHash);
         }
 

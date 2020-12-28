@@ -1,13 +1,13 @@
-﻿using NewAppChatSS.DAL.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
     public interface IRoomRepository
     {
-        IEnumerable<Room> GetAll();
+        List<Room> GetAll();
 
         Room FindById(string id);
 

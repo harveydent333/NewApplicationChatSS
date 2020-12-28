@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
-using NewAppChatSS.BLL.Interfaces.HubInterfaces;
-using NewAppChatSS.DAL.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
+using NewAppChatSS.BLL.Constants;
+using NewAppChatSS.BLL.Interfaces.HubInterfaces;
+using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
@@ -16,15 +17,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
     /// </summary>
     public sealed class HelpCommandHandlerHub : IHelpCommandHandlerHub
     {
-        const int BOT_TYPE_ROOM = 3;
+        private readonly UserManager<User> userManager;
 
         private List<string> allowedCommands = new List<string>();
 
-        private readonly UserManager<User> _userManager;
-
         public HelpCommandHandlerHub(UserManager<User> userManager)
         {
-            _userManager = userManager;
+            this.userManager = userManager;
         }
 
         /// <summary>
@@ -51,24 +50,24 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             GetCommonCommands(ref allowedCommands);
 
-            if ((await _userManager.IsInRoleAsync(currentUser, "Moderator")) || (await _userManager.IsInRoleAsync(currentUser, "Administrator")))
+            if ((await userManager.IsInRoleAsync(currentUser, "Moderator")) || (await userManager.IsInRoleAsync(currentUser, "Administrator")))
             {
                 GetModerCommands(ref allowedCommands);
             }
 
-            if (await _userManager.IsInRoleAsync(currentUser, "Administrator"))
+            if (await userManager.IsInRoleAsync(currentUser, "Administrator"))
             {
                 GetAdminCommands(ref allowedCommands);
             }
 
-            if ((await _userManager.IsInRoleAsync(currentUser, "RegularUser")) && (currentUser.Id == currentRoom.OwnerId))
+            if ((await userManager.IsInRoleAsync(currentUser, "RegularUser")) && (currentUser.Id == currentRoom.OwnerId))
             {
                 GetCommandsForOwnerRoom(ref allowedCommands);
             }
 
             allowedCommands = allowedCommands.OrderByDescending(l => l).ToList();
 
-            if (currentRoom.TypeId == BOT_TYPE_ROOM)
+            if (currentRoom.TypeId == GlobalConstants.BotRoomType)
             {
                 GetCommandsForBotRoom(ref allowedCommands);
             }
@@ -95,7 +94,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// Выдать команды доступные модератору.
         /// Метод добавляет в список доступных команд, команды пользователю с ролью "Модератор"
         /// </summary>
-        public void GetModerCommands(ref List<string> allowedCommands)
+        private void GetModerCommands(ref List<string> allowedCommands)
         {
             allowedCommands.Add("//user ban {login пользователя} [-m {Количество минут}]");
             allowedCommands.Add("//user pardon {login пользователя}");

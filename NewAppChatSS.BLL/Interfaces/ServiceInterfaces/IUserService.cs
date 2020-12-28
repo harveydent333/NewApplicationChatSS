@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using NewAppChatSS.BLL.DTO;
+using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces

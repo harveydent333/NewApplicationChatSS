@@ -11,11 +11,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public static string CreateCommandInfo(string textCommand)
         {
-            return JsonSerializer.Serialize<object>(new
+            var commandInfo = new
             {
                 messageContent = textCommand,
                 datePublication = DateTime.Now,
-            });
+            };
+
+            return JsonSerializer.Serialize<object>(commandInfo);
         }
 
         /// <summary>
@@ -23,11 +25,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// </summary>
         public static string CreateCommandInfo(List<string> allowedCommands)
         {
-            return JsonSerializer.Serialize<object>(new
+            var commandsInfo = new
             {
                 messageContent = allowedCommands,
                 datePublication = DateTime.Now,
-            });
+            };
+
+            return JsonSerializer.Serialize<object>(commandsInfo);
         }
     }
 }

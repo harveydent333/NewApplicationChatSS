@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Storage;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
+using NewAppChatSS.Common.CommonHelpers;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 
@@ -28,7 +29,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// </summary>
         public async Task<string> SaveMessageIntoDatabase(User user, string textMessage, Room room)
         {
-            string messageId = Guid.NewGuid().ToString();
+            string messageId = NewAppChatGuidHelper.GetNewGuid();
 
             Message message = new Message
             {
@@ -43,14 +44,16 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 
             await AddInfoAboutLastMessage(messageId, room.Id);
 
-            return JsonSerializer.Serialize<object>(new
+            var messageInfo = new
             {
                 userName = user.UserName,
                 messageId = message.Id,
                 messageContent = message.ContentMessage,
                 datePublication = DateTime.Now,
                 roomId = room.Id
-            });
+            };
+
+            return JsonSerializer.Serialize<object>(messageInfo);
         }
 
         /// <summary>

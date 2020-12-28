@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using NewAppChatSS.BLL.DTO;
+using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Entities;
-using NewApplicationChatSS.ViewModels;
+using NewApplicationChatSS.Models;
 
 namespace NewApplicationChatSS.Mappings
 {
