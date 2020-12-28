@@ -1,5 +1,5 @@
-﻿using NewAppChatSS.DAL.Entities;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces
 {

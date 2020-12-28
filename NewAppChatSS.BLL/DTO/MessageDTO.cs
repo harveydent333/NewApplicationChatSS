@@ -1,5 +1,5 @@
-﻿using NewAppChatSS.DAL.Entities;
-using System;
+﻿using System;
+using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.BLL.DTO
 {

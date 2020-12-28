@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using NewAppChatSS.DAL.Entities;
-using System;
 using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.DAL.Initializers;
 using NewAppChatSS.Common.CommonHelpers;

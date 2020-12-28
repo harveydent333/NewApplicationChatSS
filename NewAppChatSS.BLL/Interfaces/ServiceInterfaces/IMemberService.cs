@@ -1,8 +1,8 @@
-﻿using NewAppChatSS.BLL.DTO;
-using NewAppChatSS.DAL.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NewAppChatSS.BLL.DTO;
+using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {

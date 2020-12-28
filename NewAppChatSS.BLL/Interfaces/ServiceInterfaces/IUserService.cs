@@ -1,10 +1,10 @@
-﻿using NewAppChatSS.BLL.DTO;
-using NewAppChatSS.DAL.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using NewAppChatSS.BLL.DTO;
+using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {
@@ -14,7 +14,7 @@ namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 
         Task AssignRoleForNewUserAsync(User user);
 
-        IEnumerable<UserDTO> GetUsersDTO();
+        List<UserDTO> GetUsersDTO();
 
         Task<UserDTO> GetUserDTObyIdAsync(string id);
 

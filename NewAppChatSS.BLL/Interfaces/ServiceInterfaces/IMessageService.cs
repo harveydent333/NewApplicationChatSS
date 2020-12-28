@@ -1,5 +1,5 @@
-﻿using NewAppChatSS.BLL.DTO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using NewAppChatSS.BLL.DTO;
 
 namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {

@@ -1,9 +1,9 @@
-﻿using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
-using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
-using System;
+﻿using System;
 using System.Text.Json;
 using System.Threading.Tasks;
+using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 {
@@ -17,7 +17,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         }
 
         /// <summary>
-        /// Метод создает новую комнату 
+        /// Метод создает новую комнату
         /// </summary>
         public async Task<string> CreateRoom(string roomName, int typeRoomId, string userId)
         {

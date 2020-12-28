@@ -1,17 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
-using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
-using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
+using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.BLL.Infrastructure.Validators
 {
     public class UserValidator : IUserValidator
     {
         public IUnitOfWork Database { get; set; }
+
         private readonly UserManager<User> _userManager;
 
         public UserValidator(IUnitOfWork uow, UserManager<User> userManager)
@@ -176,8 +177,5 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
 
             return false;
         }
-
-
-
     }
 }

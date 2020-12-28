@@ -1,20 +1,21 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace NewAppChatSS.BLL.Infrastructure.Validators
 {
     public class RoomValidator : IRoomValidator
     {
         public IUnitOfWork Database { get; set; }
-        private readonly UserManager<User> _userManager;
+
+        private readonly UserManager<User> userManager;
 
         public RoomValidator(IUnitOfWork uow, UserManager<User> userManager)
         {
-            _userManager = userManager;
+            this.userManager = userManager;
             Database = uow;
         }
 
@@ -39,11 +40,12 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
 
             foreach (string role in allowedRoles)
             {
-                if (await _userManager.IsInRoleAsync(user, role))
+                if (await userManager.IsInRoleAsync(user, role))
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -56,6 +58,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
             {
                 return true;
             }
+
             return false;
         }
     }
