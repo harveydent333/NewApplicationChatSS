@@ -14,9 +14,11 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
 {
     public class YouTubeRequest
     {
-        private static string _viewCount;
-        private static string _likeCount;
-        private static string _apiKey;
+        private static string ViewCount { get; set; }
+
+        private static string LikeCount { get; set; }
+
+        private static string ApiKey { get; set; }
 
         /// <summary>
         /// Метод получает API KEI из файла JSON
@@ -27,7 +29,7 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
             {
                 string json = r.ReadToEnd();
                 var items = JsonConvert.DeserializeObject<Secret>(json);
-                _apiKey = items.API_KEY;
+                ApiKey = items.API_KEY;
             }
         }
 
@@ -38,7 +40,7 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
         {
             return new YouTubeService(new BaseClientService.Initializer()
             {
-                ApiKey = _apiKey,
+                ApiKey = ApiKey,
             });
         }
 
@@ -86,8 +88,8 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
                 {
                     datePublication = DateTime.Now,
                     title = $"Канал с названием {nameChannel} не найден",
-                    view = _viewCount,
-                    likes = _likeCount,
+                    view = ViewCount,
+                    likes = LikeCount,
                 });
         }
 
@@ -101,8 +103,8 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
                 {
                     datePublication = DateTime.Now,
                     title = $"На канале {nameChannel} не найдено данного видео",
-                    view = _viewCount,
-                    likes = _likeCount,
+                    view = ViewCount,
+                    likes = LikeCount,
                 });
         }
 
@@ -190,12 +192,12 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
 
             if (views)
             {
-                _viewCount = videoInfoResponse.Items[0].Statistics.ViewCount.ToString();
+                ViewCount = videoInfoResponse.Items[0].Statistics.ViewCount.ToString();
             }
 
             if (likes)
             {
-                _likeCount = videoInfoResponse.Items[0].Statistics.LikeCount.ToString();
+                LikeCount = videoInfoResponse.Items[0].Statistics.LikeCount.ToString();
             }
 
             return System.Text.Json.JsonSerializer.Serialize<object>(
@@ -203,8 +205,8 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
                 {
                     datePublication = DateTime.Now,
                     title = "https://www.youtube.com/watch?v=" + videoListResponse?.Items[0]?.Id.VideoId,
-                    view = _viewCount,
-                    likes = _likeCount,
+                    view = ViewCount,
+                    likes = LikeCount,
                 });
         }
 
@@ -252,9 +254,9 @@ namespace NewAppChatSS.BLL.Infrastructure.YouTubeAPI
         /// </summary>
         public async Task Run()
         {
-            _apiKey = "";
-            _viewCount = "";
-            _likeCount = "";
+            ApiKey = "";
+            ViewCount = "";
+            LikeCount = "";
             UserCredential credential;
 
             using (var stream = new FileStream("client_secrets.json", FileMode.Open, FileAccess.Read))

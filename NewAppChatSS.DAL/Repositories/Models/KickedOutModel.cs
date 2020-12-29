@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NewAppChatSS.DAL.Entities;
+﻿using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.DAL.Repositories.Models
 {

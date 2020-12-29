@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.Common.CommonHelpers;
 using NewAppChatSS.DAL.Entities;
@@ -17,12 +13,12 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
     /// </summary>
     public class MessageHandler : IMessageHandler
     {
-        public IUnitOfWork Database { get; set; }
-
         public MessageHandler(IUnitOfWork uow)
         {
             Database = uow;
         }
+
+        public IUnitOfWork Database { get; set; }
 
         /// <summary>
         /// Метод сохраняет в базу данных информацию о сообщении написаным в пользователем в чат комнаты

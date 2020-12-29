@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.BLL.Constants;
@@ -11,7 +9,6 @@ using NewAppChatSS.BLL.Infrastructure;
 using NewAppChatSS.BLL.Interfaces.HubInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
 
 namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
@@ -20,8 +17,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
     /// </summary>
     public class UserCommandHandlerHub : Hub, IUserCommandHandler
     {
-        private static string _userName;
-
         private readonly Dictionary<Regex, Func<User, string, IHubCallerClients, Task>> userCommands;
 
         private readonly UserManager<User> userManager;
@@ -42,6 +37,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             this.userManager = userManager;
             this.userValidator = userValidator;
         }
+
+        private static string UserName { get; set; }
 
         /// <summary>
         /// Метод проверяет какое регулярное выражение соответствует полученной команде
@@ -119,20 +116,20 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            _userName = Regex.Replace(command, @"^//user\sban\s", string.Empty);
+            UserName = Regex.Replace(command, @"^//user\sban\s", string.Empty);
 
-            if (await userManager.FindByNameAsync(_userName) == null)
+            if (await userManager.FindByNameAsync(UserName) == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {UserName} не найден."));
             }
 
-            _userName = await ChangedStatusBlockingUserAsync(_userName, command, true, true);
+            UserName = await ChangedStatusBlockingUserAsync(UserName, command, true, true);
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {_userName} заблокирован."));
+                CommandHandler.CreateCommandInfo($"Пользователь {UserName} заблокирован."));
         }
 
         /// <summary>
@@ -145,20 +142,20 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            _userName = Regex.Replace(command, @"^//user\spardon\s", string.Empty);
+            UserName = Regex.Replace(command, @"^//user\spardon\s", string.Empty);
 
-            if (await userManager.FindByNameAsync(_userName) == null)
+            if (await userManager.FindByNameAsync(UserName) == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {UserName} не найден."));
             }
 
-            _userName = await ChangedStatusBlockingUserAsync(_userName, command, false);
+            UserName = await ChangedStatusBlockingUserAsync(UserName, command, false);
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {_userName} разблокирован."));
+                CommandHandler.CreateCommandInfo($"Пользователь {UserName} разблокирован."));
         }
 
         /// <summary>
@@ -171,20 +168,20 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            _userName = Regex.Match(command, @"//user\sban\s(.+)\s-m\s\d*$").Groups[1].Value;
+            UserName = Regex.Match(command, @"//user\sban\s(.+)\s-m\s\d*$").Groups[1].Value;
 
-            if (await userManager.FindByNameAsync(_userName) == null)
+            if (await userManager.FindByNameAsync(UserName) == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {UserName} не найден."));
             }
 
-            _userName = await ChangedStatusBlockingUserAsync(_userName, command, true);
+            UserName = await ChangedStatusBlockingUserAsync(UserName, command, true);
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {_userName} заблокирован."));
+                CommandHandler.CreateCommandInfo($"Пользователь {UserName} заблокирован."));
         }
 
         /// <summary>
@@ -197,21 +194,21 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            _userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-n$").Groups[1].Value;
+            UserName = Regex.Match(command, @"//user\smoderator\s(.+)\s-n$").Groups[1].Value;
 
-            if (await userManager.FindByNameAsync(_userName) == null)
+            if (await userManager.FindByNameAsync(UserName) == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {UserName} не найден."));
             }
 
-            user = await userManager.FindByNameAsync(_userName);
+            user = await userManager.FindByNameAsync(UserName);
             await userManager.AddToRoleAsync(user, "Moderator");
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {_userName} был назначен модератором."));
+                CommandHandler.CreateCommandInfo($"Пользователь {UserName} был назначен модератором."));
         }
 
         /// <summary>
@@ -224,21 +221,21 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            _userName = Regex.Match(command, @"//user\smoderator\s(.+)\s-d$").Groups[1].Value;
+            UserName = Regex.Match(command, @"//user\smoderator\s(.+)\s-d$").Groups[1].Value;
 
-            if (await userManager.FindByNameAsync(_userName) == null)
+            if (await userManager.FindByNameAsync(UserName) == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Пользователь с именем {_userName} не найден."));
+                    CommandHandler.CreateCommandInfo($"Пользователь с именем {UserName} не найден."));
             }
 
-            user = await userManager.FindByNameAsync(_userName);
+            user = await userManager.FindByNameAsync(UserName);
             await userManager.RemoveFromRoleAsync(user, "Moderator");
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {_userName} был разжалован до обычного пользователя."));
+                CommandHandler.CreateCommandInfo($"Пользователь {UserName} был разжалован до обычного пользователя."));
         }
 
         /// <summary>

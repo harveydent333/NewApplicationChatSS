@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.BLL.Hubs.CommandHandlersHubs;
-using NewAppChatSS.BLL.Infrastructure.ModelHandlers;
 using NewAppChatSS.BLL.Interfaces.HubInterfaces;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
-using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 
@@ -26,8 +21,6 @@ namespace NewAppChatSS.BLL.Hubs
         private readonly IRoomCommandHandler roomCommandHandler;
         private readonly IBotCommandHandlerHub botCommandHandler;
         private readonly IHelpCommandHandlerHub helpCommandHandler;
-
-        public IUnitOfWork Database { get; set; }
 
         public ChatHub(
             UserManager<User> userManager,
@@ -48,6 +41,8 @@ namespace NewAppChatSS.BLL.Hubs
             this.botCommandHandler = botCommandHandler;
             this.helpCommandHandler = helpCommandHandler;
         }
+
+        public IUnitOfWork Database { get; set; }
 
         /// <summary>
         /// Метод проверяет заблокирован ли пользователь и имеет ли он возможность отправлять сообщения в чат

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NewApplicationChatSS.Models
+namespace NewApplicationChatSS.Models.Auth
 {
     /// <summary>
     /// Регистрационные данные пользователя

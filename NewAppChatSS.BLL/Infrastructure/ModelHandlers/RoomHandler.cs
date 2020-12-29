@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Threading.Tasks;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.Common.CommonHelpers;
@@ -10,12 +9,12 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 {
     public class RoomHandler : IRoomHandler
     {
-        public IUnitOfWork Database { get; set; }
-
         public RoomHandler(IUnitOfWork uow)
         {
             Database = uow;
         }
+
+        public IUnitOfWork Database { get; set; }
 
         /// <summary>
         /// Метод создает новую комнату

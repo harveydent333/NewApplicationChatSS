@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using NewAppChatSS.BLL.Models;
 
 namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.BLL.Constants;
 using NewAppChatSS.BLL.Infrastructure;
-using NewAppChatSS.BLL.Infrastructure.ModelHandlers;
 using NewAppChatSS.BLL.Interfaces.HubInterfaces;
 using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
@@ -23,8 +22,6 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
     public class RoomCommandHandlerHub : Hub, IRoomCommandHandler
     {
         private readonly Dictionary<Regex, Func<User, Room, string, IHubCallerClients, Task>> roomCommands;
-
-        private IUnitOfWork Database { get; set; }
 
         private readonly UserManager<User> userManager;
         private readonly IUserValidator userValidator;
@@ -56,6 +53,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             this.roomValidator = roomValidator;
             this.roomHandler = roomHandler;
         }
+
+        private IUnitOfWork Database { get; set; }
 
         /// <summary>
         /// Метод проверяет какое регулярное выражение соответствует полученной команде

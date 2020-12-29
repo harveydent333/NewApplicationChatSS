@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.BLL.Constants;
 using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.DAL.Initializers
@@ -9,7 +10,7 @@ namespace NewAppChatSS.DAL.Initializers
         {
             modelBuilder.Entity<Room>().HasData(new Room()
             {
-                Id = "1",
+                Id = GlobalConstants.MainRoomId,
                 RoomName = "MainRoom",
                 OwnerId = userId,
                 TypeId = 1,

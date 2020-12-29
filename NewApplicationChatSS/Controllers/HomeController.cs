@@ -11,8 +11,8 @@ using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Entities;
-using NewAppChatSS.DAL.Interfaces;
 using NewApplicationChatSS.Models;
+using NewApplicationChatSS.Models.Auth;
 
 namespace NewApplicationChatSS.Controllers
 {

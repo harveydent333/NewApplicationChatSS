@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NewAppChatSS.BLL.Constants;
 using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.DAL.Initializers
@@ -11,7 +12,7 @@ namespace NewAppChatSS.DAL.Initializers
             {
                 Id = 1,
                 UserId = userId,
-                RoomId = "1",
+                RoomId = GlobalConstants.MainRoomId,
             });
         }
     }

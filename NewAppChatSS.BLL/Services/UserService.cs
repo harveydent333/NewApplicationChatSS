@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -16,11 +14,9 @@ namespace NewAppChatSS.BLL.Services
 {
     public sealed class UserService : IUserService
     {
-        private IUnitOfWork Database { get; set; }
-
-        private readonly UserManager<User> userManager;
         private readonly IMapper mapper;
         private readonly SignInManager<User> signInManager;
+        private readonly UserManager<User> userManager;
 
         public UserService(IUnitOfWork uow, UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager)
         {
@@ -29,6 +25,8 @@ namespace NewAppChatSS.BLL.Services
             this.signInManager = signInManager;
             this.mapper = mapper;
         }
+
+        private IUnitOfWork Database { get; set; }
 
         public List<UserDTO> GetUsers()
         {

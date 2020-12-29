@@ -6,7 +6,7 @@ using NewAppChatSS.BLL.Infrastructure;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Entities;
-using NewApplicationChatSS.Models;
+using NewApplicationChatSS.Models.Auth;
 
 namespace NewApplicationChatSS.Controllers
 {
