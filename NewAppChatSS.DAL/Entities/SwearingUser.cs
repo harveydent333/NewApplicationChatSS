@@ -15,7 +15,7 @@ namespace NewAppChatSS.DAL.Entities
         public string UserId { get; set; }
 
         /// <summary>
-        /// Количество ругающихся слов, написанных пользователем
+        /// Количество ругательских слов, написанных пользователем
         /// </summary>
         [Required]
         public int CountSwear { get; set; }

@@ -15,19 +15,19 @@ namespace NewAppChatSS.DAL.Entities
         public string RoomName { get; set; }
 
         /// <summary>
-        /// ID владельца пользователя
+        /// Идентификатор владельца комнаты
         /// </summary>
         [Required]
         public string OwnerId { get; set; }
 
         /// <summary>
-        /// Владелец пользователя
+        /// Владелец комнаты
         /// </summary>
         [ForeignKey("OwnerId")]
         public User Owner { get; set; }
 
         /// <summary>
-        /// Id типа комнаты
+        /// Идентификатор типа комнаты
         /// </summary>
         public int TypeId { get; set; }
 
@@ -38,7 +38,7 @@ namespace NewAppChatSS.DAL.Entities
         public TypeRoom TypeRoom { get; set; }
 
         /// <summary>
-        /// Id последнего сообщения в комнате
+        /// Идентификатор последнего сообщения в комнате
         /// </summary>
         public string LastMessageId { get; set; }
 

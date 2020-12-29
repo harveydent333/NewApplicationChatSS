@@ -16,33 +16,33 @@ namespace NewAppChatSS.DAL.Entities
         public string ContentMessage { get; set; }
 
         /// <summary>
-        /// Дата публикации
-        /// </summary>
-        [Required]
-        public DateTime DatePublication { get; set; }
-
-        /// <summary>
-        /// Объект пользователя отправляющего сообщение
+        /// Пользователь отправивший сообщение
         /// </summary>
         [ForeignKey("UserId")]
         public User User { get; set; }
 
         /// <summary>
-        /// ID пользователя отправляющего сообщение
+        /// Идентификатор пользователя отправившего сообщение
         /// </summary>
         [Required]
         public string UserId { get; set; }
 
         /// <summary>
-        /// Объект комнаты в которой было отправлено сообщение
+        /// Комната в которой было отправлено сообщение
         /// </summary>
         [ForeignKey("RoomId")]
         public Room Room { get; set; }
 
         /// <summary>
-        /// Id комнаты в которой было отправлено сообщение
+        /// Идентификатор комнаты в которой было отправлено сообщение
         /// </summary>
         [Required]
         public string RoomId { get; set; }
+
+        /// <summary>
+        /// Дата публикации
+        /// </summary>
+        [Required]
+        public DateTime DatePublication { get; set; }
     }
 }
