@@ -13,6 +13,7 @@ using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 {
@@ -28,7 +29,20 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         private readonly IRoomValidator roomValidator;
         private readonly IRoomHandler roomHandler;
 
-        public RoomCommandHandlerHub(UserManager<User> userManager, IUserValidator userValidator, IRoomValidator roomValidator, IUnitOfWork uow, IRoomHandler roomHandler)
+        private readonly IMutedUserRepository mutedUserRepository;
+        private readonly IKickedOutRepository kickedOutRepository;
+        private readonly IRoomRepository roomRepository;
+        private readonly IMemberRepository memberRepository;
+
+        public RoomCommandHandlerHub(
+            IMemberRepository memberRepository,
+            IMutedUserRepository mutedUserRepository,
+            IKickedOutRepository kickedOutRepository,
+            IRoomRepository roomRepository,
+            UserManager<User> userManager,
+            IUserValidator userValidator,
+            IRoomValidator roomValidator,
+            IRoomHandler roomHandler)
         {
             roomCommands = new Dictionary<Regex, Func<User, Room, string, IHubCallerClients, Task>>
             {
@@ -47,14 +61,16 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 [new Regex(@"^//room\sspeak\s-l\s([0-9A-z])+$")] = UnmuteUser,
             };
 
-            Database = uow;
+            this.roomRepository = roomRepository;
+            this.kickedOutRepository = kickedOutRepository;
+            this.mutedUserRepository = mutedUserRepository;
+            this.memberRepository = memberRepository;
+
             this.userManager = userManager;
             this.userValidator = userValidator;
             this.roomValidator = roomValidator;
             this.roomHandler = roomHandler;
         }
-
-        private IUnitOfWork Database { get; set; }
 
         /// <summary>
         /// Метод проверяет какое регулярное выражение соответствует полученной команде
@@ -80,7 +96,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         private async Task<Task> CreateRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\screate\s(\w+)$").Groups[1].Value;
-            if (roomValidator.UniquenessCheckRoom(nameProcessedRoom))
+
+            if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
@@ -102,7 +119,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         private async Task<Task> CreatePrivateRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\screate\s(\w+)\s-c$").Groups[1].Value;
-            if (roomValidator.UniquenessCheckRoom(nameProcessedRoom))
+
+            if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
@@ -124,7 +142,8 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         private async Task<Task> CreateBotRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\screate\s(.+)\s-b$").Groups[1].Value;
-            if (roomValidator.UniquenessCheckRoom(nameProcessedRoom))
+
+            if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
@@ -147,40 +166,42 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\sremove\s(\w+)$").Groups[1].Value;
 
-            if (Database.Rooms.FindByName(nameProcessedRoom).Id == GlobalConstants.MainRoomId)
+            var processedRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom });
+
+            if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Невозможно применить к главной комнате."));
             }
 
-            if (roomValidator.UniquenessCheckRoom(nameProcessedRoom))
+            if (!await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Комнаты с именем {nameProcessedRoom} не существует"));
             }
 
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator" }, nameProcessedRoom))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator" }, nameProcessedRoom))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom).Id;
+            var members = await memberRepository.GetAsync(new MemberModel { RoomId = processedRoom.Id });
+            var memberIds = members.Select(m => m.UserId).ToList();
 
-            List<string> members = Database.Members.GetMembersIds(idProcessedRoom).ToList();
-
-            await clients.Users(members).SendAsync(
+            await clients.Users(memberIds).SendAsync(
                 "RemoveRoomUsers",
                 CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} была удалена."),
-                idProcessedRoom);
+                processedRoom.Id);
 
-            await Database.Rooms.DeleteByIdAsync(idProcessedRoom);
+            var deleteRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { processedRoom.Id } });
+            await roomRepository.DeleteAsync(deleteRoom);
 
             return clients.Caller.SendAsync(
                 "RemoveRoomCaller",
                 CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} успешно удалена."),
-                idProcessedRoom);
+                processedRoom.Id);
         }
 
         /// <summary>
@@ -197,30 +218,32 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
             }
 
             string nameProcessedRoom = Regex.Match(command, @"//room\srename\s(\w+)$").Groups[1].Value;
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator" }, currentRoom.RoomName))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator" }, currentRoom.RoomName))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (roomValidator.UniquenessCheckRoom(nameProcessedRoom))
+            if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                currentRoom.RoomName = nameProcessedRoom;
-                await Database.Rooms.UpdateAsync(currentRoom);
-
-                List<string> members = Database.Members.GetMembersIds(currentRoom.Id).ToList();
-
-                await clients.Users(members).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
-
                 return clients.Caller.SendAsync(
-                    "RenameRoom",
-                    CommandHandler.CreateCommandInfo($"Имя комнаты было успешно изменено на {nameProcessedRoom}"),
-                    currentRoom.Id,
-                    nameProcessedRoom);
+                    "ReceiveCommand",
+                    CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
 
+            currentRoom.RoomName = nameProcessedRoom;
+
+            await roomRepository.ModifyAsync(currentRoom);
+
+            var members = await memberRepository.GetAsync(new MemberModel { RoomId = currentRoom.Id });
+            var memberIds = members.Select(m => m.UserId).ToList();
+
+            await clients.Users(memberIds).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
+
             return clients.Caller.SendAsync(
-                "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
+                "RenameRoom",
+                CommandHandler.CreateCommandInfo($"Имя комнаты было успешно изменено на {nameProcessedRoom}"),
+                currentRoom.Id,
+                nameProcessedRoom);
         }
 
         /// <summary>
@@ -231,7 +254,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\sconnect\s(\w+)\s-l\s(\w+)$").Groups[1].Value;
 
-            if (Database.Rooms.FindByName(nameProcessedRoom).Id == GlobalConstants.MainRoomId)
+            var processedRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom, IncludeTypeRoom = true });
+
+            if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
@@ -240,10 +265,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             string userNameProcessedUser = Regex.Match(command, @"//room\sconnect\s(\w+)\s-l\s(\w+)$").Groups[2].Value;
 
-            string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom)?.Id;
             string idProcessedUser = (await userManager.FindByNameAsync(userNameProcessedUser))?.Id;
 
-            if (idProcessedRoom == null)
+            if (processedRoom == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
@@ -257,13 +281,13 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не найден."));
             }
 
-            if (Database.Rooms.FindByName(nameProcessedRoom).TypeRoom.Id == GlobalConstants.BotRoomType)
+            if (processedRoom.TypeRoom.Id == GlobalConstants.BotRoomType)
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
-            else if (Database.Rooms.FindByName(nameProcessedRoom).TypeRoom.Id == GlobalConstants.PrivateRoomType)
+            else if (processedRoom.TypeRoom.Id == GlobalConstants.PrivateRoomType)
             {
-                if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { }, nameProcessedRoom))
+                if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { }, nameProcessedRoom))
                 {
                     return clients.Caller.SendAsync(
                         "ReceiveCommand",
@@ -271,18 +295,24 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 }
             }
 
-            if (userValidator.IsUserInGroupById(idProcessedUser, idProcessedRoom))
+            if (await userValidator.IsUserInGroupById(idProcessedUser, processedRoom.Id))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Пользователь уже состоит в этой группе"));
             }
 
-            await Database.Members.AddMemberAsync(idProcessedUser, idProcessedRoom);
+            var member = new Member
+            {
+                UserId = idProcessedUser,
+                RoomId = processedRoom.Id
+            };
+
+            await memberRepository.AddAsync(member);
 
             await clients.User(idProcessedUser.ToString()).SendAsync(
                 "ConnectRoom",
-                JsonSerializer.Serialize<object>(new { roomId = idProcessedRoom, roomName = nameProcessedRoom }));
+                JsonSerializer.Serialize<object>(new { roomId = processedRoom.Id, roomName = nameProcessedRoom }));
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
@@ -293,7 +323,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// Отключиться от текущей комнаты.
         /// Метод удаляет запись с информацией о членстве пользователя в текущей группе.
         /// </summary>
-        private Task DisconnectFromCurrenctRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
+        private async Task<Task> DisconnectFromCurrenctRoom(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
             if (currentRoom.Id == GlobalConstants.MainRoomId)
             {
@@ -302,7 +332,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     CommandHandler.CreateCommandInfo($"Невозможно применить к главной комнате."));
             }
 
-            Database.Members.DeleteMemberAsync(currentUser.Id, currentRoom.Id);
+            var deleteMember = await memberRepository.GetFirstOrDefaultAsync(new MemberModel { UserId = currentUser.Id, RoomId = currentRoom.Id });
+
+            await memberRepository.DeleteAsync(deleteMember);
 
             return clients.Caller.SendAsync("DisconnectFromCurrentRoom");
         }
@@ -315,35 +347,37 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\sdisconnect\s(\w+)$").Groups[1].Value;
 
-            if (Database.Rooms.FindByName(nameProcessedRoom).Id == GlobalConstants.MainRoomId)
+            var processedRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom });
+
+            if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Невозможно применить к главной комнате."));
             }
 
-            string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom)?.Id;
-
-            if (idProcessedRoom == null)
+            if (processedRoom == null)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} не найдена."));
             }
 
-            if (userValidator.IsUserInGroupById(currentUser.Id, idProcessedRoom))
+            if (await userValidator.IsUserInGroupById(currentUser.Id, processedRoom.Id))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Вы не состоите в комнате {nameProcessedRoom}."));
             }
 
-            await Database.Members.DeleteMemberAsync(currentUser.Id, idProcessedRoom);
+            var deleteMember = await memberRepository.GetFirstOrDefaultAsync(new MemberModel { UserId = currentUser.Id, RoomId = currentRoom.Id });
+            // TODO: проверка deleteMember
+            await memberRepository.DeleteAsync(deleteMember);
 
             return clients.Caller.SendAsync(
                 "DisconnectFromRoom",
                 CommandHandler.CreateCommandInfo($"Вы покинули комнату {nameProcessedRoom}"),
-                idProcessedRoom);
+                processedRoom.Id);
         }
 
         /// <summary>
@@ -354,7 +388,9 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\sdisconnect\s(.+)\s-l\s(.+)$").Groups[1].Value;
 
-            if (Database.Rooms.FindByName(nameProcessedRoom).Id == GlobalConstants.MainRoomId)
+            var processedRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom });
+
+            if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
@@ -363,30 +399,39 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
 
             string userNameProcessedUser = Regex.Match(command, @"//room\sdisconnect\s(.+)\s-l\s(.+)$").Groups[2].Value;
 
-            string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom)?.Id;
             string idProcessedUser = (await userManager.FindByNameAsync(userNameProcessedUser))?.Id;
 
-            string resultChecking = CheckDataForKickedUser(nameProcessedRoom, userNameProcessedUser, idProcessedRoom, idProcessedUser);
+            string resultChecking = await CheckDataForKickedUser(nameProcessedRoom, userNameProcessedUser, processedRoom.Id, idProcessedUser);
 
             if (resultChecking != string.Empty)
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(resultChecking));
             }
 
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, nameProcessedRoom))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, nameProcessedRoom))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (Database.KickedOuts.GetListIdsKickedRoomForUser(idProcessedUser).Contains(idProcessedRoom))
+            var kickedIdRooms = (await kickedOutRepository.GetAsync(new KickedOutModel { UserId = idProcessedUser })).Select(k => k.RoomId);
+
+            if (kickedIdRooms.Contains(processedRoom.Id))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был исключен из этой команты"));
             }
 
             DateTime dateUnkick = TimeComputer.CalculateUnlockDate(command + " -m 60", @"//room\sdisconnect\s\w+\s-l\s\w+\s-m\s(60)$");
-            await Database.KickedOuts.AddKickedUserAsync(idProcessedUser, idProcessedRoom, dateUnkick);
 
-            await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", idProcessedRoom);
+            var kikedOut = new KickedOut
+            {
+                UserId = idProcessedUser,
+                RoomId = processedRoom.Id,
+                DateUnkick = dateUnkick,
+            };
+
+            await kickedOutRepository.AddAsync(kikedOut);
+
+            await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
@@ -402,38 +447,48 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         {
             string nameProcessedRoom = Regex.Match(command, @"//room\sdisconnect\s(\w+)\s-l\s(\w+)\s-m\s(\d*)$").Groups[1].Value;
 
-            if (Database.Rooms.FindByName(nameProcessedRoom).Id == GlobalConstants.MainRoomId)
+            var processedRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom });
+
+            if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo($"Невозможно применить к главной комнате."));
             }
 
             string userNameProcessedUser = Regex.Match(command, @"//room\sdisconnect\s(\w+)\s-l\s(\w+)\s-m\s(\d*)$").Groups[2].Value;
 
-            string idProcessedRoom = Database.Rooms.FindByName(nameProcessedRoom)?.Id;
-
             string idProcessedUser = (await userManager.FindByNameAsync(userNameProcessedUser))?.Id;
 
-            string resultChecking = CheckDataForKickedUser(nameProcessedRoom, userNameProcessedUser, idProcessedRoom, idProcessedUser);
+            string resultChecking = await CheckDataForKickedUser(nameProcessedRoom, userNameProcessedUser, processedRoom.Id, idProcessedUser);
 
             if (resultChecking != string.Empty)
             {
                 return clients.Caller.SendAsync("ReceiveCommand", resultChecking);
             }
 
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, nameProcessedRoom))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, nameProcessedRoom))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (Database.KickedOuts.GetListIdsKickedRoomForUser(idProcessedUser).Contains(idProcessedRoom))
+            var kickedIdRooms = (await kickedOutRepository.GetAsync(new KickedOutModel { UserId = idProcessedUser })).Select(k => k.RoomId);
+
+            if (kickedIdRooms.Contains(processedRoom.Id))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был исключен из этой команты"));
             }
 
             DateTime dateUnkick = TimeComputer.CalculateUnlockDate(command, @"//room\sdisconnect\s\w+\s-l\s\w+\s-m\s(\d*)$");
-            await Database.KickedOuts.AddKickedUserAsync(idProcessedUser, idProcessedRoom, dateUnkick);
 
-            await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", idProcessedRoom);
+            var kikedOut = new KickedOut
+            {
+                UserId = idProcessedUser,
+                RoomId = processedRoom.Id,
+                DateUnkick = dateUnkick,
+            };
+
+            await kickedOutRepository.AddAsync(kikedOut);
+
+            await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
 
             return clients.Caller.SendAsync(
                 "ReceiveCommand",
@@ -457,25 +512,36 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не найден."));
             }
 
-            if (userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
+            if (await userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не состоит комнате."));
             }
 
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (Database.MutedUsers.GetListIdsMutedRoomForUser(idProcessedUser).Contains(currentRoom.Id))
+            var mutedUsers = await mutedUserRepository.GetAsync(new MutedUserModel { UserId = idProcessedUser });
+            var idMutedRooms = mutedUsers.Select(m => m.RoomId);
+
+            if (idMutedRooms.Contains(currentRoom.Id))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был приглушен в этой команате"));
             }
 
             DateTime dateUnmute = TimeComputer.CalculateUnlockDate(command + " -m 10", @"//room\smute\s-l\s\w+\s-m\s(10)$");
-            await Database.MutedUsers.AddMutedUserAsync(idProcessedUser, currentRoom.Id, dateUnmute);
+
+            var mutedUser = new MutedUser
+            {
+                UserId = idProcessedUser,
+                RoomId = currentRoom.Id,
+                DateUnmute = dateUnmute
+            };
+
+            await mutedUserRepository.AddAsync(mutedUser);
 
             await clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
@@ -501,25 +567,36 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не найден."));
             }
 
-            if (userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
+            if (await userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не состоит комнате."));
             }
 
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (Database.MutedUsers.GetListIdsMutedRoomForUser(idProcessedUser).Contains(currentRoom.Id))
+            var mutedUsers = await mutedUserRepository.GetAsync(new MutedUserModel { UserId = idProcessedUser });
+            var idMutedRooms = mutedUsers.Select(m => m.RoomId);
+
+            if (idMutedRooms.Contains(currentRoom.Id))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Пользователь уже был приглушен в этой команате"));
             }
 
             DateTime dateUnmute = TimeComputer.CalculateUnlockDate(command, @"//room\smute\s-l\s\w+\s-m\s(\d*)$");
-            await Database.MutedUsers.AddMutedUserAsync(idProcessedUser, currentRoom.Id, dateUnmute);
+
+            var mutedUser = new MutedUser
+            {
+                UserId = idProcessedUser,
+                RoomId = currentRoom.Id,
+                DateUnmute = dateUnmute
+            };
+
+            await mutedUserRepository.AddAsync(mutedUser);
 
             await clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
@@ -544,19 +621,22 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                     CommandHandler.CreateCommandInfo("Пользователь {userNameProcessedUser} не найден."));
             }
 
-            if (await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
                 return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Отказано в доступе."));
             }
 
-            if (userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
+            if (await userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
                 return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не состоит группе."));
             }
 
-            await Database.MutedUsers.DeleteMutedUserAsync(idProcessedUser, currentRoom.Id);
+            var deleteMutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = idProcessedUser, RoomId = currentRoom.Id });
+            // TODO: if deleteMutedUser == null
+            await mutedUserRepository.DeleteAsync(deleteMutedUser);
+
             await clients.User(idProcessedUser.ToString()).SendAsync(
                 "UnmutedUser",
                 CommandHandler.CreateCommandInfo($"У вас снова есть возможность писать сообщения."),
@@ -572,7 +652,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
         /// существует ли комната из которой выгоняют.
         /// Состоит ли пользователь в данной группе.
         /// </summary>
-        private string CheckDataForKickedUser(string nameProcessedRoom, string userNameProcessedUser, string idProcessedRoom, string idProcessedUser)
+        private async Task<string> CheckDataForKickedUser(string nameProcessedRoom, string userNameProcessedUser, string idProcessedRoom, string idProcessedUser)
         {
             if (idProcessedRoom == null)
             {
@@ -584,7 +664,7 @@ namespace NewAppChatSS.BLL.Hubs.CommandHandlersHubs
                 return $"Пользователь {userNameProcessedUser} не найден.";
             }
 
-            if (userValidator.IsUserInGroupById(idProcessedUser, idProcessedRoom))
+            if (await userValidator.IsUserInGroupById(idProcessedUser, idProcessedRoom))
             {
                 return $"Пользователь {userNameProcessedUser} не состоит комнате.";
             }

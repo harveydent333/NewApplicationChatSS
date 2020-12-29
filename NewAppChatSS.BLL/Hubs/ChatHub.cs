@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
@@ -9,6 +8,7 @@ using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.BLL.Hubs
 {
@@ -21,18 +21,28 @@ namespace NewAppChatSS.BLL.Hubs
         private readonly IRoomCommandHandler roomCommandHandler;
         private readonly IBotCommandHandlerHub botCommandHandler;
         private readonly IHelpCommandHandlerHub helpCommandHandler;
+        private readonly IMessageRepository messageRepository;
+        private readonly IRoomRepository roomRepository;
+        private readonly IMutedUserRepository mutedUserRepository;
+        private readonly IMemberRepository memberRepository;
 
         public ChatHub(
+            IMemberRepository memberRepository,
+            IMutedUserRepository mutedUserRepository,
+            IMessageRepository messageRepository,
+            IRoomRepository roomRepository,
             UserManager<User> userManager,
             IUserValidator userValidator,
             IMessageHandler messageHandler,
             IUserCommandHandler userCommandHandler,
             IRoomCommandHandler roomCommandHandler,
-            IUnitOfWork uow,
             IBotCommandHandlerHub botCommandHandler,
             IHelpCommandHandlerHub helpCommandHandler)
         {
-            Database = uow;
+            this.memberRepository = memberRepository;
+            this.mutedUserRepository = mutedUserRepository;
+            this.messageRepository = messageRepository;
+            this.roomRepository = roomRepository;
             this.userManager = userManager;
             this.userValidator = userValidator;
             this.messageHandler = messageHandler;
@@ -41,8 +51,6 @@ namespace NewAppChatSS.BLL.Hubs
             this.botCommandHandler = botCommandHandler;
             this.helpCommandHandler = helpCommandHandler;
         }
-
-        public IUnitOfWork Database { get; set; }
 
         /// <summary>
         /// Метод проверяет заблокирован ли пользователь и имеет ли он возможность отправлять сообщения в чат
@@ -53,10 +61,12 @@ namespace NewAppChatSS.BLL.Hubs
 
             if (await userValidator.IsUserMutedById(user.Id, roomId))
             {
+                var timeUnmuteUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = user.Id, RoomId = roomId });
+
                 await Clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo(string.Format(
-                        "Вы лишины возможности отправлять сообщения до: {0:U}.", Database.MutedUsers.GetDateTimeUnmuteUser(user.Id, roomId))));
+                        "Вы лишины возможности отправлять сообщения до: {0:U}.", timeUnmuteUser)));
             }
 
             if (await userValidator.IsUserBlocked(user))
@@ -75,12 +85,14 @@ namespace NewAppChatSS.BLL.Hubs
         /// </summary>
         public async Task SendMessage(User user, string message, string roomId, IHubCallerClients clients)
         {
-            Room room = Database.Rooms.GetAll().FirstOrDefault(r => r.Id == roomId);
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
 
             string messageInfo = await messageHandler.SaveMessageIntoDatabase(user, message, room);
-            List<string> members = Database.Members.GetMembersIds(roomId).ToList();
 
-            await clients.Users(members).SendAsync("ReceiveMessage", messageInfo);
+            var members = await memberRepository.GetAsync(new MemberModel { RoomId = roomId });
+            var memberIds = members.Select(m => m.UserId).ToList();
+
+            await clients.Users(memberIds).SendAsync("ReceiveMessage", messageInfo);
         }
 
         // TODO: закомментировать метод
@@ -95,31 +107,32 @@ namespace NewAppChatSS.BLL.Hubs
                     CommandHandler.CreateCommandInfo("Вы заблокированы и не можете удалять сообщения."));
             }
 
-            List<string> listLastMessagesIdRoom = Database.Rooms
-                .GetAll()
-                .Select(r => r.LastMessageId)
-                .ToList();
+            var rooms = await roomRepository.GetAsync(new RoomModel { });
+            var listLastMessagesIdRoom = rooms.Select(r => r.LastMessageId);
 
             if (listLastMessagesIdRoom.Contains(messageId))
             {
-                Room processedRoom = Database.Rooms
-                    .GetAll()
-                    .FirstOrDefault(r => r.LastMessageId == messageId);
+                var processedRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { LastMessageId = messageId });
 
-                await Database.Messages.DeleteMessageAsync(messageId);
+                var deleteMessage = await messageRepository.GetFirstOrDefaultAsync(new MessageModel { Ids = new[] { messageId } });
+                await messageRepository.DeleteAsync(deleteMessage);
 
-                Message proccessedMessage = Database.Messages
-                    .GetAll()
-                    .OrderByDescending(m => m.DatePublication)
-                    .FirstOrDefault(m => m.RoomId == roomId);
+                // TODO: Реализовывать ExtendedModel и фильтровать по убыванию или возврастанию
+
+                var messages = await messageRepository.GetAsync(new MessageModel { });
+                var proccessedMessage = messages
+                                          .OrderByDescending(m => m.DatePublication)
+                                          .FirstOrDefault(m => m.RoomId == roomId);
 
                 processedRoom.LastMessageId = proccessedMessage.Id;
-                await Database.Rooms.UpdateAsync(processedRoom);
+
+                await roomRepository.ModifyAsync(processedRoom);
                 await Clients.Caller.SendAsync("DeleteMessage", messageId);
             }
             else
             {
-                await Database.Messages.DeleteMessageAsync(messageId);
+                var deleteMessage = await messageRepository.GetFirstOrDefaultAsync(new MessageModel { Ids = new[] { messageId } });
+                await messageRepository.DeleteAsync(deleteMessage);
                 await Clients.Caller.SendAsync("DeleteMessage", messageId);
             }
         }
@@ -131,7 +144,7 @@ namespace NewAppChatSS.BLL.Hubs
         /// </summary>
         public async Task ReceivingUserInteractionCommand(string userName, string comamand)
         {
-            User user = await userManager.FindByNameAsync(userName);
+            var user = await userManager.FindByNameAsync(userName);
             await userCommandHandler.SearchCommandAsync(user, comamand, Clients);
         }
 
@@ -142,8 +155,9 @@ namespace NewAppChatSS.BLL.Hubs
         /// </summary>
         public async Task ReceivingRoomInteractionCommand(string userName, string roomId, string command)
         {
-            User user = await userManager.FindByNameAsync(userName);
-            Room room = Database.Rooms.FindById(roomId);
+            var user = await userManager.FindByNameAsync(userName);
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
+
             await roomCommandHandler.SearchCommandAsync(user, room, command, Clients);
         }
 
@@ -162,8 +176,8 @@ namespace NewAppChatSS.BLL.Hubs
         /// </summary>
         public async Task ReceivingHelpCommand(string userName, string roomId, string command)
         {
-            User user = await userManager.FindByNameAsync(userName);
-            Room room = Database.Rooms.FindById(roomId);
+            var user = await userManager.FindByNameAsync(userName);
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
 
             await helpCommandHandler.SearchCommand(user, room, command, Clients);
         }

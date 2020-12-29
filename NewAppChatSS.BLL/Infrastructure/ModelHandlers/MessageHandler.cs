@@ -5,6 +5,7 @@ using NewAppChatSS.BLL.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.Common.CommonHelpers;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 {
@@ -13,12 +14,16 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
     /// </summary>
     public class MessageHandler : IMessageHandler
     {
-        public MessageHandler(IUnitOfWork uow)
-        {
-            Database = uow;
-        }
+        private readonly IRoomRepository roomRepository;
+        private readonly IMessageRepository messageRepository;
 
-        public IUnitOfWork Database { get; set; }
+        public MessageHandler(
+            IMessageRepository messageRepository,
+            IRoomRepository roomRepository)
+        {
+            this.messageRepository = messageRepository;
+            this.roomRepository = roomRepository;
+        }
 
         /// <summary>
         /// Метод сохраняет в базу данных информацию о сообщении написаным в пользователем в чат комнаты
@@ -27,7 +32,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         {
             string messageId = NewAppChatGuidHelper.GetNewGuid();
 
-            Message message = new Message
+            var message = new Message
             {
                 Id = messageId,
                 ContentMessage = textMessage,
@@ -36,7 +41,7 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
                 RoomId = room.Id
             };
 
-            await Database.Messages.AddMessage(message);
+            await messageRepository.AddAsync(message);
 
             await AddInfoAboutLastMessage(messageId, room.Id);
 
@@ -57,10 +62,10 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
         /// </summary>
         private async Task AddInfoAboutLastMessage(string messageId, string roomId)
         {
-            Room room = Database.Rooms.FindById(roomId);
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
 
             room.LastMessageId = messageId;
-            await Database.Rooms.UpdateAsync(room);
+            await roomRepository.ModifyAsync(room);
         }
     }
 }

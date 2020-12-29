@@ -4,30 +4,21 @@ using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.BLL.Infrastructure.Validators
 {
     public class RoomValidator : IRoomValidator
     {
-        public IUnitOfWork Database { get; set; }
-
         private readonly UserManager<User> userManager;
+        private readonly IRoomRepository roomRepository;
 
-        public RoomValidator(IUnitOfWork uow, UserManager<User> userManager)
+        public RoomValidator(
+            IRoomRepository roomRepository,
+            UserManager<User> userManager)
         {
+            this.roomRepository = roomRepository;
             this.userManager = userManager;
-            Database = uow;
-        }
-
-        /// <summary>
-        /// Метод проверяет есть ли в базе данных запись с таким же именем комнаты
-        /// </summary>
-        /// <returns>Возвращает True если записей нет и False если уже присутсвуют</returns>
-        public bool UniquenessCheckRoom(string roomName)
-        {
-            // TODO: Сделать проверку по кол-во, реализовать общий метод и если возвращает не 0, то вернуть true
-            var rooms = Database.Rooms.FindByName(roomName);
-            return rooms != null;
         }
 
         /// <summary>
@@ -35,7 +26,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// </summary>
         public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, string nameProcessedRoom)
         {
-            if (IsOwnerRoom(user.Id, nameProcessedRoom))
+            if (await IsOwnerRoom(user.Id, nameProcessedRoom))
             {
                 return true;
             }
@@ -54,9 +45,11 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет является ли пользователь владельцем комнаты
         /// </summary>
-        public bool IsOwnerRoom(string userId, string nameProcessedRoom)
+        public async Task<bool> IsOwnerRoom(string userId, string nameProcessedRoom)
         {
-            if (Database.Rooms.FindByName(nameProcessedRoom).OwnerId == userId)
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom });
+
+            if (room.OwnerId == userId)
             {
                 return true;
             }

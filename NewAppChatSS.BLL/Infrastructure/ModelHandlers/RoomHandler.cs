@@ -9,12 +9,16 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
 {
     public class RoomHandler : IRoomHandler
     {
-        public RoomHandler(IUnitOfWork uow)
-        {
-            Database = uow;
-        }
+        private readonly IRoomRepository roomRepository;
+        private readonly IMemberRepository memberRepository;
 
-        public IUnitOfWork Database { get; set; }
+        public RoomHandler(
+            IMemberRepository memberRepository,
+            IRoomRepository roomRepository)
+        {
+            this.memberRepository = memberRepository;
+            this.roomRepository = roomRepository;
+        }
 
         /// <summary>
         /// Метод создает новую комнату
@@ -31,8 +35,15 @@ namespace NewAppChatSS.BLL.Infrastructure.ModelHandlers
                 TypeId = typeRoomId
             };
 
-            await Database.Rooms.CreateAsync(newRoom);
-            await Database.Members.AddMemberAsync(userId, roomId);
+            await roomRepository.AddAsync(newRoom);
+
+            var member = new Member
+            {
+                UserId = userId,
+                RoomId = roomId,
+            };
+
+            await memberRepository.AddAsync(member);
 
             var roomInfo = new
             {
