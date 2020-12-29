@@ -6,18 +6,26 @@ using Microsoft.AspNetCore.Identity;
 using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.BLL.Infrastructure.Validators
 {
     public class UserValidator : IUserValidator
     {
-        public IUnitOfWork Database { get; set; }
-
+        private readonly IMemberRepository memberRepository;
+        private readonly IKickedOutRepository kickedOutRepository;
+        private readonly IMutedUserRepository mutedUserRepository;
         private readonly UserManager<User> userManager;
 
-        public UserValidator(IUnitOfWork uow, UserManager<User> userManager)
+        public UserValidator(
+            IMemberRepository memberRepository,
+            IMutedUserRepository mutedUserRepository,
+            IKickedOutRepository kickedOutRepository,
+            UserManager<User> userManager)
         {
-            Database = uow;
+            this.memberRepository = memberRepository;
+            this.mutedUserRepository = mutedUserRepository;
+            this.kickedOutRepository = kickedOutRepository;
             this.userManager = userManager;
         }
 
@@ -40,9 +48,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// </summary>
         public async Task<bool> IsUserMutedById(string userId, string roomId)
         {
-            List<MutedUser> listRoomWhereMutedUser = Database.MutedUsers.GetListMutedRoomForUser(userId).ToList();
-
-            MutedUser mutedUser = listRoomWhereMutedUser.FirstOrDefault(m => m.RoomId == roomId);
+            var mutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = userId, RoomId = roomId });
 
             if (mutedUser != null)
             {
@@ -52,7 +58,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    await Database.MutedUsers.DeleteMutedUserAsync(userId, roomId);
+                    await mutedUserRepository.DeleteAsync(mutedUser);
                     return false;
                 }
             }
@@ -66,9 +72,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         {
             string userId = (await userManager.FindByNameAsync(userName))?.Id;
 
-            List<MutedUser> listRoomWhereMutedUser = Database.MutedUsers.GetListMutedRoomForUser(userId).ToList();
-
-            MutedUser mutedUser = listRoomWhereMutedUser.FirstOrDefault(m => m.RoomId == roomId);
+            var mutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = userId, RoomId = roomId });
 
             if (mutedUser != null)
             {
@@ -78,7 +82,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    await Database.MutedUsers.DeleteMutedUserAsync(userId, roomId);
+                    await mutedUserRepository.DeleteAsync(mutedUser);
                     return false;
                 }
             }
@@ -93,9 +97,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// </summary>
         public async Task<bool> IsUserKickedById(string userId, string roomId)
         {
-            List<KickedOut> listKickedOut = Database.KickedOuts.GetListKickedRoomForUser(userId).ToList();
-
-            KickedOut kicked = listKickedOut.FirstOrDefault(k => k.RoomId == roomId);
+            var kicked = await kickedOutRepository.GetFirstOrDefaultAsync(new KickedOutModel { UserId = userId, RoomId = roomId });
 
             if (kicked != null)
             {
@@ -105,7 +107,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    await Database.KickedOuts.DeleteKickedUserAsync(userId, roomId);
+                    await kickedOutRepository.DeleteAsync(kicked);
                     return false;
                 }
             }
@@ -120,10 +122,9 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// </summary>
         public async Task<bool> IsUserKickedByNameAsync(string userName, string roomId)
         {
-            User user = await userManager.FindByNameAsync(userName);
-            List<KickedOut> listKickedOut = Database.KickedOuts.GetListKickedRoomForUser(user.Id).ToList();
+            var user = await userManager.FindByNameAsync(userName);
 
-            KickedOut kicked = listKickedOut.FirstOrDefault(k => k.RoomId == roomId);
+            var kicked = await kickedOutRepository.GetFirstOrDefaultAsync(new KickedOutModel { UserId = user.Id, RoomId = roomId });
 
             if (kicked != null)
             {
@@ -133,7 +134,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
                 }
                 else
                 {
-                    await Database.KickedOuts.DeleteKickedUserAsync(user.Id, roomId);
+                    await kickedOutRepository.DeleteAsync(kicked);
                     return false;
                 }
             }
@@ -146,9 +147,12 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет, является ли пользователь участником комнаты
         /// </summary>
-        public bool IsUserInGroupById(string userId, string roomId)
+        public async Task<bool> IsUserInGroupById(string userId, string roomId)
         {
-            return Database.Members.GetRoomsIds(userId).Contains(roomId);
+            var members = await memberRepository.GetAsync(new MemberModel { UserId = userId });
+            var memberIds = members.Select(m => m.RoomId).ToList();
+
+            return memberIds.Contains(roomId);
         }
 
         /// <summary>
@@ -157,7 +161,7 @@ namespace NewAppChatSS.BLL.Infrastructure.Validators
         public async Task<bool> IsUserInGroupByNameAsync(string userName, string roomId)
         {
             var user = await userManager.FindByNameAsync(userName);
-            var roomIds = Database.Members.GetRoomsIds(user.Id);
+            var roomIds = (await memberRepository.GetAsync(new MemberModel { UserId = user.Id })).Select(m => m.RoomId);
             return roomIds.Contains(roomId);
         }
 

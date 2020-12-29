@@ -17,16 +17,19 @@ namespace NewAppChatSS.BLL.Services
         private readonly IMapper mapper;
         private readonly SignInManager<User> signInManager;
         private readonly UserManager<User> userManager;
+        private readonly IMemberRepository memberRepository;
 
-        public UserService(IUnitOfWork uow, UserManager<User> userManager, IMapper mapper, SignInManager<User> signInManager)
+        public UserService(
+            IMemberRepository memberRepository,
+            UserManager<User> userManager,
+            IMapper mapper,
+            SignInManager<User> signInManager)
         {
-            Database = uow;
+            this.memberRepository = memberRepository;
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.mapper = mapper;
         }
-
-        private IUnitOfWork Database { get; set; }
 
         public List<UserDTO> GetUsers()
         {
@@ -76,7 +79,13 @@ namespace NewAppChatSS.BLL.Services
 
         public async Task AddingUserInMainRoom(string userId)
         {
-            await Database.Members.AddMemberAsync(userId, GlobalConstants.MainRoomId);
+            var member = new Member
+            {
+                UserId = userId,
+                RoomId = GlobalConstants.MainRoomId,
+            };
+
+            await memberRepository.AddAsync(member);
         }
 
         public async Task AuthenticateUserAsync(UserDTO userDTO)

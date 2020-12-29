@@ -16,7 +16,7 @@ namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces
 
         Task<bool> IsUserKickedByNameAsync(string userName, string roomId);
 
-        bool IsUserInGroupById(string userId, string roomId);
+        Task<bool> IsUserInGroupById(string userId, string roomId);
 
         Task<bool> IsUserInGroupByNameAsync(string userName, string roomId);
 

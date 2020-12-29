@@ -6,10 +6,14 @@ namespace NewAppChatSS.BLL.Interfaces.ValidatorInterfaces
 {
     public interface IRoomValidator
     {
-        bool UniquenessCheckRoom(string roomName);
-
+        /// <summary>
+        /// Метод проверяет доступ к командам взаимодействия с комнатой у пользователя
+        /// </summary>
         Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, string nameProcessedRoom);
 
-        bool IsOwnerRoom(string userId, string nameProcessedRoom);
+        /// <summary>
+        /// Метод проверяет является ли пользователь владельцем комнаты
+        /// </summary>
+        Task<bool> IsOwnerRoom(string userId, string nameProcessedRoom);
     }
 }

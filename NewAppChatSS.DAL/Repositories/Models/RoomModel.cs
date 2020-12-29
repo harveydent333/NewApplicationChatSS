@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using NewAppChatSS.DAL.Entities;
 
@@ -42,6 +39,11 @@ namespace NewAppChatSS.DAL.Repositories.Models
         /// </summary>
         public string LastMessageId { get; set; }
 
+        /// <summary>
+        /// Имя комнаты
+        /// </summary>
+        public string RoomName { get; set; }
+
         public override IQueryable<Room> GetQuarable(ApplicationDbContext context)
         {
             var query = base.GetQuarable(context);
@@ -59,6 +61,11 @@ namespace NewAppChatSS.DAL.Repositories.Models
             if (LastMessageId != null)
             {
                 query = query.Where(q => q.LastMessageId == LastMessageId);
+            }
+
+            if (RoomName != null)
+            {
+                query = query.Where(q => q.RoomName == RoomName);
             }
 
             query = AddOwner(query, IncludeOwner);

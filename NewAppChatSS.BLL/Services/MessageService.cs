@@ -1,26 +1,33 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
 using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Interfaces;
+using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.BLL.Services
 {
     public sealed class MessageService : IMessageService
     {
-        public IUnitOfWork Database { get; set; }
-
         private readonly IMapper mapper;
+        private readonly IMessageRepository messageRepository;
 
-        public MessageService(IUnitOfWork uow, IMapper mapper)
+        public MessageService(
+            IMessageRepository messageRepository,
+            IMapper mapper)
         {
-            Database = uow;
+            this.messageRepository = messageRepository;
             this.mapper = mapper;
         }
 
-        public List<MessageDTO> GetRoomMessages(string roomId)
+        public async Task<List<MessageDTO>> GetRoomMessages(string roomId)
         {
-            return mapper.Map<List<MessageDTO>>(Database.Messages.GetRoomMessages(roomId));
+            var roomMessages = (await messageRepository.GetAsync(new MessageModel { IncludeRoom = true, IncludeUser = true, RoomId = roomId }))
+                .OrderBy(m => m.DatePublication).ToList();
+
+            return mapper.Map<List<MessageDTO>>(roomMessages);
         }
     }
 }

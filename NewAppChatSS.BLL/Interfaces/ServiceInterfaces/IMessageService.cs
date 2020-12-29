@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using NewAppChatSS.BLL.Models;
 
 namespace NewAppChatSS.BLL.Interfaces.ServiceInterfaces
 {
     public interface IMessageService
     {
-        List<MessageDTO> GetRoomMessages(string roomId);
+        Task<List<MessageDTO>> GetRoomMessages(string roomId);
     }
 }

@@ -49,19 +49,28 @@ namespace NewApplicationChatSS
             services.AddSignalR();
             services.AddRazorPages();
 
-            services.AddTransient<IUnitOfWork, EFUnitOfWork>();
+            services.AddTransient<IRoomRepository, RoomRepository>();
+            services.AddTransient<IMutedUserRepository, MutedUserRepository>();
+            services.AddTransient<IMessageRepository, MessageRepository>();
+            services.AddTransient<IKickedOutRepository, KickedOutRepository>();
+            services.AddTransient<IMemberRepository, MemberRepository>();
+
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IRoomService, RoomService>();
             services.AddTransient<IMemberService, MemberService>();
             services.AddTransient<IMessageService, MessageService>();
+
             services.AddTransient<IUserCommandHandler, UserCommandHandlerHub>();
             services.AddTransient<IRoomCommandHandler, RoomCommandHandlerHub>();
             services.AddTransient<IHelpCommandHandlerHub, HelpCommandHandlerHub>();
             services.AddTransient<IBotCommandHandlerHub, BotCommandHandlerHub>();
+
             services.AddTransient<IUserValidator, UserValidator>();
             services.AddTransient<IRoomValidator, RoomValidator>();
+
             services.AddTransient<IMessageHandler, MessageHandler>();
             services.AddTransient<IRoomHandler, RoomHandler>();
+
             services.AddTransient(typeof(YouTubeRequest));
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
