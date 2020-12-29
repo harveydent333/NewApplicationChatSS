@@ -8,13 +8,14 @@ namespace NewAppChatSS.DAL.Initializers
     {
         public static void Seed(ModelBuilder modelBuilder, string userId)
         {
-            modelBuilder.Entity<Room>().HasData(new Room()
-            {
-                Id = GlobalConstants.MainRoomId,
-                RoomName = "MainRoom",
-                OwnerId = userId,
-                TypeId = 1,
-            });
+            modelBuilder.Entity<Room>().HasData(
+                new Room()
+                {
+                    Id = GlobalConstants.MainRoomId,
+                    RoomName = "MainRoom",
+                    OwnerId = userId,
+                    TypeId = 1,
+                });
         }
     }
 }

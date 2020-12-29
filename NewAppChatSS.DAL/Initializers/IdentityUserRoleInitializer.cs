@@ -7,11 +7,12 @@ namespace NewAppChatSS.DAL.Initializers
     {
         public static void Seed(ModelBuilder modelBuilder, string userId, string adminRoleId)
         {
-            modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>()
-            {
-                UserId = userId,
-                RoleId = adminRoleId,
-            });
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+                new IdentityUserRole<string>()
+                {
+                    UserId = userId,
+                    RoleId = adminRoleId,
+                });
         }
     }
 }

@@ -12,17 +12,17 @@ namespace NewAppChatSS.BLL.Models
         public string RoomName { get; set; }
 
         /// <summary>
-        /// ID владельца пользователя
+        /// Идентификатор владельца комнаты
         /// </summary>
         public string OwnerId { get; set; }
 
         /// <summary>
-        /// Владелец пользователя
+        /// Владелец комнаты
         /// </summary>
         public virtual User Owner { get; set; }
 
         /// <summary>
-        /// Id типа комнаты
+        /// Идентификатор типа комнаты
         /// </summary>
         public int TypeId { get; set; }
 
@@ -32,7 +32,7 @@ namespace NewAppChatSS.BLL.Models
         public virtual TypeRoom TypeRoom { get; set; }
 
         /// <summary>
-        /// Id последнего сообщения в комнате
+        /// Идентификатор последнего сообщения в комнате
         /// </summary>
         public string LastMessageId { get; set; }
 
