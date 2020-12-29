@@ -40,7 +40,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
         /// <summary>
         /// Идентификатор последнего сообщения
         /// </summary>
-        public string LastMessage { get; set; }
+        public string LastMessageId { get; set; }
 
         public override IQueryable<Room> GetQuarable(ApplicationDbContext context)
         {
@@ -51,7 +51,19 @@ namespace NewAppChatSS.DAL.Repositories.Models
                 query = query.Where(q => q.OwnerId == OwnerId);
             }
 
+            if (TypeId.HasValue)
+            {
+                query = query.Where(q => q.TypeId == TypeId.Value);
+            }
+
+            if (LastMessageId != null)
+            {
+                query = query.Where(q => q.LastMessageId == LastMessageId);
+            }
+
             query = AddOwner(query, IncludeOwner);
+            query = AddTypeRoom(query, IncludeTypeRoom);
+            query = AddLastMessage(query, IncludeLastMessage);
 
             return query;
         }
