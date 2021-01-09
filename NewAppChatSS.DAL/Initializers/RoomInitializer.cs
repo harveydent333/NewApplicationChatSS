@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NewAppChatSS.BLL.Constants;
+using NewAppChatSS.Common.Constants;
 using NewAppChatSS.DAL.Entities;
 
 namespace NewAppChatSS.DAL.Initializers

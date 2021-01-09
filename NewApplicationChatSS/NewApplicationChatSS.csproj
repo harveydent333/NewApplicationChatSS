@@ -34,6 +34,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\NewAppChatSS.BLL\NewAppChatSS.BLL.csproj" />
 		<ProjectReference Include="..\NewAppChatSS.DAL\NewAppChatSS.DAL.csproj" />
+		<ProjectReference Include="..\NewAppChatSS.Hubs\NewAppChatSS.Hubs.csproj" />
 	</ItemGroup>
 
 </Project>

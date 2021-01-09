@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
+using NewAppChatSS.BLL.Interfaces;
+using NewAppChatSS.BLL.Interfaces;
 using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Interfaces;
 using NewAppChatSS.DAL.Repositories.Models;

@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using NewAppChatSS.BLL.Constants;
 using NewAppChatSS.BLL.Infrastructure;
-using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
+using NewAppChatSS.BLL.Interfaces;
 using NewAppChatSS.BLL.Models;
 using NewAppChatSS.Common.CommonHelpers;
+using NewAppChatSS.Common.Constants;
 using NewAppChatSS.DAL.Entities;
 using NewAppChatSS.DAL.Interfaces;
 

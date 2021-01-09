@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using NewAppChatSS.BLL.Constants;
-using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
-using NewAppChatSS.BLL.Interfaces.ValidatorInterfaces;
+using NewAppChatSS.BLL.Interfaces;
 using NewAppChatSS.BLL.Models;
+using NewAppChatSS.Common.Constants;
 using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.Hubs.Interfaces.ValidatorInterfaces;
 using NewApplicationChatSS.Models;
 using NewApplicationChatSS.Models.Auth;
 

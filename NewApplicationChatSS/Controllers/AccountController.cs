@@ -3,7 +3,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NewAppChatSS.BLL.Infrastructure;
-using NewAppChatSS.BLL.Interfaces.ServiceInterfaces;
+using NewAppChatSS.BLL.Interfaces;
 using NewAppChatSS.BLL.Models;
 using NewAppChatSS.DAL.Entities;
 using NewApplicationChatSS.Models.Auth;

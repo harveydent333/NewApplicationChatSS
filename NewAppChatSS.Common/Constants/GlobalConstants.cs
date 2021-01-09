@@ -1,4 +1,4 @@
-﻿namespace NewAppChatSS.BLL.Constants
+﻿namespace NewAppChatSS.Common.Constants
 {
     public static class GlobalConstants
     {
