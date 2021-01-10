@@ -10,14 +10,16 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 {
     public sealed class BotCommandHandlerHub : IBotCommandHandlerHub
     {
-        private readonly Dictionary<Regex, Func<string, IHubCallerClients, Task>> botCommands;
+        private readonly Dictionary<Regex, Func<string, Task>> botCommands;
         private readonly YouTubeRequest youTubeRequest;
+
+        private IHubCallerClients clients;
 
         public BotCommandHandlerHub(YouTubeRequest youTubeRequest)
         {
             this.youTubeRequest = youTubeRequest;
 
-            botCommands = new Dictionary<Regex, Func<string, IHubCallerClients, Task>>
+            botCommands = new Dictionary<Regex, Func<string, Task>>
             {
                 [new Regex(@"^//find\s[\w\s]+\W{2}.+[^-v|^-l]$")] = CreateRefOnVideo,
                 [new Regex(@"^//find\s[\s\w\d]+\W{2}.+[^-l]\s-v$")] = CreateRefOnVideoAndGetCountViews,
@@ -32,23 +34,26 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// Метод проверяет какое регулярное выражение соответствует полученной команде
         /// по результатам перенаправляет на нужный метод обработки команды
         /// </summary>
-        public Task SearchCommand(string command, IHubCallerClients calledClients)
+        public Task SearchCommand(string command, IHubCallerClients clients)
         {
+            this.clients = clients;
+
             foreach (Regex keyCommand in botCommands.Keys)
             {
                 if (keyCommand.IsMatch(command))
                 {
-                    return botCommands[keyCommand](command, calledClients);
+                    return botCommands[keyCommand](command);
                 }
             }
 
-            return calledClients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Неверная команда"));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.IncorrectCommand));
         }
 
         /// <summary>
         /// Метод возвращает ссылку на искомое видео
         /// </summary>
-        private async Task<Task> CreateRefOnVideo(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideo(string command)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             string nameVideo = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
@@ -63,7 +68,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео и информацию о количестве просмотров под искомым видео
         /// </summary>
-        private async Task<Task> CreateRefOnVideoAndGetCountViews(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideoAndGetCountViews(string command)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             command = Regex.Replace(command, @"\s-v", "");
@@ -79,7 +84,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео и информацию о количестве лайков под искомым видео
         /// </summary>
-        private async Task<Task> CreateRefOnVideoAndGetCountLikes(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideoAndGetCountLikes(string command)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w])+$").Groups[1].Value;
             command = Regex.Replace(command, @"\s-l", "");
@@ -95,7 +100,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылку на искомое видео и информацию о количестве просмотров и лайков под искомым видео
         /// </summary>
-        private async Task<Task> CreateRefOnVideoAndGetCountViewsAndLikes(string command, IHubCallerClients clients)
+        private async Task<Task> CreateRefOnVideoAndGetCountViewsAndLikes(string command)
         {
             string nameChannel = Regex.Match(command, @"//find\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             command = Regex.Replace(command, @"\s-l", "");
@@ -112,7 +117,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает ссылки к 5 видео, имеющиеся на канале
         /// </summary>
-        private async Task<Task> GetInfoAboutChannel(string command, IHubCallerClients clients)
+        private async Task<Task> GetInfoAboutChannel(string command)
         {
             string nameChannel = Regex.Match(command, @"//info\s([\s\W\w]+)$").Groups[1].Value;
 
@@ -124,14 +129,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод возвращает информацию о комментарии к видео, принимая название канала и видео
         /// </summary>
-        private Task GetRandomComments(string command, IHubCallerClients clients)
+        private Task GetRandomComments(string command)
         {
             string nameChannel = Regex.Match(command, @"//videoCommentRandom\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[1].Value;
             string nameVideo = Regex.Match(command, @"//videoCommentRandom\s([\s\w]+)\W{2}([\s\W\w]+)$").Groups[2].Value;
 
             return clients.Caller.SendAsync(
-                "PrintCommentInfo",
-                YouTubeRequest.GetCommentVideo(nameChannel, nameVideo));
+                "PrintCommentInfo", YouTubeRequest.GetCommentVideo(nameChannel, nameVideo));
         }
     }
 }

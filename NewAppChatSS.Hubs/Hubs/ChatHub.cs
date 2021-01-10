@@ -10,7 +10,6 @@ using NewAppChatSS.Hubs.Interfaces.HubInterfaces;
 using NewAppChatSS.Hubs.Interfaces.ModelHandlerInterfaces;
 using NewAppChatSS.Hubs.Interfaces.ValidatorInterfaces;
 
-//TODO: Убрать передачу перменной Client
 namespace NewAppChatSS.Hubs.Hubs
 {
     public class ChatHub : Hub
@@ -146,7 +145,7 @@ namespace NewAppChatSS.Hubs.Hubs
         public async Task ReceivingUserInteractionCommand(string userName, string comamand)
         {
             var user = await userManager.FindByNameAsync(userName);
-            await userCommandHandler.SearchCommandAsync(user, comamand);
+            await userCommandHandler.SearchCommandAsync(user, comamand, Clients);
         }
 
         /// <summary>
@@ -159,7 +158,7 @@ namespace NewAppChatSS.Hubs.Hubs
             var user = await userManager.FindByNameAsync(userName);
             var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
 
-            await roomCommandHandler.SearchCommandAsync(user, room, command);
+            await roomCommandHandler.SearchCommandAsync(user, room, command, Clients);
         }
 
         /// <summary>

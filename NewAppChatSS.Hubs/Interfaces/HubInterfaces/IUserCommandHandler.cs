@@ -7,6 +7,6 @@ namespace NewAppChatSS.Hubs.Interfaces.HubInterfaces
     public interface IUserCommandHandler
     {
         // TODO: переписать на все public методы и добавить сюда
-        Task SearchCommandAsync(User user, string command);
+        Task SearchCommandAsync(User user, string command, IHubCallerClients clients);
     }
 }

@@ -7,6 +7,6 @@ namespace NewAppChatSS.Hubs.Interfaces.HubInterfaces
     public interface IHelpCommandHandlerHub
     {
         // TODO: переписать на все public методы и добавить сюда
-        Task SearchCommand(User currentUser, Room currentRoom, string command, IHubCallerClients calledClients);
+        Task SearchCommand(User currentUser, Room currentRoom, string command, IHubCallerClients clients);
     }
 }

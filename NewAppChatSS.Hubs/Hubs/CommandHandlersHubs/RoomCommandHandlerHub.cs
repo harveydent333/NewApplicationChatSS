@@ -21,7 +21,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
     /// <summary>
     /// Обработчик команд взаимодействия с комнатой
     /// </summary>
-    public class RoomCommandHandlerHub : Hub, IRoomCommandHandler
+    public class RoomCommandHandlerHub : IRoomCommandHandler
     {
         private readonly Dictionary<Regex, Func<User, Room, string, Task>> roomCommands;
 
@@ -34,6 +34,8 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         private readonly IKickedOutRepository kickedOutRepository;
         private readonly IRoomRepository roomRepository;
         private readonly IMemberRepository memberRepository;
+
+        private IHubCallerClients clients;
 
         public RoomCommandHandlerHub(
             IMemberRepository memberRepository,
@@ -77,8 +79,10 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// Метод проверяет какое регулярное выражение соответствует полученной команде
         /// по результатам перенаправляет на нужный метод обработки команды
         /// </summary>
-        public Task SearchCommandAsync(User currentUser, Room currentRoom, string command)
+        public Task SearchCommandAsync(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
+            this.clients = clients;
+
             foreach (Regex keyCommand in roomCommands.Keys)
             {
                 if (keyCommand.IsMatch(command))
@@ -87,7 +91,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                 }
             }
 
-            return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Неверная команда"));
+            return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.IncorrectCommand));
         }
 
         /// <summary>
@@ -100,16 +104,16 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
 
             string roomInfo = await roomHandler.CreateRoom(nameProcessedRoom, GlobalConstants.RegularRoomType, currentUser.Id);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "CreateRoom",
-                CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} успешно создана."),
+                CommandHandler.CreateCommandInfo(InformationMessages.RoomHasBeenCreated),
                 roomInfo);
         }
 
@@ -123,16 +127,16 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
 
             string roomInfo = await roomHandler.CreateRoom(nameProcessedRoom, GlobalConstants.PrivateRoomType, currentUser.Id);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "CreateRoom",
-                CommandHandler.CreateCommandInfo($"Приватная комната {nameProcessedRoom} успешно создана."),
+                CommandHandler.CreateCommandInfo(InformationMessages.RoomHasBeenCreated),
                 roomInfo);
         }
 
@@ -146,16 +150,16 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo($"Комната с именем {nameProcessedRoom} уже занята"));
             }
 
             string roomInfo = await roomHandler.CreateRoom(nameProcessedRoom, GlobalConstants.BotRoomType, currentUser.Id);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "CreateRoom",
-                CommandHandler.CreateCommandInfo($"Чат-бот комната {nameProcessedRoom} успешно создана."),
+                CommandHandler.CreateCommandInfo(InformationMessages.RoomHasBeenCreated),
                 roomInfo);
         }
 
@@ -171,37 +175,35 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync(
-                    "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
 
             if (!await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                return Clients.Caller.SendAsync(
-                    "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo($"Комнаты с именем {nameProcessedRoom} не существует"));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.RoomNotFound));
             }
 
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator" }, nameProcessedRoom))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             var members = await memberRepository.GetAsync(new MemberModel { RoomId = processedRoom.Id });
             var memberIds = members.Select(m => m.UserId).ToList();
 
-            await Clients.Users(memberIds).SendAsync(
+            await clients.Users(memberIds).SendAsync(
                 "RemoveRoomUsers",
-                CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} была удалена."),
+                CommandHandler.CreateCommandInfo(InformationMessages.RoomHasBeenRemoved),
                 processedRoom.Id);
 
             var deleteRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { processedRoom.Id } });
             await roomRepository.DeleteAsync(deleteRoom);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "RemoveRoomCaller",
-                CommandHandler.CreateCommandInfo($"Комната {nameProcessedRoom} успешно удалена."),
+                CommandHandler.CreateCommandInfo(InformationMessages.RoomHasBeenRemoved),
                 processedRoom.Id);
         }
 
@@ -213,19 +215,19 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         {
             if (currentRoom.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
 
             string nameProcessedRoom = Regex.Match(command, @"//room\srename\s(\w+)$").Groups[1].Value;
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator" }, currentRoom.RoomName))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.RoomNameAlreadyTaken));
             }
 
@@ -236,9 +238,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             var members = await memberRepository.GetAsync(new MemberModel { RoomId = currentRoom.Id });
             var memberIds = members.Select(m => m.UserId).ToList();
 
-            await Clients.Users(memberIds).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
+            await clients.Users(memberIds).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "RenameRoom",
                 CommandHandler.CreateCommandInfo(InformationMessages.RoomNameHasBeenChanged),
                 currentRoom.Id,
@@ -257,7 +259,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
 
@@ -267,30 +269,30 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (processedRoom == null)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.RoomNotFound));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.RoomNotFound));
             }
 
             if (idProcessedUser == null)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
             }
 
             if (processedRoom.TypeRoom.Id == GlobalConstants.BotRoomType)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
             else if (processedRoom.TypeRoom.Id == GlobalConstants.PrivateRoomType)
             {
                 if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { }, nameProcessedRoom))
                 {
-                    return Clients.Caller.SendAsync(
+                    return clients.Caller.SendAsync(
                         "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
                 }
             }
 
             if (await userValidator.IsUserInGroupById(idProcessedUser, processedRoom.Id))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserIsAlreadyMemberOfRoom));
             }
 
@@ -302,11 +304,11 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await memberRepository.AddAsync(member);
 
-            await Clients.User(idProcessedUser.ToString()).SendAsync(
+            await clients.User(idProcessedUser.ToString()).SendAsync(
                 "ConnectRoom",
                 JsonSerializer.Serialize<object>(new { roomId = processedRoom.Id, roomName = nameProcessedRoom }));
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenAdded));
         }
 
@@ -318,7 +320,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         {
             if (currentRoom.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
 
@@ -326,7 +328,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await memberRepository.DeleteAsync(deleteMember);
 
-            return Clients.Caller.SendAsync("DisconnectFromCurrentRoom");
+            return clients.Caller.SendAsync("DisconnectFromCurrentRoom");
         }
 
         /// <summary>
@@ -341,20 +343,20 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
 
             if (processedRoom == null)
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo(InformationMessages.RoomNotFound));
             }
 
             if (await userValidator.IsUserInGroupById(currentUser.Id, processedRoom.Id))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.YouIsNotMemberRoom));
             }
 
@@ -362,7 +364,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             // TODO: проверка deleteMember
             await memberRepository.DeleteAsync(deleteMember);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "DisconnectFromRoom",
                 CommandHandler.CreateCommandInfo(InformationMessages.YouLeaveRoom),
                 processedRoom.Id);
@@ -380,7 +382,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand",
                     CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
@@ -393,19 +395,19 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (resultChecking != string.Empty)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(resultChecking));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(resultChecking));
             }
 
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, nameProcessedRoom))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             var kickedIdRooms = (await kickedOutRepository.GetAsync(new KickedOutModel { UserId = idProcessedUser })).Select(k => k.RoomId);
 
             if (kickedIdRooms.Contains(processedRoom.Id))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillKicked));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillKicked));
             }
 
             DateTime dateUnkick = TimeComputer.CalculateUnlockDate(command + " -m 60", @"//room\sdisconnect\s\w+\s-l\s\w+\s-m\s(60)$");
@@ -419,12 +421,10 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await kickedOutRepository.AddAsync(kikedOut);
 
-            await Clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
+            await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
 
-            return Clients.Caller.SendAsync(
-                "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был исключен из комнаты {nameProcessedRoom} на " +
-                    $"{Math.Round((dateUnkick - DateTime.Now).TotalMinutes)} минут."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenKicked));
         }
 
         /// <summary>
@@ -439,7 +439,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (processedRoom?.Id == GlobalConstants.MainRoomId)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.CannotBeAppliedToMainRoom));
             }
 
             string userNameProcessedUser = Regex.Match(command, @"//room\sdisconnect\s(\w+)\s-l\s(\w+)\s-m\s(\d*)$").Groups[2].Value;
@@ -450,19 +450,19 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (resultChecking != string.Empty)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", resultChecking);
+                return clients.Caller.SendAsync("ReceiveCommand", resultChecking);
             }
 
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, nameProcessedRoom))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             var kickedIdRooms = (await kickedOutRepository.GetAsync(new KickedOutModel { UserId = idProcessedUser })).Select(k => k.RoomId);
 
             if (kickedIdRooms.Contains(processedRoom.Id))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillKicked));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillKicked));
             }
 
             DateTime dateUnkick = TimeComputer.CalculateUnlockDate(command, @"//room\sdisconnect\s\w+\s-l\s\w+\s-m\s(\d*)$");
@@ -476,12 +476,10 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await kickedOutRepository.AddAsync(kikedOut);
 
-            await Clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
+            await clients.User(idProcessedUser.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
 
-            return Clients.Caller.SendAsync(
-                "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был исключен из комнаты {nameProcessedRoom} на " +
-                    $"{Math.Round((dateUnkick - DateTime.Now).TotalMinutes)} минут."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenKicked));
         }
 
         /// <summary>
@@ -495,17 +493,17 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (idProcessedUser == null)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
             }
 
             if (await userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserIsNotMemberRoom));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserIsNotMemberRoom));
             }
 
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             var mutedUsers = await mutedUserRepository.GetAsync(new MutedUserModel { UserId = idProcessedUser });
@@ -513,7 +511,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (idMutedRooms.Contains(currentRoom.Id))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillMuted));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillMuted));
             }
 
             DateTime dateUnmute = TimeComputer.CalculateUnlockDate(command + " -m 10", @"//room\smute\s-l\s\w+\s-m\s(10)$");
@@ -527,12 +525,10 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await mutedUserRepository.AddAsync(mutedUser);
 
-            await Clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
+            await clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
-            return Clients.Caller.SendAsync(
-                "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был приглушен на " +
-                    $"{Math.Round((dateUnmute - DateTime.Now).TotalMinutes)} минут."));
+            return clients.Caller.SendAsync(
+                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenMuted));
         }
 
         /// <summary>
@@ -546,17 +542,17 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (idProcessedUser == null)
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
             }
 
             if (await userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserIsNotMemberRoom));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserIsNotMemberRoom));
             }
 
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             var mutedUsers = await mutedUserRepository.GetAsync(new MutedUserModel { UserId = idProcessedUser });
@@ -564,7 +560,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (idMutedRooms.Contains(currentRoom.Id))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillMuted));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserStillMuted));
             }
 
             DateTime dateUnmute = TimeComputer.CalculateUnlockDate(command, @"//room\smute\s-l\s\w+\s-m\s(\d*)$");
@@ -578,12 +574,11 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await mutedUserRepository.AddAsync(mutedUser);
 
-            await Clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
+            await clients.User(idProcessedUser.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "ReceiveCommand",
-                CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} был приглушен на " +
-                    $"{Math.Round((dateUnmute - DateTime.Now).TotalMinutes)} минут."));
+                CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenMuted));
         }
 
         /// <summary>
@@ -596,18 +591,18 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (idProcessedUser == null)
             {
-                return Clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo($"Пользователь {userNameProcessedUser} не найден."));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
             }
 
             if (!await roomValidator.CommandAccessCheckAsync(currentUser, new List<string> { "Administrator", "Moderator" }, currentRoom.RoomName))
             {
-                return Clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                return clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
             }
 
             if (await userValidator.IsUserInGroupById(idProcessedUser, currentRoom.Id))
             {
-                return Clients.Caller.SendAsync(
+                return clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserIsNotMemberRoom));
             }
 
@@ -615,12 +610,12 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             // TODO: if deleteMutedUser == null
             await mutedUserRepository.DeleteAsync(deleteMutedUser);
 
-            await Clients.User(idProcessedUser.ToString()).SendAsync(
+            await clients.User(idProcessedUser.ToString()).SendAsync(
                 "UnmutedUser",
                 CommandHandler.CreateCommandInfo($"У вас снова есть возможность писать сообщения."),
                 currentRoom.Id);
 
-            return Clients.Caller.SendAsync(
+            return clients.Caller.SendAsync(
                 "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserUnmuted));
         }
 
