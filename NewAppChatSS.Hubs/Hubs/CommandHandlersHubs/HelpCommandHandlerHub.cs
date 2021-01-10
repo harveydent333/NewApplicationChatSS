@@ -16,6 +16,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
     public sealed class HelpCommandHandlerHub : IHelpCommandHandlerHub
     {
         private readonly UserManager<User> userManager;
+        private IHubCallerClients clients;
 
         private List<string> allowedCommands = new List<string>();
 
@@ -27,22 +28,25 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод проверяет корректность команды и перенаправляет на метод сбора доступных команд
         /// </summary>
-        public Task SearchCommand(User currentUser, Room currentRoom, string command, IHubCallerClients calledClients)
+        public Task SearchCommand(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
+            this.clients = clients;
+
             if (new Regex(@"^//help$").IsMatch(command))
             {
-                return GetAllowedCommands(currentUser, currentRoom, calledClients);
+                return GetAllowedCommands(currentUser, currentRoom);
             }
             else
             {
-                return calledClients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo("Неверная команда"));
+                return clients.Caller.SendAsync(
+                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.IncorrectCommand));
             }
         }
 
         /// <summary>
         /// Метод собирает список доступных команд пользователю
         /// </summary>
-        private async Task<Task> GetAllowedCommands(User currentUser, Room currentRoom, IHubCallerClients clients)
+        private async Task<Task> GetAllowedCommands(User currentUser, Room currentRoom)
         {
             allowedCommands.Clear();
 
@@ -79,13 +83,12 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetCommonCommands(ref List<string> allowedCommands)
         {
-            allowedCommands.Add("//user rename {login пользователя}||{Новый login пользователя}");
-            allowedCommands.Add("//user rename {login пользователя}||{Новый login пользователя}");
-            allowedCommands.Add("//room create {Название комнаты} [-c] or [-b]");
-            allowedCommands.Add("//room remove {Название комнаты}");
-            allowedCommands.Add("//room disconnect");
-            allowedCommands.Add("//room disconnect {Название комнаты}");
-            allowedCommands.Add("//room connect {Название комнаты} -l {login пользователя}");
+            allowedCommands.Add(ChatCommands.RoomCreate);
+            allowedCommands.Add(ChatCommands.RoomRename);
+            allowedCommands.Add(ChatCommands.RoomRemove);
+            allowedCommands.Add(ChatCommands.DisconnectFromCurrentRoom);
+            allowedCommands.Add(ChatCommands.DisconeectFromRoom);
+            allowedCommands.Add(ChatCommands.ConnectToRoom);
         }
 
         /// <summary>
@@ -94,11 +97,11 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetModerCommands(ref List<string> allowedCommands)
         {
-            allowedCommands.Add("//user ban {login пользователя} [-m {Количество минут}]");
-            allowedCommands.Add("//user pardon {login пользователя}");
-            allowedCommands.Add("//room mute -l {login пользователя} [-m {Количество минут}]");
-            allowedCommands.Add("//room speak -l {login пользователя}");
-            allowedCommands.Add("//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]");
+            allowedCommands.Add(ChatCommands.UserBan);
+            allowedCommands.Add(ChatCommands.UserUnban);
+            allowedCommands.Add(ChatCommands.UserMute);
+            allowedCommands.Add(ChatCommands.UserUnmute);
+            allowedCommands.Add(ChatCommands.UserKick);
         }
 
         /// <summary>
@@ -107,9 +110,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetAdminCommands(ref List<string> allowedCommands)
         {
-            allowedCommands.Add("//user moderator {login пользователя} [-n] or [-d]");
-            allowedCommands.Add("//room remove {Название комнаты}");
-            allowedCommands.Add("//room rename {Название комнаты}");
+            allowedCommands.Add(ChatCommands.ChangeModeratorRole);
+            allowedCommands.Add(ChatCommands.RoomRemove);
+            allowedCommands.Add(ChatCommands.RoomRename);
         }
 
         /// <summary>
@@ -118,9 +121,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetCommandsForBotRoom(ref List<string> allowedCommands)
         {
-            allowedCommands.Add("//find {название канала}||{название видео} [-v] [-l]");
-            allowedCommands.Add("//info {название канала}");
-            allowedCommands.Add("//videoCommentRandom {название канала}||{Название ролика}");
+            allowedCommands.Add(ChatCommands.FindVideoOnYouTubeChannel);
+            allowedCommands.Add(ChatCommands.GetInfoAboutYouTubeChannel);
+            allowedCommands.Add(ChatCommands.GetVideoComments);
         }
 
         /// <summary>
@@ -129,11 +132,11 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private void GetCommandsForOwnerRoom(ref List<string> allowedCommands)
         {
-            allowedCommands.Add("//room disconnect {Название комнаты} [-l {login пользователя}] [-m {Количество минут}]");
-            allowedCommands.Add("//room speak -l {login пользователя}");
-            allowedCommands.Add("//room mute -l {login пользователя} [-m {Количество минут}]");
-            allowedCommands.Add("//room remove {Название комнаты}");
-            allowedCommands.Add("//room rename {Название комнаты}");
+            allowedCommands.Add(ChatCommands.UserKick);
+            allowedCommands.Add(ChatCommands.UserUnmute);
+            allowedCommands.Add(ChatCommands.UserMute);
+            allowedCommands.Add(ChatCommands.RoomRemove);
+            allowedCommands.Add(ChatCommands.RoomRename);
         }
     }
 }
