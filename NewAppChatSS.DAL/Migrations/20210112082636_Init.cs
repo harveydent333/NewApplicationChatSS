@@ -49,28 +49,16 @@ namespace NewAppChatSS.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DicrtionaryBadWords",
+                name: "type_rooms",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Word = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DicrtionaryBadWords", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TypesRooms",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false),
                     TypeName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TypesRooms", x => x.Id);
+                    table.PrimaryKey("PK_type_rooms", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,7 +144,7 @@ namespace NewAppChatSS.DAL.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -180,7 +168,7 @@ namespace NewAppChatSS.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SwearingUsers",
+                name: "swaring_users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -190,17 +178,16 @@ namespace NewAppChatSS.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SwearingUsers", x => x.Id);
+                    table.PrimaryKey("PK_swaring_users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SwearingUsers_AspNetUsers_UserId",
+                        name: "FK_swaring_users_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "KickedOuts",
+                name: "kicked_outs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -211,17 +198,16 @@ namespace NewAppChatSS.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_KickedOuts", x => x.Id);
+                    table.PrimaryKey("PK_kicked_outs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_KickedOuts_AspNetUsers_UserId",
+                        name: "FK_kicked_outs_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Members",
+                name: "members",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -231,71 +217,74 @@ namespace NewAppChatSS.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Members", x => x.Id);
+                    table.PrimaryKey("PK_members", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Members_AspNetUsers_UserId",
+                        name: "FK_members_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Messages",
+                name: "messages",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ContentMessage = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DatePublication = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DatePublication = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
+                    table.PrimaryKey("PK_messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_UserId",
+                        name: "FK_messages_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Rooms",
+                name: "rooms",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     RoomName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TypeId = table.Column<int>(type: "int", nullable: false),
-                    LastMessageId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    LastMessageId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    TypeRoomId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Rooms", x => x.Id);
+                    table.PrimaryKey("PK_rooms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Rooms_AspNetUsers_OwnerId",
+                        name: "FK_rooms_AspNetUsers_OwnerId",
                         column: x => x.OwnerId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Rooms_Messages_LastMessageId",
+                        name: "FK_rooms_messages_LastMessageId",
                         column: x => x.LastMessageId,
-                        principalTable: "Messages",
+                        principalTable: "messages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Rooms_TypesRooms_TypeId",
+                        name: "FK_rooms_type_rooms_TypeId",
                         column: x => x.TypeId,
-                        principalTable: "TypesRooms",
+                        principalTable: "type_rooms",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_rooms_type_rooms_TypeRoomId",
+                        column: x => x.TypeRoomId,
+                        principalTable: "type_rooms",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "MutedUsers",
+                name: "muted_users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -306,19 +295,17 @@ namespace NewAppChatSS.DAL.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MutedUsers", x => x.Id);
+                    table.PrimaryKey("PK_muted_users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MutedUsers_AspNetUsers_UserId",
+                        name: "FK_muted_users_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_MutedUsers_Rooms_RoomId",
+                        name: "FK_muted_users_rooms_RoomId",
                         column: x => x.RoomId,
-                        principalTable: "Rooms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        principalTable: "rooms",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -326,18 +313,18 @@ namespace NewAppChatSS.DAL.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0e47f739963a4ff19dc44e6da2bdd19f", "58b46a8b-f923-48df-bbd2-ae752ceea327", "RegularUser", "REGULARUSER" },
-                    { "5456461b1c694ffba161cc83ad7042ae", "683023fe-4cb7-4d82-9e82-adbe9def1222", "Administrator", "ADMINISTRATOR" },
-                    { "9aee0c5298b74c3f909a44848db366f5", "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8", "Moderator", "MODERATOR" }
+                    { "1f92521ac2bb428f8f2e25e0077bb009", "58b46a8b-f923-48df-bbd2-ae752ceea327", "RegularUser", "REGULARUSER" },
+                    { "e5a71aa07e324b2b8839f102a604d4a4", "683023fe-4cb7-4d82-9e82-adbe9def1222", "Administrator", "ADMINISTRATOR" },
+                    { "e46d038d06424d9a97f69534fc454764", "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8", "Moderator", "MODERATOR" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "DateUnblock", "Email", "EmailConfirmed", "IsLocked", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "b80d934c40cd440291e0108ca0d4ade2", 0, "af10709c-ab87-4c8a-badc-2d1e0421adfa", null, "admin@gmail.com", false, false, true, null, "ADMIN@GMAIL.COM", "ADMIN", "AQAAAAEAACcQAAAAEPp5IfNNpKxmZneDEq+E9JlFLrCvuZVewUvPr/gyAhxLdouVInuOzQUdc8fPbhJvlg==", null, false, "", false, "admin" });
+                values: new object[] { "9ed66f6c76e94ca29d477fa1ccf702dc", 0, "af10709c-ab87-4c8a-badc-2d1e0421adfa", null, "admin@gmail.com", false, false, true, null, "ADMIN@GMAIL.COM", "ADMIN", "AQAAAAEAACcQAAAAEPp5IfNNpKxmZneDEq+E9JlFLrCvuZVewUvPr/gyAhxLdouVInuOzQUdc8fPbhJvlg==", null, false, "", false, "admin" });
 
             migrationBuilder.InsertData(
-                table: "TypesRooms",
+                table: "type_rooms",
                 columns: new[] { "Id", "TypeName" },
                 values: new object[,]
                 {
@@ -349,17 +336,17 @@ namespace NewAppChatSS.DAL.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetUserRoles",
                 columns: new[] { "RoleId", "UserId" },
-                values: new object[] { "5456461b1c694ffba161cc83ad7042ae", "b80d934c40cd440291e0108ca0d4ade2" });
+                values: new object[] { "e5a71aa07e324b2b8839f102a604d4a4", "9ed66f6c76e94ca29d477fa1ccf702dc" });
 
             migrationBuilder.InsertData(
-                table: "Rooms",
-                columns: new[] { "Id", "LastMessageId", "OwnerId", "RoomName", "TypeId" },
-                values: new object[] { "1", null, "b80d934c40cd440291e0108ca0d4ade2", "MainRoom", 1 });
+                table: "rooms",
+                columns: new[] { "Id", "LastMessageId", "OwnerId", "RoomName", "TypeId", "TypeRoomId" },
+                values: new object[] { "1", null, "9ed66f6c76e94ca29d477fa1ccf702dc", "MainRoom", 1, null });
 
             migrationBuilder.InsertData(
-                table: "Members",
+                table: "members",
                 columns: new[] { "Id", "RoomId", "UserId" },
-                values: new object[] { 1, "1", "b80d934c40cd440291e0108ca0d4ade2" });
+                values: new object[] { 1, "1", "9ed66f6c76e94ca29d477fa1ccf702dc" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -401,103 +388,105 @@ namespace NewAppChatSS.DAL.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_KickedOuts_RoomId",
-                table: "KickedOuts",
+                name: "IX_kicked_outs_RoomId",
+                table: "kicked_outs",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_KickedOuts_UserId",
-                table: "KickedOuts",
+                name: "IX_kicked_outs_UserId",
+                table: "kicked_outs",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_RoomId",
-                table: "Members",
+                name: "IX_members_RoomId",
+                table: "members",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Members_UserId",
-                table: "Members",
+                name: "IX_members_UserId",
+                table: "members",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_RoomId",
-                table: "Messages",
+                name: "IX_messages_RoomId",
+                table: "messages",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_UserId",
-                table: "Messages",
+                name: "IX_messages_UserId",
+                table: "messages",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MutedUsers_RoomId",
-                table: "MutedUsers",
+                name: "IX_muted_users_RoomId",
+                table: "muted_users",
                 column: "RoomId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MutedUsers_UserId",
-                table: "MutedUsers",
+                name: "IX_muted_users_UserId",
+                table: "muted_users",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_LastMessageId",
-                table: "Rooms",
+                name: "IX_rooms_LastMessageId",
+                table: "rooms",
                 column: "LastMessageId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_OwnerId",
-                table: "Rooms",
+                name: "IX_rooms_OwnerId",
+                table: "rooms",
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Rooms_TypeId",
-                table: "Rooms",
+                name: "IX_rooms_TypeId",
+                table: "rooms",
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SwearingUsers_UserId",
-                table: "SwearingUsers",
+                name: "IX_rooms_TypeRoomId",
+                table: "rooms",
+                column: "TypeRoomId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_swaring_users_UserId",
+                table: "swaring_users",
                 column: "UserId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_KickedOuts_Rooms_RoomId",
-                table: "KickedOuts",
+                name: "FK_kicked_outs_rooms_RoomId",
+                table: "kicked_outs",
                 column: "RoomId",
-                principalTable: "Rooms",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalTable: "rooms",
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Members_Rooms_RoomId",
-                table: "Members",
+                name: "FK_members_rooms_RoomId",
+                table: "members",
                 column: "RoomId",
-                principalTable: "Rooms",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalTable: "rooms",
+                principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Messages_Rooms_RoomId",
-                table: "Messages",
+                name: "FK_messages_rooms_RoomId",
+                table: "messages",
                 column: "RoomId",
-                principalTable: "Rooms",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalTable: "rooms",
+                principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Messages_AspNetUsers_UserId",
-                table: "Messages");
+                name: "FK_messages_AspNetUsers_UserId",
+                table: "messages");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Rooms_AspNetUsers_OwnerId",
-                table: "Rooms");
+                name: "FK_rooms_AspNetUsers_OwnerId",
+                table: "rooms");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Messages_Rooms_RoomId",
-                table: "Messages");
+                name: "FK_messages_rooms_RoomId",
+                table: "messages");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -515,19 +504,16 @@ namespace NewAppChatSS.DAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "DicrtionaryBadWords");
+                name: "kicked_outs");
 
             migrationBuilder.DropTable(
-                name: "KickedOuts");
+                name: "members");
 
             migrationBuilder.DropTable(
-                name: "Members");
+                name: "muted_users");
 
             migrationBuilder.DropTable(
-                name: "MutedUsers");
-
-            migrationBuilder.DropTable(
-                name: "SwearingUsers");
+                name: "swaring_users");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -536,13 +522,13 @@ namespace NewAppChatSS.DAL.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Rooms");
+                name: "rooms");
 
             migrationBuilder.DropTable(
-                name: "Messages");
+                name: "messages");
 
             migrationBuilder.DropTable(
-                name: "TypesRooms");
+                name: "type_rooms");
         }
     }
 }

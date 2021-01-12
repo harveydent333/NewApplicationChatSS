@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
+namespace NewAppChatSS.Common.Constants
 {
-    // TODO: Вынести в отдельную папку
     public class InformationMessages
     {
         public const string AccessIsDenied = "Отказано в доступе";

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewAppChatSS.DAL;
 
 namespace NewAppChatSS.DAL.Migrations
 {
     [DbContext(typeof(NewAppChatSSContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210112082636_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,21 +50,21 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0e47f739963a4ff19dc44e6da2bdd19f",
+                            Id = "1f92521ac2bb428f8f2e25e0077bb009",
                             ConcurrencyStamp = "58b46a8b-f923-48df-bbd2-ae752ceea327",
                             Name = "RegularUser",
                             NormalizedName = "REGULARUSER"
                         },
                         new
                         {
-                            Id = "5456461b1c694ffba161cc83ad7042ae",
+                            Id = "e5a71aa07e324b2b8839f102a604d4a4",
                             ConcurrencyStamp = "683023fe-4cb7-4d82-9e82-adbe9def1222",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "9aee0c5298b74c3f909a44848db366f5",
+                            Id = "e46d038d06424d9a97f69534fc454764",
                             ConcurrencyStamp = "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8",
                             Name = "Moderator",
                             NormalizedName = "MODERATOR"
@@ -156,8 +158,8 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "b80d934c40cd440291e0108ca0d4ade2",
-                            RoleId = "5456461b1c694ffba161cc83ad7042ae"
+                            UserId = "9ed66f6c76e94ca29d477fa1ccf702dc",
+                            RoleId = "e5a71aa07e324b2b8839f102a604d4a4"
                         });
                 });
 
@@ -178,21 +180,6 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
-                });
-
-            modelBuilder.Entity("NewAppChatSS.DAL.Entities.DictionaryBadWords", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Word")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DicrtionaryBadWords");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.KickedOut", b =>
@@ -219,7 +206,7 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("KickedOuts");
+                    b.ToTable("kicked_outs");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.Member", b =>
@@ -243,14 +230,14 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Members");
+                    b.ToTable("members");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             RoomId = "1",
-                            UserId = "b80d934c40cd440291e0108ca0d4ade2"
+                            UserId = "9ed66f6c76e94ca29d477fa1ccf702dc"
                         });
                 });
 
@@ -280,7 +267,7 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("messages");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.MutedUser", b =>
@@ -307,7 +294,7 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("MutedUsers");
+                    b.ToTable("muted_users");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.Room", b =>
@@ -329,6 +316,9 @@ namespace NewAppChatSS.DAL.Migrations
                     b.Property<int>("TypeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TypeRoomId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LastMessageId");
@@ -337,13 +327,15 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Rooms");
+                    b.HasIndex("TypeRoomId");
+
+                    b.ToTable("rooms");
 
                     b.HasData(
                         new
                         {
                             Id = "1",
-                            OwnerId = "b80d934c40cd440291e0108ca0d4ade2",
+                            OwnerId = "9ed66f6c76e94ca29d477fa1ccf702dc",
                             RoomName = "MainRoom",
                             TypeId = 1
                         });
@@ -367,13 +359,15 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SwearingUsers");
+                    b.ToTable("swaring_users");
                 });
 
             modelBuilder.Entity("NewAppChatSS.DAL.Entities.TypeRoom", b =>
                 {
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
 
                     b.Property<string>("TypeName")
                         .IsRequired()
@@ -381,7 +375,7 @@ namespace NewAppChatSS.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TypesRooms");
+                    b.ToTable("type_rooms");
 
                     b.HasData(
                         new
@@ -474,7 +468,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b80d934c40cd440291e0108ca0d4ade2",
+                            Id = "9ed66f6c76e94ca29d477fa1ccf702dc",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "af10709c-ab87-4c8a-badc-2d1e0421adfa",
                             Email = "admin@gmail.com",
@@ -547,13 +541,13 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasOne("NewAppChatSS.DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("NewAppChatSS.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Room");
@@ -566,13 +560,13 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasOne("NewAppChatSS.DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("NewAppChatSS.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Room");
@@ -585,13 +579,13 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasOne("NewAppChatSS.DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("NewAppChatSS.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Room");
@@ -604,13 +598,13 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasOne("NewAppChatSS.DAL.Entities.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("NewAppChatSS.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Room");
@@ -627,14 +621,18 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasOne("NewAppChatSS.DAL.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("NewAppChatSS.DAL.Entities.TypeRoom", "TypeRoom")
-                        .WithMany("Rooms")
+                        .WithMany()
                         .HasForeignKey("TypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.HasOne("NewAppChatSS.DAL.Entities.TypeRoom", null)
+                        .WithMany("Rooms")
+                        .HasForeignKey("TypeRoomId");
 
                     b.Navigation("LastMessage");
 
@@ -648,7 +646,7 @@ namespace NewAppChatSS.DAL.Migrations
                     b.HasOne("NewAppChatSS.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");

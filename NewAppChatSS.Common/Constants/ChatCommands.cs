@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-// TODO: Вынести в отдельную папку и разбить по файлам (если будут новые команды), пользователь-комната-бот
-namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
+// TODO: разбить по файлам (если будут новые команды), пользователь-комната-бот
+namespace NewAppChatSS.Common.Constants
 {
     public class ChatCommands
     {
