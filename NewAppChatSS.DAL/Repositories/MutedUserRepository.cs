@@ -4,9 +4,9 @@ using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class MutedUserRepository : BaseRepository<MutedUser, int, ApplicationDbContext, MutedUserModel>, IMutedUserRepository
+    public class MutedUserRepository : BaseRepository<MutedUser, int, NewAppChatSSContext, MutedUserModel>, IMutedUserRepository
     {
-        public MutedUserRepository(ApplicationDbContext context)
+        public MutedUserRepository(NewAppChatSSContext context)
             : base(context)
         {
         }

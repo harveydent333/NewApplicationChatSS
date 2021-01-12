@@ -8,7 +8,7 @@ using NewAppChatSS.DAL;
 
 namespace NewAppChatSS.DAL.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(NewAppChatSSContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -3,7 +3,7 @@ using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IMessageRepository : IBaseRepository<Message, string, ApplicationDbContext, MessageModel>
+    public interface IMessageRepository : IBaseRepository<Message, string, NewAppChatSSContext, MessageModel>
     {
     }
 }

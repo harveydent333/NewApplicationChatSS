@@ -7,7 +7,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
     /// <summary>
     /// Модель для фильтрации <see cref="KickedOut"/>
     /// </summary>
-    public class KickedOutModel : BaseModel<KickedOut, int, ApplicationDbContext>
+    public class KickedOutModel : BaseModel<KickedOut, int, NewAppChatSSContext>
     {
         /// <summary>
         /// Нужно ли возвращать пользователя <see cref="KickedOut.User"/>
@@ -29,7 +29,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
         /// </summary>
         public string RoomId { get; set; }
 
-        public override IQueryable<KickedOut> GetQuarable(ApplicationDbContext context)
+        public override IQueryable<KickedOut> GetQuarable(NewAppChatSSContext context)
         {
             var query = base.GetQuarable(context);
 

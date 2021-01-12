@@ -38,13 +38,13 @@ namespace NewApplicationChatSS
         {
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<NewAppChatSSContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddControllersWithViews();
 
             services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<NewAppChatSSContext>();
 
             services.AddSignalR();
             services.AddRazorPages();

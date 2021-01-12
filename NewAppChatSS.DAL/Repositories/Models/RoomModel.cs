@@ -7,7 +7,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
     /// <summary>
     /// Модель для фильтрации <see cref="Room"/>
     /// </summary>
-    public class RoomModel : BaseModel<Room, string, ApplicationDbContext>
+    public class RoomModel : BaseModel<Room, string, NewAppChatSSContext>
     {
         /// <summary>
         /// Нужно ли возвращать владельца комнаты <see cref="Room.Owner"/>
@@ -44,7 +44,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
         /// </summary>
         public string RoomName { get; set; }
 
-        public override IQueryable<Room> GetQuarable(ApplicationDbContext context)
+        public override IQueryable<Room> GetQuarable(NewAppChatSSContext context)
         {
             var query = base.GetQuarable(context);
 

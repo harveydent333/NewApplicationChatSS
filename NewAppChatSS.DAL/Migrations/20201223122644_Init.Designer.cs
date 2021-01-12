@@ -9,7 +9,7 @@ using NewAppChatSS.DAL;
 
 namespace NewAppChatSS.DAL.Migrations
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(NewAppChatSSContext))]
     [Migration("20201223122644_Init")]
     partial class Init
     {

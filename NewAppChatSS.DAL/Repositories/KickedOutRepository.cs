@@ -4,9 +4,9 @@ using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class KickedOutRepository : BaseRepository<KickedOut, int, ApplicationDbContext, KickedOutModel>, IKickedOutRepository
+    public class KickedOutRepository : BaseRepository<KickedOut, int, NewAppChatSSContext, KickedOutModel>, IKickedOutRepository
     {
-        public KickedOutRepository(ApplicationDbContext context)
+        public KickedOutRepository(NewAppChatSSContext context)
             : base(context)
         {
         }

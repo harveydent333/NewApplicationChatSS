@@ -7,7 +7,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
     /// <summary>
     /// Модель для фильтрации <see cref="MutedUser"/>
     /// </summary>
-    public class MutedUserModel : BaseModel<MutedUser, int, ApplicationDbContext>
+    public class MutedUserModel : BaseModel<MutedUser, int, NewAppChatSSContext>
     {
         /// <summary>
         /// Нужно ли возвращать пользователя <see cref="MutedUser.User"/>
@@ -29,7 +29,7 @@ namespace NewAppChatSS.DAL.Repositories.Models
         /// </summary>
         public string RoomId { get; set; }
 
-        public override IQueryable<MutedUser> GetQuarable(ApplicationDbContext context)
+        public override IQueryable<MutedUser> GetQuarable(NewAppChatSSContext context)
         {
             var query = base.GetQuarable(context);
 

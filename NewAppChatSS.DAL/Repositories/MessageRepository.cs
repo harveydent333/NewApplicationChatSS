@@ -4,9 +4,9 @@ using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Repositories
 {
-    public class MessageRepository : BaseRepository<Message, string, ApplicationDbContext, MessageModel>, IMessageRepository
+    public class MessageRepository : BaseRepository<Message, string, NewAppChatSSContext, MessageModel>, IMessageRepository
     {
-        public MessageRepository(ApplicationDbContext context)
+        public MessageRepository(NewAppChatSSContext context)
             : base(context)
         {
         }

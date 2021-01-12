@@ -3,7 +3,7 @@ using NewAppChatSS.DAL.Repositories.Models;
 
 namespace NewAppChatSS.DAL.Interfaces
 {
-    public interface IMutedUserRepository : IBaseRepository<MutedUser, int, ApplicationDbContext, MutedUserModel>
+    public interface IMutedUserRepository : IBaseRepository<MutedUser, int, NewAppChatSSContext, MutedUserModel>
     {
     }
 }
