@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,7 +17,6 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
     public sealed class HelpCommandHandlerHub : IHelpCommandHandlerHub
     {
         private readonly UserManager<User> userManager;
-        private IHubCallerClients clients;
 
         private List<string> allowedCommands = new List<string>();
 
@@ -26,62 +26,44 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         }
 
         /// <summary>
-        /// Метод проверяет корректность команды и перенаправляет на метод сбора доступных команд
-        /// </summary>
-        public Task SearchCommand(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
-        {
-            this.clients = clients;
-
-            if (new Regex(@"^//help$").IsMatch(command))
-            {
-                return GetAllowedCommands(currentUser, currentRoom);
-            }
-            else
-            {
-                return clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.IncorrectCommand));
-            }
-        }
-
-        /// <summary>
         /// Метод собирает список доступных команд пользователю
         /// </summary>
-        private async Task<Task> GetAllowedCommands(User currentUser, Room currentRoom)
+        public async Task GetAllowedCommandsAsync(User user, Room room, IHubCallerClients clients)
         {
             allowedCommands.Clear();
 
-            GetCommonCommands(ref allowedCommands);
+            GetCommonCommands(allowedCommands);
 
-            if ((await userManager.IsInRoleAsync(currentUser, "Moderator")) || (await userManager.IsInRoleAsync(currentUser, "Administrator")))
+            if ((await userManager.IsInRoleAsync(user, RoleConstants.ModeratorRole)) || (await userManager.IsInRoleAsync(user, RoleConstants.AdministratorRole)))
             {
-                GetModerCommands(ref allowedCommands);
+                GetModerCommands(allowedCommands);
             }
 
-            if (await userManager.IsInRoleAsync(currentUser, "Administrator"))
+            if (await userManager.IsInRoleAsync(user, RoleConstants.AdministratorRole))
             {
-                GetAdminCommands(ref allowedCommands);
+                GetAdminCommands(allowedCommands);
             }
 
-            if ((await userManager.IsInRoleAsync(currentUser, "RegularUser")) && (currentUser.Id == currentRoom.OwnerId))
+            if ((await userManager.IsInRoleAsync(user, RoleConstants.RegularUserRole)) && (user.Id == room.OwnerId))
             {
-                GetCommandsForOwnerRoom(ref allowedCommands);
+                GetCommandsForOwnerRoom(allowedCommands);
             }
 
             allowedCommands = allowedCommands.OrderByDescending(l => l).ToList();
 
-            if (currentRoom.TypeId == GlobalConstants.BotRoomType)
+            if (room.TypeId == GlobalConstants.BotRoomType)
             {
-                GetCommandsForBotRoom(ref allowedCommands);
+                GetCommandsForBotRoom(allowedCommands);
             }
 
-            return clients.Caller.SendAsync("PrintAllowedCommands", CommandHandler.CreateCommandInfo(allowedCommands));
+            await clients.Caller.SendAsync("PrintAllowedCommands", CommandHandler.CreateCommandInfo(allowedCommands));
         }
 
         /// <summary>
         /// Выдать общие команды
         /// Метод добавляет в список доступных команд, команды которые может использовать каждый пользователь в комнате
         /// </summary>
-        private void GetCommonCommands(ref List<string> allowedCommands)
+        private void GetCommonCommands(List<string> allowedCommands)
         {
             allowedCommands.Add(ChatCommands.RoomCreate);
             allowedCommands.Add(ChatCommands.RoomRename);
@@ -95,7 +77,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// Выдать команды доступные модератору.
         /// Метод добавляет в список доступных команд, команды пользователю с ролью "Модератор"
         /// </summary>
-        private void GetModerCommands(ref List<string> allowedCommands)
+        private void GetModerCommands(List<string> allowedCommands)
         {
             allowedCommands.Add(ChatCommands.UserBan);
             allowedCommands.Add(ChatCommands.UserUnban);
@@ -108,7 +90,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// Выдать команды доступные администратору.
         /// Метод добавляет в список доступных команд, команды пользователю с ролью "Администратор"
         /// </summary>
-        private void GetAdminCommands(ref List<string> allowedCommands)
+        private void GetAdminCommands(List<string> allowedCommands)
         {
             allowedCommands.Add(ChatCommands.ChangeModeratorRole);
             allowedCommands.Add(ChatCommands.RoomRemove);
@@ -119,7 +101,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// Выдать команды доступные в чат-бот комнате.
         /// Метод добавляет в список доступных команд, команды которые можно использовать только в чат-бот комнате
         /// </summary>
-        private void GetCommandsForBotRoom(ref List<string> allowedCommands)
+        private void GetCommandsForBotRoom(List<string> allowedCommands)
         {
             allowedCommands.Add(ChatCommands.FindVideoOnYouTubeChannel);
             allowedCommands.Add(ChatCommands.GetInfoAboutYouTubeChannel);
@@ -130,7 +112,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// Выдать команды владельцу комнаты.
         /// Метод добавляет в список доступных команд, команды доступные только владельцу комнаты
         /// </summary>
-        private void GetCommandsForOwnerRoom(ref List<string> allowedCommands)
+        private void GetCommandsForOwnerRoom(List<string> allowedCommands)
         {
             allowedCommands.Add(ChatCommands.UserKick);
             allowedCommands.Add(ChatCommands.UserUnmute);

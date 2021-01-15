@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using NewAppChatSS.DAL.Entities;
+using NewAppChatSS.Hubs.Hubs.CommandHandlersHubs;
 
 namespace NewAppChatSS.Hubs.Interfaces.HubInterfaces
 {
-    public interface IUserCommandHandler
+    public interface IUserCommandHandler : IAbstractHub
     {
         // TODO: переписать на все public методы и добавить сюда
-        Task SearchCommandAsync(User user, string command, IHubCallerClients clients);
     }
 }

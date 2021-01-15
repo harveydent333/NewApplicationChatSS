@@ -63,7 +63,7 @@ namespace NewApplicationChatSS
             services.AddTransient<IUserCommandHandler, UserCommandHandlerHub>();
             services.AddTransient<IRoomCommandHandler, RoomCommandHandlerHub>();
             services.AddTransient<IHelpCommandHandlerHub, HelpCommandHandlerHub>();
-            services.AddTransient<IBotCommandHandlerHub, BotCommandHandlerHub>();
+            services.AddSingleton<IBotCommandHandlerHub, BotCommandHandlerHub>();
 
             services.AddTransient<IUserValidator, UserValidator>();
             services.AddTransient<IRoomValidator, RoomValidator>();
