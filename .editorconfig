@@ -19,3 +19,9 @@ dotnet_diagnostic.SA1115.severity = none
 
 # Default severity for analyzer diagnostics with category 'Style'
 dotnet_analyzer_diagnostic.category-Style.severity = none
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.MaintainabilityRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.MaintainabilityRules.severity = none
+
+# SA1401: Fields should be private
+dotnet_diagnostic.SA1401.severity = none

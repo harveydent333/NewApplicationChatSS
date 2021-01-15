@@ -55,12 +55,12 @@ namespace NewAppChatSS.BLL.Services
         {
             if (await userManager.FindByEmailAsync(userDTO.Email) != null)
             {
-                throw new ValidationException("Данный E-mail адрес уже зарегистрирован.", "");
+                throw new ValidationException("Данный E-mail адрес уже зарегистрирован");
             }
 
             if (await userManager.FindByNameAsync(userDTO.UserName) != null)
             {
-                throw new ValidationException("Пользователь с таким именем уже зарегистрирован.", "");
+                throw new ValidationException("Пользователь с таким именем уже зарегистрирован");
             }
 
             User user = mapper.Map<User>(userDTO);
@@ -69,7 +69,7 @@ namespace NewAppChatSS.BLL.Services
             await userManager.CreateAsync(user, userDTO.Password);
 
             await AssignRoleForNewUserAsync(user);
-            await AddingUserInMainRoom(user.Id);
+            await AddingUserInMainRoomAsync(user.Id);
         }
 
         public async Task AssignRoleForNewUserAsync(User user)
@@ -77,7 +77,7 @@ namespace NewAppChatSS.BLL.Services
             await userManager.AddToRolesAsync(user, new string[] { "RegularUser" });
         }
 
-        public async Task AddingUserInMainRoom(string userId)
+        public async Task AddingUserInMainRoomAsync(string userId)
         {
             var member = new Member
             {
@@ -94,14 +94,14 @@ namespace NewAppChatSS.BLL.Services
 
             if (user == null)
             {
-                throw new ValidationException("Пользователь не найден", "");
+                throw new ValidationException("Пользователь не найден");
             }
 
             var result = await signInManager.PasswordSignInAsync(user.UserName, userDTO.Password, (bool)userDTO.RememberMe, false);
 
             if (!result.Succeeded)
             {
-                throw new ValidationException("Неправильный логин или пароль", "");
+                throw new ValidationException("Неправильный логин или пароль");
             }
         }
     }
