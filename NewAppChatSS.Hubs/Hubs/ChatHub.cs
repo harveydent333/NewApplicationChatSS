@@ -105,6 +105,8 @@ namespace NewAppChatSS.Hubs.Hubs
             {
                 await Clients.Caller.SendAsync(
                     "ReceiveCommand", CommandHandler.CreateCommandInfo("Вы заблокированы и не можете удалять сообщения."));
+
+                return;
             }
 
             var rooms = await roomRepository.GetAsync(new RoomModel { });
