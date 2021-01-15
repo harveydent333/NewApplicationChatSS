@@ -22,7 +22,7 @@ namespace NewAppChatSS.BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<MessageDTO>> GetRoomMessages(string roomId)
+        public async Task<List<MessageDTO>> GetRoomMessagesAsync(string roomId)
         {
             var roomMessages = (await messageRepository.GetAsync(new MessageModel { IncludeRoom = true, IncludeUser = true, RoomId = roomId }))
                 .OrderBy(m => m.DatePublication).ToList();

@@ -32,7 +32,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет заблокирован ли пользователь в приложении
         /// </summary>
-        public async Task<bool> IsUserBlocked(User user)
+        public async Task<bool> IsUserBlockedAsync(User user)
         {
             if (user.IsLocked && (DateTime.Now > user.DateUnblock))
             {
@@ -46,7 +46,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет, имеет ли пользователь возможность отправлять сообщения в чат в комнате
         /// </summary>
-        public async Task<bool> IsUserMutedById(string userId, string roomId)
+        public async Task<bool> IsUserMutedByIdAsync(string userId, string roomId)
         {
             var mutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = userId, RoomId = roomId });
 
@@ -95,7 +95,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет выгнан ли пользователь из комнаты
         /// </summary>
-        public async Task<bool> IsUserKickedById(string userId, string roomId)
+        public async Task<bool> IsUserKickedByIdAsync(string userId, string roomId)
         {
             var kicked = await kickedOutRepository.GetFirstOrDefaultAsync(new KickedOutModel { UserId = userId, RoomId = roomId });
 
@@ -147,7 +147,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет, является ли пользователь участником комнаты
         /// </summary>
-        public async Task<bool> IsUserInGroupById(string userId, string roomId)
+        public async Task<bool> IsUserInGroupByIdAsync(string userId, string roomId)
         {
             var members = await memberRepository.GetAsync(new MemberModel { UserId = userId });
             var memberIds = members.Select(m => m.RoomId).ToList();

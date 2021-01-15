@@ -28,7 +28,7 @@ namespace NewAppChatSS.Hubs.ModelHandlers
         /// <summary>
         /// Метод сохраняет в базу данных информацию о сообщении написаным в пользователем в чат комнаты
         /// </summary>
-        public async Task<string> SaveMessageIntoDatabase(User user, string textMessage, Room room)
+        public async Task<string> SaveMessageIntoDatabaseAsync(User user, string textMessage, Room room)
         {
             string messageId = NewAppChatGuidHelper.GetNewGuid();
 
@@ -43,7 +43,7 @@ namespace NewAppChatSS.Hubs.ModelHandlers
 
             await messageRepository.AddAsync(message);
 
-            await AddInfoAboutLastMessage(messageId, room.Id);
+            await AddInfoAboutLastMessageAsync(messageId, room.Id);
 
             var messageInfo = new
             {
@@ -60,7 +60,7 @@ namespace NewAppChatSS.Hubs.ModelHandlers
         /// <summary>
         /// Метод добавляет информацию в базу данных о последем сообщении в комнате
         /// </summary>
-        private async Task AddInfoAboutLastMessage(string messageId, string roomId)
+        private async Task AddInfoAboutLastMessageAsync(string messageId, string roomId)
         {
             var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
 

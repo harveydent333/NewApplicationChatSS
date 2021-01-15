@@ -20,7 +20,7 @@ namespace NewAppChatSS.BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<RoomDTO> GetRoom(string id)
+        public async Task<RoomDTO> GetRoomAsync(string id)
         {
             var room = await roomRepository.GetFirstOrDefaultAsync(
                 new RoomModel

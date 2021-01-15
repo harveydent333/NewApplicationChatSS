@@ -5,6 +5,6 @@ namespace NewAppChatSS.Hubs.Interfaces.ModelHandlerInterfaces
 {
     public interface IMessageHandler
     {
-        Task<string> SaveMessageIntoDatabase(User user, string textMessage, Room room);
+        Task<string> SaveMessageIntoDatabaseAsync(User user, string textMessage, Room room);
     }
 }

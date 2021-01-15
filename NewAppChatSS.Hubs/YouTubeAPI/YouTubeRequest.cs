@@ -259,7 +259,7 @@ namespace NewAppChatSS.Hubs.YouTubeAPI
         /// <summary>
         /// Метод авторизирует профиль в ютюбе.
         /// </summary>
-        public async Task Run()
+        public async Task RunAsync()
         {
             ApiKey = "";
             ViewCount = "";

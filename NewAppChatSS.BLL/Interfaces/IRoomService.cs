@@ -5,6 +5,6 @@ namespace NewAppChatSS.BLL.Interfaces
 {
     public interface IRoomService
     {
-        Task<RoomDTO> GetRoom(string id);
+        Task<RoomDTO> GetRoomAsync(string id);
     }
 }

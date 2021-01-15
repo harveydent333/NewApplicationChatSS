@@ -40,7 +40,7 @@ namespace NewApplicationChatSS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel loginUserModel)
+        public async Task<IActionResult> LoginAsync(LoginModel loginUserModel)
         {
             if (ModelState.IsValid)
             {
@@ -51,7 +51,7 @@ namespace NewApplicationChatSS.Controllers
                 }
                 catch (ValidationException ex)
                 {
-                    ModelState.AddModelError(ex.Property, ex.Message);
+                    ModelState.AddModelError("", ex.Message);
                     return View(loginUserModel);
                 }
             }
@@ -60,7 +60,7 @@ namespace NewApplicationChatSS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterModel registerUserModel)
+        public async Task<IActionResult> RegisterAsync(RegisterModel registerUserModel)
         {
             if (ModelState.IsValid)
             {
@@ -73,7 +73,7 @@ namespace NewApplicationChatSS.Controllers
                 }
                 catch (ValidationException ex)
                 {
-                    ModelState.AddModelError(ex.Property, ex.Message);
+                    ModelState.AddModelError("", ex.Message);
 
                     return View(registerUserModel);
                 }
@@ -83,7 +83,7 @@ namespace NewApplicationChatSS.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> LogoutAsync()
         {
             await signInManager.SignOutAsync();
 

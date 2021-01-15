@@ -6,6 +6,6 @@ namespace NewAppChatSS.BLL.Interfaces
 {
     public interface IMessageService
     {
-        Task<List<MessageDTO>> GetRoomMessages(string roomId);
+        Task<List<MessageDTO>> GetRoomMessagesAsync(string roomId);
     }
 }

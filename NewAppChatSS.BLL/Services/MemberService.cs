@@ -27,7 +27,7 @@ namespace NewAppChatSS.BLL.Services
         }
 
         // TODO: need to improve this method
-        public async Task<List<RoomDTO>> GetUserRooms(string userId)
+        public async Task<List<RoomDTO>> GetUserRoomsAsync(string userId)
         {
             var roomIds = (await memberRepository.GetAsync(new MemberModel { UserId = userId })).Select(m => m.RoomId);
 

@@ -84,9 +84,9 @@ namespace NewApplicationChatSS.Controllers
                 ViewBag.IsKicked = 0;
             }
 
-            ViewBag.Messages = mapper.Map<List<MessageModel>>(await messageService.GetRoomMessages(roomId));
+            ViewBag.Messages = mapper.Map<List<MessageModel>>(await messageService.GetRoomMessagesAsync(roomId));
 
-            var room = await roomService.GetRoom(roomId);
+            var room = await roomService.GetRoomAsync(roomId);
 
             ViewBag.CurrentRoomName = room.RoomName;
             ViewBag.CurrentRoomId = roomId;
@@ -95,7 +95,7 @@ namespace NewApplicationChatSS.Controllers
 
             string userId = (await userService.GetUserbyUserNameAsync(User.Identity.Name)).Id;
 
-            ViewBag.RoomsUser = mapper.Map<List<RoomModel>>(await memberService.GetUserRooms(userId));
+            ViewBag.RoomsUser = mapper.Map<List<RoomModel>>(await memberService.GetUserRoomsAsync(userId));
 
             return View("Chat");
         }

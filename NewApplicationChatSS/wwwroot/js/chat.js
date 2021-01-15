@@ -218,7 +218,7 @@ document.querySelector('.msg_send_btn').addEventListener("click", function (even
         if (message.match(/^\/\/help/)) {
             sendCommandHelp(userName, roomId, message);
         } else {
-            connection.invoke("ReceivingBotInteractionCommand", message).catch(function (err) {
+            connection.invoke("ReceivingBotInteractionCommandAsync", userName, roomId, message).catch(function (err) {
                 return console.error(err.toString());
             });
         }
@@ -231,12 +231,12 @@ document.querySelector('.msg_send_btn').addEventListener("click", function (even
 
     if (message.match(/^\/\//) != null) {
         if (message.match(/^\/\/user/)) {
-            connection.invoke("ReceivingUserInteractionCommand", userName, message).catch(function (err) {
+            connection.invoke("ReceivingUserInteractionCommandAsync", userName, roomId, message).catch(function (err) {
                 return console.error(err.toString());
             });
         }
         else if (message.match(/^\/\/room/)) {
-            connection.invoke("ReceivingRoomInteractionCommand", userName, roomId, message).catch(function (err) {
+            connection.invoke("ReceivingRoomInteractionCommandAsync", userName, roomId, message).catch(function (err) {
                 return console.error(err.toString());
             });
         }
@@ -245,7 +245,7 @@ document.querySelector('.msg_send_btn').addEventListener("click", function (even
         }
     }
     else {
-        connection.invoke("ReceivingInteractionMessage", userName, roomId, message).catch(function (err) {
+        connection.invoke("ReceivingInteractionMessageAsync", userName, roomId, message).catch(function (err) {
             return console.error(err.toString());
         });
     }

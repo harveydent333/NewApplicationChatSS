@@ -6,17 +6,17 @@ namespace NewAppChatSS.Hubs.Interfaces.ValidatorInterfaces
 {
     public interface IUserValidator
     {
-        Task<bool> IsUserBlocked(User user);
+        Task<bool> IsUserBlockedAsync(User user);
 
-        Task<bool> IsUserMutedById(string userId, string roomId);
+        Task<bool> IsUserMutedByIdAsync(string userId, string roomId);
 
         Task<bool> IsUserMutedByNameAsync(string userName, string roomId);
 
-        Task<bool> IsUserKickedById(string userId, string roomId);
+        Task<bool> IsUserKickedByIdAsync(string userId, string roomId);
 
         Task<bool> IsUserKickedByNameAsync(string userName, string roomId);
 
-        Task<bool> IsUserInGroupById(string userId, string roomId);
+        Task<bool> IsUserInGroupByIdAsync(string userId, string roomId);
 
         Task<bool> IsUserInGroupByNameAsync(string userName, string roomId);
 

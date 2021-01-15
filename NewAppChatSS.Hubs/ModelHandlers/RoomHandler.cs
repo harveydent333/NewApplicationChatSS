@@ -23,7 +23,7 @@ namespace NewAppChatSS.Hubs.ModelHandlers
         /// <summary>
         /// Метод создает новую комнату
         /// </summary>
-        public async Task<string> CreateRoom(string roomName, int typeRoomId, string userId)
+        public async Task<string> CreateRoomAsync(string roomName, int typeRoomId, string userId)
         {
             string roomId = NewAppChatGuidHelper.GetNewGuid();
 

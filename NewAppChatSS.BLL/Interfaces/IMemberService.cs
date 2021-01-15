@@ -6,6 +6,6 @@ namespace NewAppChatSS.BLL.Interfaces
 {
     public interface IMemberService
     {
-        Task<List<RoomDTO>> GetUserRooms(string userId);
+        Task<List<RoomDTO>> GetUserRoomsAsync(string userId);
     }
 }

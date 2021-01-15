@@ -26,7 +26,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// </summary>
         public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, string nameProcessedRoom)
         {
-            if (await IsOwnerRoom(user.Id, nameProcessedRoom))
+            if (await IsOwnerRoomAsync(user.Id, nameProcessedRoom))
             {
                 return true;
             }
@@ -45,7 +45,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет является ли пользователь владельцем комнаты
         /// </summary>
-        public async Task<bool> IsOwnerRoom(string userId, string nameProcessedRoom)
+        public async Task<bool> IsOwnerRoomAsync(string userId, string nameProcessedRoom)
         {
             var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { RoomName = nameProcessedRoom });
 

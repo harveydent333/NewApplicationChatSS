@@ -14,6 +14,6 @@ namespace NewAppChatSS.Hubs.Interfaces.ValidatorInterfaces
         /// <summary>
         /// Метод проверяет является ли пользователь владельцем комнаты
         /// </summary>
-        Task<bool> IsOwnerRoom(string userId, string nameProcessedRoom);
+        Task<bool> IsOwnerRoomAsync(string userId, string nameProcessedRoom);
     }
 }
