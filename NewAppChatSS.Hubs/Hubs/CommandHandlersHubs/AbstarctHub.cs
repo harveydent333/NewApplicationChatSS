@@ -11,7 +11,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 {
     public abstract class AbstarctHub : IAbstractHub
     {
-        public abstract Dictionary<Regex, Func<string, Task>> Commands { get; }
+        public virtual Dictionary<Regex, Func<string, Task>> Commands { get; }
 
         protected IHubCallerClients clients;
         protected Room room;
@@ -37,7 +37,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                 }
             }
 
-            await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.IncorrectCommand));
+            await SendResponseMessage(InformationMessages.IncorrectCommand);
+        }
+
+        protected async Task SendResponseMessage(string informationMessage)
+        {
+            var responseMessage = CommandHandler.CreateResponseMessage(informationMessage);
+            await clients.Caller.SendAsync("ReceiveCommand", responseMessage);
         }
     }
 }

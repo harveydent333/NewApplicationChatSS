@@ -58,7 +58,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, true, userNames["oldUserName"]))
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
+                await SendResponseMessage(InformationMessages.AccessIsDenied);
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(userNames["oldUserName"]) == null)
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
+                await SendResponseMessage(InformationMessages.UserNotFound);
                 return;
             }
 
@@ -80,21 +80,18 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                     await clients.Caller.SendAsync(
                         "UserRenameClient",
                         userNames["newUserName"],
-                        CommandHandler.CreateCommandInfo(InformationMessages.UserNameHasBeenChanged));
+                        CommandHandler.CreateResponseMessage(InformationMessages.UserNameHasBeenChanged));
 
                     return;
                 }
                 else
                 {
-                    await clients.Caller.SendAsync(
-                        "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNameHasBeenChanged));
-
+                    await SendResponseMessage(InformationMessages.UserNameHasBeenChanged);
                     return;
                 }
             }
 
-            await clients.Caller.SendAsync(
-                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNameIsAlreadyInUse));
+            await SendResponseMessage(InformationMessages.UserNameIsAlreadyInUse);
         }
 
         /// <summary>
@@ -110,8 +107,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
-
+                await SendResponseMessage(InformationMessages.AccessIsDenied);
                 return;
             }
 
@@ -119,16 +115,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
+                await SendResponseMessage(InformationMessages.UserNotFound);
 
                 return;
             }
 
-            UserName = await ChangedStatusBlockingUserAsync(UserName, command, true, true);
+            await ChangedStatusBlockingUserAsync(UserName, command, true, true);
 
-            await clients.Caller.SendAsync(
-                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenBlocked));
+            await SendResponseMessage(InformationMessages.UserHasBeenBlocked);
         }
 
         /// <summary>
@@ -144,8 +138,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
-
+                await SendResponseMessage(InformationMessages.AccessIsDenied);
                 return;
             }
 
@@ -153,16 +146,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
-
+                await SendResponseMessage(InformationMessages.UserNotFound);
                 return;
             }
 
-            UserName = await ChangedStatusBlockingUserAsync(UserName, command, false, false);
+            await ChangedStatusBlockingUserAsync(UserName, command, false, false);
 
-            await clients.Caller.SendAsync(
-                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenUnblocked));
+            await SendResponseMessage(InformationMessages.UserHasBeenUnblocked);
         }
 
         /// <summary>
@@ -178,25 +168,22 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
-
+                await SendResponseMessage(InformationMessages.AccessIsDenied);
                 return;
             }
 
             UserName = Regex.Match(command, @"//user\sban\s(.+)\s-m\s\d*$").Groups[1].Value;
 
+            // получить в переменную var processedUser and check in method Validato IsNullUser
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
-
+                await SendResponseMessage(InformationMessages.UserNotFound);
                 return;
             }
 
-            UserName = await ChangedStatusBlockingUserAsync(UserName, command, true, false);
+            await ChangedStatusBlockingUserAsync(UserName, command, true, false);
 
-            await clients.Caller.SendAsync(
-                "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserHasBeenBlocked));
+            await SendResponseMessage(InformationMessages.UserHasBeenBlocked);
         }
 
         /// <summary>
@@ -204,16 +191,11 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task SetModerationRoleAsync(string command)
         {
-            var acceptableRoles = new List<string>
-            {
-                RoleConstants.AdministratorRole,
-                RoleConstants.ModeratorRole
-            };
+            var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
             if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
-
+                await SendResponseMessage(InformationMessages.AccessIsDenied);
                 return;
             }
 
@@ -221,16 +203,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
-
+                await SendResponseMessage(InformationMessages.UserNotFound);
                 return;
             }
 
             user = await userManager.FindByNameAsync(UserName);
             await userManager.AddToRoleAsync(user, RoleConstants.ModeratorRole);
 
-            await clients.Caller.SendAsync(
-                "ReceiveCommand", CommandHandler.CreateCommandInfo($"Пользователь {UserName} был назначен модератором."));
+            await SendResponseMessage($"Пользователь {UserName} был назначен модератором.");
         }
 
         /// <summary>
@@ -238,16 +218,11 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task RemoveModerationRoleAsync(string command)
         {
-            var acceptableRoles = new List<string>
-            {
-                RoleConstants.AdministratorRole,
-                RoleConstants.ModeratorRole
-            };
+            var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
             if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
             {
-                await clients.Caller.SendAsync("ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.AccessIsDenied));
-
+                await SendResponseMessage(InformationMessages.AccessIsDenied);
                 return;
             }
 
@@ -255,17 +230,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo(InformationMessages.UserNotFound));
-
+                await SendResponseMessage(InformationMessages.UserNotFound);
                 return;
             }
 
             user = await userManager.FindByNameAsync(UserName);
             await userManager.RemoveFromRoleAsync(user, RoleConstants.ModeratorRole);
 
-            await clients.Caller.SendAsync(
-                "ReceiveCommand", CommandHandler.CreateCommandInfo($"Пользователь {UserName} был разжалован до обычного пользователя."));
+            await SendResponseMessage($"Пользователь {UserName} был разжалован до обычного пользователя.");
         }
 
         // TODO: Вынести отсюда
@@ -287,7 +259,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// <summary>
         /// Метод меняет статус роли пользователя
         /// </summary>
-        private async Task<string> ChangedStatusBlockingUserAsync(string userName, string command, bool blockStatus, bool isIndefiniteBlock)
+        private async Task ChangedStatusBlockingUserAsync(string userName, string command, bool blockStatus, bool isIndefiniteBlock)
         {
             User user = await userManager.FindByNameAsync(userName);
             user.IsLocked = blockStatus;
@@ -302,8 +274,6 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             }
 
             await userManager.UpdateAsync(user);
-
-            return user.UserName;
         }
     }
 }

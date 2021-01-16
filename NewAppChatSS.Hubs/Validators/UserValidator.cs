@@ -30,6 +30,21 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         }
 
         /// <summary>
+        /// Метод указывает, действительно ли указанный объект <see cref="User"/> является null
+        /// </summary>
+        /// <param name="user">Объект <see cref="User"/></param>
+        /// <returns>Значение true если объект равен null, в противном случае false </returns>
+        public async Task<bool> IsNullUserAsync(User user)
+        {
+            if (user == null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Метод проверяет заблокирован ли пользователь в приложении
         /// </summary>
         public async Task<bool> IsUserBlockedAsync(User user)
@@ -46,33 +61,14 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет, имеет ли пользователь возможность отправлять сообщения в чат в комнате
         /// </summary>
-        public async Task<bool> IsUserMutedByIdAsync(string userId, string roomId)
+        /// <param name="userId">Идентификатор объект <see cref="User"/></param>
+        /// <param name="roomId">Идентификатор объект <see cref="Room"/></param>
+        /// <returns>Значение true если пользователь находится в муте и не может отправлять сообщения в чат,
+        ///          в противном случае значние false</returns>
+        public async Task<bool> IsUserMutedAsync(string userId, string roomId)
         {
-            var mutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = userId, RoomId = roomId });
-
-            if (mutedUser != null)
-            {
-                if (mutedUser.DateUnmute > DateTime.Now)
-                {
-                    return true;
-                }
-                else
-                {
-                    await mutedUserRepository.DeleteAsync(mutedUser);
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> IsUserMutedByNameAsync(string userName, string roomId)
-        {
-            string userId = (await userManager.FindByNameAsync(userName))?.Id;
-
-            var mutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = userId, RoomId = roomId });
+            var mutedUserModel = new MutedUserModel { UserId = userId, RoomId = roomId };
+            var mutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(mutedUserModel);
 
             if (mutedUser != null)
             {
@@ -95,7 +91,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         /// <summary>
         /// Метод проверяет выгнан ли пользователь из комнаты
         /// </summary>
-        public async Task<bool> IsUserKickedByIdAsync(string userId, string roomId)
+        public async Task<bool> IsUserKickedAsync(string userId, string roomId)
         {
             var kicked = await kickedOutRepository.GetFirstOrDefaultAsync(new KickedOutModel { UserId = userId, RoomId = roomId });
 
@@ -118,36 +114,9 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
         }
 
         /// <summary>
-        /// Метод проверяет выгнан ли пользователь из комнаты
-        /// </summary>
-        public async Task<bool> IsUserKickedByNameAsync(string userName, string roomId)
-        {
-            var user = await userManager.FindByNameAsync(userName);
-
-            var kicked = await kickedOutRepository.GetFirstOrDefaultAsync(new KickedOutModel { UserId = user.Id, RoomId = roomId });
-
-            if (kicked != null)
-            {
-                if (kicked.DateUnkick > DateTime.Now)
-                {
-                    return true;
-                }
-                else
-                {
-                    await kickedOutRepository.DeleteAsync(kicked);
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
         /// Метод проверяет, является ли пользователь участником комнаты
         /// </summary>
-        public async Task<bool> IsUserInGroupByIdAsync(string userId, string roomId)
+        public async Task<bool> IsUserInGroupAsync(string userId, string roomId)
         {
             var members = await memberRepository.GetAsync(new MemberModel { UserId = userId });
             var memberIds = members.Select(m => m.RoomId).ToList();
@@ -155,17 +124,8 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
             return memberIds.Contains(roomId);
         }
 
-        /// <summary>
-        /// Метод проверяет, является ли пользователь участником комнаты
-        /// </summary>
-        public async Task<bool> IsUserInGroupByNameAsync(string userName, string roomId)
-        {
-            var user = await userManager.FindByNameAsync(userName);
-            var roomIds = (await memberRepository.GetAsync(new MemberModel { UserId = user.Id })).Select(m => m.RoomId);
-            return roomIds.Contains(roomId);
-        }
-
-        public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, bool checkOnOwner = false, string processingUserName = "")
+        // TODO: дописать логику, последних двух перменных по умолчнию
+        public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, bool checkOnOwner, string processingUserName)
         {
             foreach (string role in allowedRoles)
             {

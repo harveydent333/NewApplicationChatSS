@@ -59,13 +59,13 @@ namespace NewAppChatSS.Hubs.Hubs
         {
             User user = await userManager.FindByNameAsync(userName);
 
-            if (await userValidator.IsUserMutedByIdAsync(user.Id, roomId))
+            if (await userValidator.IsUserMutedAsync(user.Id, roomId))
             {
                 var timeUnmuteUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = user.Id, RoomId = roomId });
 
                 await Clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo(string.Format(
+                    CommandHandler.CreateResponseMessage(string.Format(
                         "Вы лишины возможности отправлять сообщения до: {0:U}.", timeUnmuteUser)));
                 return;
             }
@@ -74,7 +74,7 @@ namespace NewAppChatSS.Hubs.Hubs
             {
                 await Clients.Caller.SendAsync(
                     "ReceiveCommand",
-                    CommandHandler.CreateCommandInfo(string.Format("Вы заблокированы до: {0:U}.", user.DateUnblock)));
+                    CommandHandler.CreateResponseMessage(string.Format("Вы заблокированы до: {0:U}.", user.DateUnblock)));
                 return;
             }
 
@@ -104,7 +104,7 @@ namespace NewAppChatSS.Hubs.Hubs
             if (user.IsLocked)
             {
                 await Clients.Caller.SendAsync(
-                    "ReceiveCommand", CommandHandler.CreateCommandInfo("Вы заблокированы и не можете удалять сообщения."));
+                    "ReceiveCommand", CommandHandler.CreateResponseMessage("Вы заблокированы и не можете удалять сообщения."));
 
                 return;
             }

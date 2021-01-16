@@ -58,13 +58,17 @@ namespace NewApplicationChatSS.Controllers
         [HttpGet("/Chat/{roomId?}")]
         public async Task<IActionResult> ChatAsync(string roomId)
         {
+            var room = await roomService.GetRoomAsync(roomId);
+            var user = await userService.GetUserbyUserNameAsync(User.Identity.Name);
+
             // TODO: сделать проверку [FromRoute] на roomId и выкидывать 404 в случае не найденой комнаты
             if (roomId == null)
             {
                 roomId = GlobalConstants.MainRoomId;
             }
 
-            if (!await userValidator.IsUserInGroupByNameAsync(User.Identity.Name, roomId))
+            // TODO: сделать метод универсальным, передавать User user, удалить лишний IsUserInGroupByNameAsync и IsUserInGroupByIdAsync. Сделать общий IsUserInGroupAsync
+            if (!await userValidator.IsUserInGroupAsync(User.Identity.Name, roomId))
             {
                 ViewBag.UserNotMemberRoom = 1;
                 roomId = GlobalConstants.MainRoomId;
@@ -74,7 +78,7 @@ namespace NewApplicationChatSS.Controllers
                 ViewBag.UserNotMemberRoom = 0;
             }
 
-            if (await userValidator.IsUserKickedByNameAsync(User.Identity.Name, roomId))
+            if (await userValidator.IsUserKickedAsync(user.Id, roomId))
             {
                 ViewBag.IsKicked = 1;
                 roomId = GlobalConstants.MainRoomId;
@@ -86,16 +90,14 @@ namespace NewApplicationChatSS.Controllers
 
             ViewBag.Messages = mapper.Map<List<MessageModel>>(await messageService.GetRoomMessagesAsync(roomId));
 
-            var room = await roomService.GetRoomAsync(roomId);
+            room = await roomService.GetRoomAsync(roomId);
 
             ViewBag.CurrentRoomName = room.RoomName;
             ViewBag.CurrentRoomId = roomId;
             ViewBag.TypeRoom = room.TypeRoom.TypeName;
             ViewBag.UserName = User.Identity.Name;
 
-            string userId = (await userService.GetUserbyUserNameAsync(User.Identity.Name)).Id;
-
-            ViewBag.RoomsUser = mapper.Map<List<RoomModel>>(await memberService.GetUserRoomsAsync(userId));
+            ViewBag.RoomsUser = mapper.Map<List<RoomModel>>(await memberService.GetUserRoomsAsync(user.Id));
 
             return View("Chat");
         }

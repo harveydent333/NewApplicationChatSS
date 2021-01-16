@@ -7,17 +7,19 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
     public class CommandHandler
     {
         /// <summary>
-        ///  Метод формирует JSON объект c информацией о команде для отправки клиенту
+        /// Метод формирует JSON объект c информацией о команде для отправки клиенту
         /// </summary>
-        public static string CreateCommandInfo(string textCommand)
+        /// <param name="messageText">Текст с </param>
+        /// <returns>Возвращает сериализованную строку ответа</returns>
+        public static string CreateResponseMessage(string messageText)
         {
-            var commandInfo = new
+            var responseMessage = new
             {
-                messageContent = textCommand,
+                messageText = messageText,
                 datePublication = DateTime.Now,
             };
 
-            return JsonSerializer.Serialize<object>(commandInfo);
+            return JsonSerializer.Serialize<object>(responseMessage);
         }
 
         /// <summary>

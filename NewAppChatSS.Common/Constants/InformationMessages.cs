@@ -24,6 +24,7 @@ namespace NewAppChatSS.Common.Constants
         public const string UserHasBeenBlocked = "Пользователь был заблокирован";
         public const string UserHasBeenUnblocked = "Пользователь был разблокирован";
         public const string UserNameHasBeenChanged = "Имя пользователя было успешно изменено";
+        public const string YouCanWriteMessageAgain = "У вас снова есть возможность писать сообщения.";
 
         public const string RoomNameAlreadyTaken = "Название комнаты уже занято";
         public const string RoomHasBeenCreated = "Комната успешно создана";
