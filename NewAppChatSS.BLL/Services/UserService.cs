@@ -55,16 +55,16 @@ namespace NewAppChatSS.BLL.Services
         {
             if (await userManager.FindByEmailAsync(userDTO.Email) != null)
             {
-                throw new ValidationException("Данный E-mail адрес уже зарегистрирован");
+                throw new ValidationException(ValidationMessageConstants.EmailAlreadyInUse);
             }
 
             if (await userManager.FindByNameAsync(userDTO.UserName) != null)
             {
-                throw new ValidationException("Пользователь с таким именем уже зарегистрирован");
+                throw new ValidationException(ValidationMessageConstants.UserNameAlreadyInUse);
             }
 
             User user = mapper.Map<User>(userDTO);
-            user.Id = NewAppChatGuidHelper.GetNewGuid();
+            user.Id = GuidHelper.GetNewGuid();
 
             await userManager.CreateAsync(user, userDTO.Password);
 
@@ -74,7 +74,7 @@ namespace NewAppChatSS.BLL.Services
 
         public async Task AssignRoleForNewUserAsync(User user)
         {
-            await userManager.AddToRolesAsync(user, new string[] { "RegularUser" });
+            await userManager.AddToRolesAsync(user, new string[] { RoleConstants.RegularUserRole });
         }
 
         public async Task AddingUserInMainRoomAsync(string userId)
@@ -94,14 +94,14 @@ namespace NewAppChatSS.BLL.Services
 
             if (user == null)
             {
-                throw new ValidationException("Пользователь не найден");
+                throw new ValidationException(ValidationMessageConstants.UserNotFound);
             }
 
             var result = await signInManager.PasswordSignInAsync(user.UserName, userDTO.Password, (bool)userDTO.RememberMe, false);
 
             if (!result.Succeeded)
             {
-                throw new ValidationException("Неправильный логин или пароль");
+                throw new ValidationException(ValidationMessageConstants.IncorrectCommand);
             }
         }
     }

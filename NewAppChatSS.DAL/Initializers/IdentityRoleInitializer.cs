@@ -11,7 +11,7 @@ namespace NewAppChatSS.DAL.Initializers
             modelBuilder.Entity<IdentityRole>().HasData(
                 new IdentityRole()
                 {
-                    Id = NewAppChatGuidHelper.GetNewGuid(),
+                    Id = GuidHelper.GetNewGuid(),
                     Name = "RegularUser",
                     NormalizedName = "REGULARUSER",
                     ConcurrencyStamp = "58b46a8b-f923-48df-bbd2-ae752ceea327"
@@ -27,7 +27,7 @@ namespace NewAppChatSS.DAL.Initializers
 
                 new IdentityRole()
                 {
-                    Id = NewAppChatGuidHelper.GetNewGuid(),
+                    Id = GuidHelper.GetNewGuid(),
                     Name = "Moderator",
                     NormalizedName = "MODERATOR",
                     ConcurrencyStamp = "fa4da5b5-ad1a-44d7-8ba1-130b55a434c8"

@@ -14,18 +14,29 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         public virtual Dictionary<Regex, Func<string, Task>> Commands { get; }
 
         protected IHubCallerClients clients;
-        protected Room room;
-        protected User user;
+        protected Room currentRoom;
+        protected User currentUser;
 
         /// <summary>
         /// Метод проверяет какое регулярное выражение соответствует полученной команде
         /// по результатам перенаправляет на нужный метод обработки команды
         /// </summary>
-        public async Task SearchCommandAsync(User user, Room room, string command, IHubCallerClients clients)
+        public async Task SearchCommandAsync(User currentUser, Room currentRoom, string command, IHubCallerClients clients)
         {
             this.clients = clients;
-            this.room = room;
-            this.user = user;
+            this.currentRoom = currentRoom;
+
+            if (currentRoom == null)
+            {
+                throw new Exception(ValidationMessageConstants.CurrentRoomNotFound);
+            }
+
+            this.currentUser = currentUser;
+
+            if (currentUser == null)
+            {
+                throw new Exception(ValidationMessageConstants.CurrentUserNotFound);
+            }
 
             foreach (Regex keyCommand in Commands.Keys)
             {
@@ -37,7 +48,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                 }
             }
 
-            await SendResponseMessage(InformationMessages.IncorrectCommand);
+            await SendResponseMessage(ValidationMessageConstants.IncorrectCommand);
         }
 
         protected async Task SendResponseMessage(string informationMessage)

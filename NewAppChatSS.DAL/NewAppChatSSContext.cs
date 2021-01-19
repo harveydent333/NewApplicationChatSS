@@ -31,8 +31,8 @@ namespace NewAppChatSS.DAL
 
             base.OnModelCreating(modelBuilder);
 
-            var userId = NewAppChatGuidHelper.GetNewGuid();
-            var adminRoleId = NewAppChatGuidHelper.GetNewGuid();
+            var userId = GuidHelper.GetNewGuid();
+            var adminRoleId = GuidHelper.GetNewGuid();
 
             UserInitializer.Seed(modelBuilder, userId);
             TypeRoomInitializer.Seed(modelBuilder);

@@ -46,7 +46,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task UserRenameAsync(string command)
         {
-            string ownerUserName = user.UserName;
+            string ownerUserName = currentUser.UserName;
 
             Dictionary<string, string> userNames = ParsingUserNames(command);
 
@@ -56,42 +56,42 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                 RoleConstants.ModeratorRole
             };
 
-            if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, true, userNames["oldUserName"]))
+            if (!await userValidator.CommandAccessCheckAsync(currentUser, acceptableRoles, true, userNames["oldUserName"]))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
-            user = await userManager.FindByNameAsync(userNames["oldUserName"]);
+            currentUser = await userManager.FindByNameAsync(userNames["oldUserName"]);
 
             if (await userManager.FindByNameAsync(userNames["oldUserName"]) == null)
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (await userManager.FindByNameAsync(userNames["newUserName"]) == null)
             {
-                user.UserName = userNames["newUserName"];
-                await userManager.UpdateAsync(user);
+                currentUser.UserName = userNames["newUserName"];
+                await userManager.UpdateAsync(currentUser);
 
                 if (ownerUserName == userNames["oldUserName"])
                 {
                     await clients.Caller.SendAsync(
                         "UserRenameClient",
                         userNames["newUserName"],
-                        CommandHandler.CreateResponseMessage(InformationMessages.UserNameHasBeenChanged));
+                        CommandHandler.CreateResponseMessage(InformationMessageConstants.UserNameHasBeenChanged));
 
                     return;
                 }
                 else
                 {
-                    await SendResponseMessage(InformationMessages.UserNameHasBeenChanged);
+                    await SendResponseMessage(InformationMessageConstants.UserNameHasBeenChanged);
                     return;
                 }
             }
 
-            await SendResponseMessage(InformationMessages.UserNameIsAlreadyInUse);
+            await SendResponseMessage(ValidationMessageConstants.UserNameAlreadyInUse);
         }
 
         /// <summary>
@@ -105,9 +105,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                 RoleConstants.ModeratorRole
             };
 
-            if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
+            if (!await userValidator.CommandAccessCheckAsync(currentUser, acceptableRoles, false, ""))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -115,14 +115,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
 
                 return;
             }
 
             await ChangedStatusBlockingUserAsync(UserName, command, true, true);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenBlocked);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenBlocked);
         }
 
         /// <summary>
@@ -136,9 +136,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
                 RoleConstants.ModeratorRole
             };
 
-            if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
+            if (!await userValidator.CommandAccessCheckAsync(currentUser, acceptableRoles, false, ""))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -146,13 +146,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             await ChangedStatusBlockingUserAsync(UserName, command, false, false);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenUnblocked);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenUnblocked);
         }
 
         /// <summary>
@@ -160,15 +160,19 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task TemporaryUserBlockAsync(string command)
         {
+            // какой вариант с точки зрения правильности код стайла лучше
+/*
             var acceptableRoles = new List<string>
             {
                 RoleConstants.AdministratorRole,
                 RoleConstants.ModeratorRole
             };
+*/
+            var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
+            if (!await userValidator.CommandAccessCheckAsync(currentUser, acceptableRoles, false, ""))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -177,13 +181,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             // получить в переменную var processedUser and check in method Validato IsNullUser
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             await ChangedStatusBlockingUserAsync(UserName, command, true, false);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenBlocked);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenBlocked);
         }
 
         /// <summary>
@@ -193,9 +197,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         {
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
+            if (!await userValidator.CommandAccessCheckAsync(currentUser, acceptableRoles, false, ""))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -203,14 +207,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
-            user = await userManager.FindByNameAsync(UserName);
-            await userManager.AddToRoleAsync(user, RoleConstants.ModeratorRole);
+            currentUser = await userManager.FindByNameAsync(UserName);
+            await userManager.AddToRoleAsync(currentUser, RoleConstants.ModeratorRole);
 
-            await SendResponseMessage($"Пользователь {UserName} был назначен модератором.");
+            await SendResponseMessage(InformationMessageConstants.UserAssignedModerRole);
         }
 
         /// <summary>
@@ -220,24 +224,25 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         {
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await userValidator.CommandAccessCheckAsync(user, acceptableRoles, false, ""))
+            if (!await userValidator.CommandAccessCheckAsync(currentUser, acceptableRoles, false, ""))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
             UserName = Regex.Match(command, @"//user\smoderator\s(.+)\s-d$").Groups[1].Value;
 
+            var user = await userManager.FindByNameAsync(UserName);
+
             if (await userManager.FindByNameAsync(UserName) == null)
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
-            user = await userManager.FindByNameAsync(UserName);
-            await userManager.RemoveFromRoleAsync(user, RoleConstants.ModeratorRole);
+            await userManager.RemoveFromRoleAsync(currentUser, RoleConstants.ModeratorRole);
 
-            await SendResponseMessage($"Пользователь {UserName} был разжалован до обычного пользователя.");
+            await SendResponseMessage(InformationMessageConstants.UserAssignedRegularRole);
         }
 
         // TODO: Вынести отсюда

@@ -2,7 +2,7 @@
 
 namespace NewAppChatSS.Common.CommonHelpers
 {
-    public static class NewAppChatGuidHelper
+    public static class GuidHelper
     {
         public static string GetNewGuid()
         {

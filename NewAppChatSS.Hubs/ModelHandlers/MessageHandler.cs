@@ -30,7 +30,7 @@ namespace NewAppChatSS.Hubs.ModelHandlers
         /// </summary>
         public async Task<string> SaveMessageIntoDatabaseAsync(User user, string textMessage, Room room)
         {
-            string messageId = NewAppChatGuidHelper.GetNewGuid();
+            string messageId = GuidHelper.GetNewGuid();
 
             var message = new Message
             {

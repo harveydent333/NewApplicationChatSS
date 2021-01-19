@@ -124,7 +124,7 @@ namespace NewAppChatSS.Hubs.Infrastructure.Validators
             return memberIds.Contains(roomId);
         }
 
-        // TODO: дописать логику, последних двух перменных по умолчнию
+        // TODO: переписать
         public async Task<bool> CommandAccessCheckAsync(User user, List<string> allowedRoles, bool checkOnOwner, string processingUserName)
         {
             foreach (string role in allowedRoles)

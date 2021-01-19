@@ -25,7 +25,7 @@ namespace NewAppChatSS.Hubs.ModelHandlers
         /// </summary>
         public async Task<string> CreateRoomAsync(string roomName, int typeRoomId, string userId)
         {
-            string roomId = NewAppChatGuidHelper.GetNewGuid();
+            string roomId = GuidHelper.GetNewGuid();
 
             Room newRoom = new Room
             {

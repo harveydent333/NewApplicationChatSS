@@ -82,14 +82,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                await SendResponseMessage(InformationMessages.RoomNameAlreadyTaken);
+                await SendResponseMessage(ValidationMessageConstants.RoomNameAlreadyTaken);
                 return;
             }
 
-            string roomInfo = await roomHandler.CreateRoomAsync(nameProcessedRoom, GlobalConstants.RegularRoomType, user.Id);
+            string roomInfo = await roomHandler.CreateRoomAsync(nameProcessedRoom, GlobalConstants.RegularRoomType, currentUser.Id);
 
             await clients.Caller.SendAsync(
-                "CreateRoom", CommandHandler.CreateResponseMessage(InformationMessages.RoomHasBeenCreated), roomInfo);
+                "CreateRoom", CommandHandler.CreateResponseMessage(InformationMessageConstants.RoomHasBeenCreated), roomInfo);
         }
 
         /// <summary>
@@ -102,14 +102,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                await SendResponseMessage(InformationMessages.RoomNameAlreadyTaken);
+                await SendResponseMessage(ValidationMessageConstants.RoomNameAlreadyTaken);
                 return;
             }
 
-            string roomInfo = await roomHandler.CreateRoomAsync(nameProcessedRoom, GlobalConstants.PrivateRoomType, user.Id);
+            string roomInfo = await roomHandler.CreateRoomAsync(nameProcessedRoom, GlobalConstants.PrivateRoomType, currentUser.Id);
 
             await clients.Caller.SendAsync(
-                "CreateRoom", CommandHandler.CreateResponseMessage(InformationMessages.RoomHasBeenCreated), roomInfo);
+                "CreateRoom", CommandHandler.CreateResponseMessage(InformationMessageConstants.RoomHasBeenCreated), roomInfo);
         }
 
         /// <summary>
@@ -122,14 +122,14 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                await SendResponseMessage(InformationMessages.RoomNameAlreadyTaken);
+                await SendResponseMessage(ValidationMessageConstants.RoomNameAlreadyTaken);
                 return;
             }
 
-            string roomInfo = await roomHandler.CreateRoomAsync(nameProcessedRoom, GlobalConstants.BotRoomType, user.Id);
+            string roomInfo = await roomHandler.CreateRoomAsync(nameProcessedRoom, GlobalConstants.BotRoomType, currentUser.Id);
 
             await clients.Caller.SendAsync(
-                "CreateRoom", CommandHandler.CreateResponseMessage(InformationMessages.RoomHasBeenCreated), roomInfo);
+                "CreateRoom", CommandHandler.CreateResponseMessage(InformationMessageConstants.RoomHasBeenCreated), roomInfo);
         }
 
         /// <summary>
@@ -144,27 +144,27 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomValidator.InNullRoomAsync(processedRoom))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (await roomValidator.IsMainRoomAsync(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
             if (!await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                await SendResponseMessage(InformationMessages.RoomNotFound);
+                await SendResponseMessage(ValidationMessageConstants.RoomNotFound);
                 return;
             }
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, processedRoom, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, processedRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -172,13 +172,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             var memberIds = members.Select(m => m.UserId).ToList();
 
             await clients.Users(memberIds).SendAsync(
-                "RemoveRoomUsers", CommandHandler.CreateResponseMessage(InformationMessages.RoomHasBeenRemoved), processedRoom.Id);
+                "RemoveRoomUsers", CommandHandler.CreateResponseMessage(InformationMessageConstants.RoomHasBeenRemoved), processedRoom.Id);
 
             var deleteRoom = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { processedRoom.Id } });
             await roomRepository.DeleteAsync(deleteRoom);
 
             await clients.Caller.SendAsync(
-                "RemoveRoomCaller", CommandHandler.CreateResponseMessage(InformationMessages.RoomHasBeenRemoved), processedRoom.Id);
+                "RemoveRoomCaller", CommandHandler.CreateResponseMessage(InformationMessageConstants.RoomHasBeenRemoved), processedRoom.Id);
         }
 
         /// <summary>
@@ -187,9 +187,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task RenameRoomAsync(string command)
         {
-            if (await roomValidator.IsMainRoomAsync(room.Id))
+            if (await roomValidator.IsMainRoomAsync(currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
@@ -197,29 +197,29 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, room, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, currentRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
             if (await roomRepository.IsExistAsync(new RoomModel { RoomName = nameProcessedRoom }))
             {
-                await SendResponseMessage(InformationMessages.RoomNameAlreadyTaken);
+                await SendResponseMessage(ValidationMessageConstants.RoomNameAlreadyTaken);
                 return;
             }
 
-            room.RoomName = nameProcessedRoom;
+            currentRoom.RoomName = nameProcessedRoom;
 
-            await roomRepository.ModifyAsync(room);
+            await roomRepository.ModifyAsync(currentRoom);
 
-            var members = await memberRepository.GetAsync(new MemberModel { RoomId = room.Id });
+            var members = await memberRepository.GetAsync(new MemberModel { RoomId = currentRoom.Id });
             var memberIds = members.Select(m => m.UserId).ToList();
 
-            await clients.Users(memberIds).SendAsync("RenameRoomUser", room.Id, nameProcessedRoom);
+            await clients.Users(memberIds).SendAsync("RenameRoomUser", currentRoom.Id, nameProcessedRoom);
 
             await clients.Caller.SendAsync(
-                "RenameRoom", CommandHandler.CreateResponseMessage(InformationMessages.RoomNameHasBeenChanged), room.Id, nameProcessedRoom);
+                "RenameRoom", CommandHandler.CreateResponseMessage(InformationMessageConstants.RoomNameHasBeenChanged), currentRoom.Id, nameProcessedRoom);
         }
 
         /// <summary>
@@ -234,13 +234,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomValidator.InNullRoomAsync(processedRoom))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (await roomValidator.IsMainRoomAsync(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
@@ -250,27 +250,27 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userValidator.IsNullUserAsync(processedUser))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (processedRoom.TypeRoom.Id == GlobalConstants.BotRoomType)
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
             else if (processedRoom.TypeRoom.Id == GlobalConstants.PrivateRoomType)
             {
-                if (!await roomValidator.CommandAccessCheckAsync(user, processedRoom, new List<string> { }))
+                if (!await roomValidator.CommandAccessCheckAsync(currentUser, processedRoom, new List<string> { }))
                 {
-                    await SendResponseMessage(InformationMessages.AccessIsDenied);
+                    await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                     return;
                 }
             }
 
             if (await userValidator.IsUserInGroupAsync(processedUser.Id, processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserIsAlreadyMemberOfRoom);
+                await SendResponseMessage(ValidationMessageConstants.UserAlreadyMemberOfRoom);
                 return;
             }
 
@@ -285,7 +285,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             await clients.User(processedUser.Id.ToString()).SendAsync(
                 "ConnectRoom", JsonSerializer.Serialize<object>(new { roomId = processedRoom.Id, roomName = nameProcessedRoom }));
 
-            await SendResponseMessage(InformationMessages.UserHasBeenAdded);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenAdded);
         }
 
         /// <summary>
@@ -294,13 +294,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
         /// </summary>
         private async Task DisconnectFromCurrenctRoomAsync(string command)
         {
-            if (await roomValidator.IsMainRoomAsync(room.Id))
+            if (await roomValidator.IsMainRoomAsync(currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
-            var deleteMember = await memberRepository.GetFirstOrDefaultAsync(new MemberModel { UserId = user.Id, RoomId = room.Id });
+            var deleteMember = await memberRepository.GetFirstOrDefaultAsync(new MemberModel { UserId = currentUser.Id, RoomId = currentRoom.Id });
 
             await memberRepository.DeleteAsync(deleteMember);
 
@@ -319,28 +319,28 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomValidator.InNullRoomAsync(processedRoom))
             {
-                await SendResponseMessage(InformationMessages.RoomNotFound);
+                await SendResponseMessage(ValidationMessageConstants.RoomNotFound);
                 return;
             }
 
             if (await roomValidator.IsMainRoomAsync(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
-            if (await userValidator.IsUserInGroupAsync(user.Id, processedRoom.Id))
+            if (await userValidator.IsUserInGroupAsync(currentUser.Id, processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.YouIsNotMemberRoom);
+                await SendResponseMessage(ValidationMessageConstants.YouIsNotMemberRoom);
                 return;
             }
 
-            var deleteMember = await memberRepository.GetFirstOrDefaultAsync(new MemberModel { UserId = user.Id, RoomId = room.Id });
+            var deleteMember = await memberRepository.GetFirstOrDefaultAsync(new MemberModel { UserId = currentUser.Id, RoomId = currentRoom.Id });
             // TODO: проверка deleteMember
             await memberRepository.DeleteAsync(deleteMember);
 
             await clients.Caller.SendAsync(
-                "DisconnectFromRoom", CommandHandler.CreateResponseMessage(InformationMessages.YouLeaveRoom), processedRoom.Id);
+                "DisconnectFromRoom", CommandHandler.CreateResponseMessage(InformationMessageConstants.YouLeaveRoom), processedRoom.Id);
         }
 
         /// <summary>
@@ -355,13 +355,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomValidator.InNullRoomAsync(processedRoom))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (await roomValidator.IsMainRoomAsync(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
@@ -371,21 +371,21 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userValidator.IsNullUserAsync(processedUser))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (await userValidator.IsUserInGroupAsync(processedUser.Id, processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserIsNotMemberRoom);
+                await SendResponseMessage(ValidationMessageConstants.UserNotMemberRoom);
                 return;
             }
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, processedRoom, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, processedRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -393,7 +393,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (kickedIdRooms.Contains(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserStillKicked);
+                await SendResponseMessage(ValidationMessageConstants.UserStillKicked);
                 return;
             }
 
@@ -410,7 +410,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await clients.User(processedUser.Id.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenKicked);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenKicked);
         }
 
         /// <summary>
@@ -425,13 +425,13 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await roomValidator.InNullRoomAsync(processedRoom))
             {
-                await SendResponseMessage(InformationMessages.RoomNotFound);
+                await SendResponseMessage(ValidationMessageConstants.RoomNotFound);
                 return;
             }
 
             if (await roomValidator.IsMainRoomAsync(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.CannotBeAppliedToMainRoom);
+                await SendResponseMessage(ValidationMessageConstants.CannotBeAppliedToMainRoom);
                 return;
             }
 
@@ -441,21 +441,21 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userValidator.IsNullUserAsync(processedUser))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             if (await userValidator.IsUserInGroupAsync(processedUser.Id, processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserIsNotMemberRoom);
+                await SendResponseMessage(ValidationMessageConstants.UserNotMemberRoom);
                 return;
             }
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, processedRoom, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, processedRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -463,7 +463,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (kickedIdRooms.Contains(processedRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserStillKicked);
+                await SendResponseMessage(ValidationMessageConstants.UserStillKicked);
                 return;
             }
 
@@ -480,7 +480,7 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             await clients.User(processedUser.Id.ToString()).SendAsync("DisconnectFromRoomUser", processedRoom.Id);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenKicked);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenKicked);
         }
 
         /// <summary>
@@ -494,21 +494,21 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userValidator.IsNullUserAsync(processedUser))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
-            if (await userValidator.IsUserInGroupAsync(processedUser.Id, room.Id))
+            if (await userValidator.IsUserInGroupAsync(processedUser.Id, currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserIsNotMemberRoom);
+                await SendResponseMessage(ValidationMessageConstants.UserNotMemberRoom);
                 return;
             }
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, room, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, currentRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
@@ -516,9 +516,9 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             var mutedUsers = await mutedUserRepository.GetAsync(new MutedUserModel { UserId = processedUser.Id });
             var idMutedRooms = mutedUsers.Select(m => m.RoomId);
 
-            if (idMutedRooms.Contains(room.Id))
+            if (idMutedRooms.Contains(currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserStillMuted);
+                await SendResponseMessage(ValidationMessageConstants.UserStillMuted);
                 return;
             }
 
@@ -527,15 +527,15 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             var mutedUser = new MutedUser
             {
                 UserId = processedUser.Id,
-                RoomId = room.Id,
+                RoomId = currentRoom.Id,
                 DateUnmute = dateUnmute
             };
 
             await mutedUserRepository.AddAsync(mutedUser);
 
-            await clients.User(processedUser.Id.ToString()).SendAsync("MuteUser", room.Id);
+            await clients.User(processedUser.Id.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenMuted);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenMuted);
         }
 
         /// <summary>
@@ -550,30 +550,30 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userValidator.IsNullUserAsync(processedUser))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
-            if (await userValidator.IsUserInGroupAsync(processedUser.Id, room.Id))
+            if (await userValidator.IsUserInGroupAsync(processedUser.Id, currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserIsNotMemberRoom);
+                await SendResponseMessage(ValidationMessageConstants.UserNotMemberRoom);
                 return;
             }
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, room, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, currentRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
             var mutedUsers = await mutedUserRepository.GetAsync(new MutedUserModel { UserId = processedUser.Id });
             var idMutedRooms = mutedUsers.Select(m => m.RoomId);
 
-            if (idMutedRooms.Contains(room.Id))
+            if (idMutedRooms.Contains(currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserStillMuted);
+                await SendResponseMessage(ValidationMessageConstants.UserStillMuted);
                 return;
             }
 
@@ -582,15 +582,15 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
             var mutedUser = new MutedUser
             {
                 UserId = processedUser.Id,
-                RoomId = room.Id,
+                RoomId = currentRoom.Id,
                 DateUnmute = dateUnmute
             };
 
             await mutedUserRepository.AddAsync(mutedUser);
 
-            await clients.User(processedUser.Id.ToString()).SendAsync("MuteUser", room.Id);
+            await clients.User(processedUser.Id.ToString()).SendAsync("MuteUser", currentRoom.Id);
 
-            await SendResponseMessage(InformationMessages.UserHasBeenMuted);
+            await SendResponseMessage(InformationMessageConstants.UserHasBeenMuted);
         }
 
         /// <summary>
@@ -604,34 +604,34 @@ namespace NewAppChatSS.Hubs.Hubs.CommandHandlersHubs
 
             if (await userValidator.IsNullUserAsync(processedUser))
             {
-                await SendResponseMessage(InformationMessages.UserNotFound);
+                await SendResponseMessage(ValidationMessageConstants.UserNotFound);
                 return;
             }
 
             var acceptableRoles = new List<string> { RoleConstants.AdministratorRole, RoleConstants.ModeratorRole };
 
-            if (!await roomValidator.CommandAccessCheckAsync(user, room, acceptableRoles))
+            if (!await roomValidator.CommandAccessCheckAsync(currentUser, currentRoom, acceptableRoles))
             {
-                await SendResponseMessage(InformationMessages.AccessIsDenied);
+                await SendResponseMessage(ValidationMessageConstants.AccessIsDenied);
                 return;
             }
 
-            if (await userValidator.IsUserInGroupAsync(processedUser.Id, room.Id))
+            if (await userValidator.IsUserInGroupAsync(processedUser.Id, currentRoom.Id))
             {
-                await SendResponseMessage(InformationMessages.UserIsNotMemberRoom);
+                await SendResponseMessage(ValidationMessageConstants.UserNotMemberRoom);
                 return;
             }
 
             // TODO: if deleteMutedUser == null
-            var mutedUserModel = new MutedUserModel { UserId = processedUser.Id, RoomId = room.Id };
+            var mutedUserModel = new MutedUserModel { UserId = processedUser.Id, RoomId = currentRoom.Id };
             var deleteMutedUser = await mutedUserRepository.GetFirstOrDefaultAsync(mutedUserModel);
 
             await mutedUserRepository.DeleteAsync(deleteMutedUser);
 
             await clients.User(processedUser.Id.ToString()).SendAsync(
-                "UnmutedUser", CommandHandler.CreateResponseMessage(InformationMessages.YouCanWriteMessageAgain), room.Id);
+                "UnmutedUser", CommandHandler.CreateResponseMessage(InformationMessageConstants.YouCanWriteMessageAgain), currentRoom.Id);
 
-            await SendResponseMessage(InformationMessages.UserUnmuted);
+            await SendResponseMessage(InformationMessageConstants.UserUnmuted);
         }
     }
 }

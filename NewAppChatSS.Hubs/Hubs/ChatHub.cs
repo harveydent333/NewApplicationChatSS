@@ -25,8 +25,10 @@ namespace NewAppChatSS.Hubs.Hubs
         private readonly IRoomRepository roomRepository;
         private readonly IMutedUserRepository mutedUserRepository;
         private readonly IMemberRepository memberRepository;
+        private readonly IMessageHub messageHub;
 
         public ChatHub(
+            IMessageHub messageHub,
             IMemberRepository memberRepository,
             IMutedUserRepository mutedUserRepository,
             IMessageRepository messageRepository,
@@ -39,6 +41,7 @@ namespace NewAppChatSS.Hubs.Hubs
             IBotCommandHandlerHub botCommandHandler,
             IHelpCommandHandlerHub helpCommandHandler)
         {
+            this.messageHub = messageHub;
             this.memberRepository = memberRepository;
             this.mutedUserRepository = mutedUserRepository;
             this.messageRepository = messageRepository;
@@ -50,50 +53,6 @@ namespace NewAppChatSS.Hubs.Hubs
             this.roomCommandHandler = roomCommandHandler;
             this.botCommandHandler = botCommandHandler;
             this.helpCommandHandler = helpCommandHandler;
-        }
-
-        /// <summary>
-        /// Метод проверяет заблокирован ли пользователь и имеет ли он возможность отправлять сообщения в чат
-        /// </summary>
-        public async Task ReceivingInteractionMessageAsync(string userName, string roomId, string message)
-        {
-            User user = await userManager.FindByNameAsync(userName);
-
-            if (await userValidator.IsUserMutedAsync(user.Id, roomId))
-            {
-                var timeUnmuteUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = user.Id, RoomId = roomId });
-
-                await Clients.Caller.SendAsync(
-                    "ReceiveCommand",
-                    CommandHandler.CreateResponseMessage(string.Format(
-                        "Вы лишины возможности отправлять сообщения до: {0:U}.", timeUnmuteUser)));
-                return;
-            }
-
-            if (await userValidator.IsUserBlockedAsync(user))
-            {
-                await Clients.Caller.SendAsync(
-                    "ReceiveCommand",
-                    CommandHandler.CreateResponseMessage(string.Format("Вы заблокированы до: {0:U}.", user.DateUnblock)));
-                return;
-            }
-
-            await SendMessageAsync(user, message, roomId);
-        }
-
-        /// <summary>
-        /// Метод обрабатывает принятое сообщение пользователя и вызывает метод клиента, передавая информацию о сообщении для отображения.
-        /// </summary>
-        public async Task SendMessageAsync(User user, string message, string roomId)
-        {
-            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
-
-            string messageInfo = await messageHandler.SaveMessageIntoDatabaseAsync(user, message, room);
-
-            var members = await memberRepository.GetAsync(new MemberModel { RoomId = roomId });
-            var memberIds = members.Select(m => m.UserId).ToList();
-
-            await Clients.Users(memberIds).SendAsync("ReceiveMessage", messageInfo);
         }
 
         // TODO: закомментировать метод
@@ -139,6 +98,51 @@ namespace NewAppChatSS.Hubs.Hubs
 
                 await Clients.Caller.SendAsync("DeleteMessage", messageId);
             }
+        }
+
+        /// <summary>
+        /// Метод обрабатывает принятое сообщение пользователя и вызывает метод клиента, передавая информацию о сообщении для отображения.
+        /// </summary>
+        public async Task SendMessageAsync(User user, string message, string roomId)
+        {
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
+
+            string messageInfo = await messageHandler.SaveMessageIntoDatabaseAsync(user, message, room);
+
+            var members = await memberRepository.GetAsync(new MemberModel { RoomId = roomId });
+            var memberIds = members.Select(m => m.UserId).ToList();
+
+            await Clients.Users(memberIds).SendAsync("ReceiveMessage", messageInfo);
+        }
+
+        /// <summary>
+        /// Метод проверяет заблокирован ли пользователь и имеет ли он возможность отправлять сообщения в чат
+        /// </summary>
+        public async Task ReceivingInteractionMessageAsync(string userName, string roomId, string message)
+        {
+            var user = await userManager.FindByNameAsync(userName);
+            var room = await roomRepository.GetFirstOrDefaultAsync(new RoomModel { Ids = new[] { roomId } });
+
+            if (await userValidator.IsUserMutedAsync(user.Id, roomId))
+            {
+                var timeUnmuteUser = await mutedUserRepository.GetFirstOrDefaultAsync(new MutedUserModel { UserId = user.Id, RoomId = roomId });
+
+                await Clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateResponseMessage(string.Format(
+                        "Вы лишины возможности отправлять сообщения до: {0:U}.", timeUnmuteUser)));
+                return;
+            }
+
+            if (await userValidator.IsUserBlockedAsync(user))
+            {
+                await Clients.Caller.SendAsync(
+                    "ReceiveCommand",
+                    CommandHandler.CreateResponseMessage(string.Format("Вы заблокированы до: {0:U}.", user.DateUnblock)));
+                return;
+            }
+
+            await SendMessageAsync(user, message, roomId);
         }
 
         /// <summary>
