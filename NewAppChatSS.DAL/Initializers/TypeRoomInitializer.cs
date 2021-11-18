@@ -8,22 +8,22 @@ namespace NewAppChatSS.DAL.Initializers
         public static void Seed(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TypeRoom>().HasData(
-                new TypeRoom()
+                new TypeRoom
                 {
                     Id = 1,
-                    TypeName = "RegularRoom",
+                    TypeName = "RegularRoom"
                 },
 
                 new TypeRoom
                 {
                     Id = 2,
-                    TypeName = "PrivateRoom",
+                    TypeName = "PrivateRoom"
                 },
 
                 new TypeRoom
                 {
                     Id = 3,
-                    TypeName = "BotRoom",
+                    TypeName = "BotRoom"
                 });
         }
     }
